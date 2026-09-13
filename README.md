@@ -42,6 +42,13 @@ tools.
 See [the minimal agent example](examples/minimal-agent.md) for a small,
 provider-neutral design.
 
+## Project record
+
+Read the [Lean Agent Engineering v0.1.1 project build, architecture,
+evaluation, and publication record](docs/lean-agent-engineering-v0.1.1-project-record.pdf).
+
+
+
 ## Evaluation
 
 [evals/evals.json](evals/evals.json) contains the 18-case manual behavioral
