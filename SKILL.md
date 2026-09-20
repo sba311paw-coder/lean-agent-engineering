@@ -1,6 +1,6 @@
 ---
 name: lean-agent-engineering
-description: Use when building, modifying, debugging, reviewing, or securing AI and agentic software, or when deciding whether new tools, frameworks, skills, plugins, MCP servers, or dependencies are necessary. Prefer the smallest reliable workflow and verify results before claiming success.
+description: "Decision framework for building and debugging AI agents and agentic workflows: tool selection, workflow simplification, failure-boundary diagnosis, result verification, and security review. Use when designing agent systems or deciding whether to add tools, frameworks, MCP, agents, or orchestration, especially when correctness and minimal dependencies matter. Don't use for general AI explanations or non-agentic coding unless the core question concerns agent architecture, behavior, reliability, or security."
 license: Apache-2.0
 compatibility: Works with skills-compatible AI agents. Requires no specific model, API, framework, network access, or paid service.
 metadata:
