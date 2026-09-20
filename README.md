@@ -44,10 +44,33 @@ provider-neutral design.
 
 ## Project record
 
-Read the [Lean Agent Engineering v0.1.1 project build, architecture,
-evaluation, and publication record](docs/lean-agent-engineering-v0.1.1-project-record.pdf).
+Read the [Lean Agent Engineering evaluation results](docs/lean-agent-engineering-v0.1.1-project-record-through-gate-4.pdf)
+(documentation updated **20 September 2026**; skill version remains **0.1.1**).
+This concise PDF contains the original 18-case results and the separate Gate 2,
+Gate 3, and Gate 4 results and limitations. It excludes older project-build
+and publication history. The original project-record PDF remains local as a
+historical source but is not part of the intended publication package.
 
+### Document register
 
+Dates below are local file creation and last-edit dates in this project, not
+independently verified dates of the underlying historical evaluations.
+Document editions are separate from the unchanged skill version.
+
+| Document | Edition/version | Created here | Last updated | Status |
+|---|---|---|---|---|
+| [Canonical skill](SKILL.md) | 0.1.1 | 2026-09-12 | 2026-09-12 | Current; unchanged |
+| [18-case evaluation JSON](evals/evals.json) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Historical baseline |
+| [Minimal-agent example](examples/minimal-agent.md) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Current; unchanged |
+| [README](README.md) | Skill 0.1.1 | 2026-09-12 | 2026-09-20 | Current |
+| [Gate 2 review](evals/gate-2-robustness-safety.md) | Gate 2 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
+| [Gate 3 review](evals/gate-3-portability-consistency.md) | Gate 3 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
+| [Gate 4 evaluation record](evals/gate-4-production-reliability.md) | Gate 4 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
+| [Evaluation results PDF](docs/lean-agent-engineering-v0.1.1-project-record-through-gate-4.pdf) | 2026-09-20 edition; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
+
+The Apache-2.0 `LICENSE` remains unchanged since 2026-09-12. `.gitignore`
+was updated on 2026-09-20 to exclude the older project PDF. Neither is a
+separately versioned evaluation document.
 
 ## Evaluation
 
@@ -92,13 +115,42 @@ Use simulated scenarios for destructive actions and credentials. These
 prompts request design advice, not permission to operate live systems.
 Keep new results separate from the historical baseline.
 
+Later manual reviews reported Gate 2 (Robustness, Safety & Architecture) at
+**12/12 PASS, 240/240** and Gate 3 (Portability & Consistency) at **12 scored
+executions, 240/240**. The Gate 3 executions covered ten scenarios, with
+the final scenario compared across three clients. These are historical
+manual judgments, not freshly executed repository tests. The updated
+results PDF summarizes them separately. Read the [Gate 2 review](evals/gate-2-robustness-safety.md)
+and [Gate 3 review](evals/gate-3-portability-consistency.md) for each
+scenario's plain-language purpose, historical score, observed behavior, and
+limits. These records do not embed the complete original prompts and outputs;
+full reproduction requires those source transcripts and a fresh evaluation.
+
+The separate [Gate 4 Implementation & Production Reliability record](evals/gate-4-production-reliability.md)
+documents eight manually reviewed implementation scenarios, their frozen
+rubrics and findings: **8/8 PASS, 160/160**. Test 4 used the original
+above-$500 approval rule; Test 5 evaluated the later all-refunds rule. These
+scores assess generated guidance and test plans, not executed production code.
+They do not establish production readiness, universal reliability, or a
+controlled causal effect of this skill. Gate 2 and Gate 3 history remains
+separate in their respective reviews; scores across gates should not be combined.
+
 ## Package
 
 - [SKILL.md](SKILL.md): agent instructions and metadata.
 - [evals/evals.json](evals/evals.json): prompts, criteria, and historical status.
+- [evals/gate-2-robustness-safety.md](evals/gate-2-robustness-safety.md):
+  twelve scenario reviews and evidence limitations.
+- [evals/gate-3-portability-consistency.md](evals/gate-3-portability-consistency.md):
+  twelve scored executions across ten scenarios and evidence limitations.
+- [evals/gate-4-production-reliability.md](evals/gate-4-production-reliability.md):
+  Gate 4 manual evaluation record and limitations.
+- [Evaluation results PDF](docs/lean-agent-engineering-v0.1.1-project-record-through-gate-4.pdf):
+  five-page reader-friendly summary of all four evaluation sets.
 - [examples/minimal-agent.md](examples/minimal-agent.md): architecture example.
 - [LICENSE](LICENSE): full Apache-2.0 terms.
 - `.gitignore`: common local files and credential artifacts.
+- `.gitattributes`: treats PDFs as binary for Git review.
 
 Keep changes tied to an observed failure or missing capability, and verify
 the affected behavior. Avoid adding infrastructure merely for completeness.

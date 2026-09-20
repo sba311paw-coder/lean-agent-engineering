@@ -23,3 +23,6 @@ __pycache__/
 *.log
 dist/
 build/
+
+# Retain the older broad project record locally; publish the evaluation-only PDF.
+docs/lean-agent-engineering-v0.1.1-project-record.pdf
