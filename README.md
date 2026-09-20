@@ -59,7 +59,7 @@ Document editions are separate from the unchanged skill version.
 
 | Document | Edition/version | Created here | Last updated | Status |
 |---|---|---|---|---|
-| [Canonical skill](SKILL.md) | 0.1.1 | 2026-09-12 | 2026-09-12 | Current; unchanged |
+| [Canonical skill](SKILL.md) | 0.1.1 | 2026-09-12 | 2026-09-20 | Current; description updated after evaluation; body unchanged |
 | [18-case evaluation JSON](evals/evals.json) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Historical baseline |
 | [Minimal-agent example](examples/minimal-agent.md) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Current; unchanged |
 | [README](README.md) | Skill 0.1.1 | 2026-09-12 | 2026-09-20 | Current |
@@ -71,6 +71,11 @@ Document editions are separate from the unchanged skill version.
 The Apache-2.0 `LICENSE` remains unchanged since 2026-09-12. `.gitignore`
 was updated on 2026-09-20 to exclude the older project PDF. Neither is a
 separately versioned evaluation document.
+
+The skill's discovery description was refined after the evaluations. The
+instruction body and version remain 0.1.1; the recorded scores do not test
+this revised activation wording. The PDF's document register is a snapshot
+from before this metadata-only update.
 
 ## Evaluation
 
