@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__baseline__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides clear educational explanation of RAG with definition, how it works, benefits, components, and use cases.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response treats it as a knowledge question, offering an explanatory overview with no debugging framing, code troubleshooting, or error analysis.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00661
+}

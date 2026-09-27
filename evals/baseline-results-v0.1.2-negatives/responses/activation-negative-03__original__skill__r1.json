@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__skill__r1",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "Retrieval Augmented Generation (RAG) is a technique for improving LLM outputs by combining a retrieval step with a generation step, rather than relying solely on the model's trained-in knowledge.\n\n**How it works:**\n\n1. **Query** \u2013 A user submits a question or prompt.\n2. **Retrieve** \u2013 The system searches an external knowledge source (often a vector database, but can be a search index, SQL database, or API) for content relevant to the query. This typically involves embedding the query and finding semantically similar documents/chunks.\n3. **Augment** \u2013 The retrieved content is inserted into the prompt as context.\n4. **Generate** \u2013 The LLM produces a response conditioned on both the original query and the retrieved context.\n\n**Why it's used:**\n\n- **Freshness** \u2013 The model can answer using up-to-date information beyond its training cutoff.\n- **Grounding** \u2013 Responses can be tied to specific source documents, reducing hallucination.\n- **Domain/private data** \u2013 Lets an LLM answer questions about internal docs, codebases, or proprietary data it was never trained on.\n- **Traceability** \u2013 Retrieved sources can be cited, making answers auditable.\n- **Cheaper than fine-tuning** \u2013 Updating a knowledge base is far easier than retraining or fine-tuning a model.\n\n**Typical components:**\n\n- A document store (chunked and embedded).\n- A vector database or search index (e.g., FAISS, Pinecone, Elasticsearch).\n- An embedding model to convert text to vectors.\n- A retriever (similarity search, sometimes with reranking).\n- The LLM itself, which synthesizes the final answer from the retrieved context.\n\n**Common failure modes to be aware of:**\n\n- **Poor chunking** \u2013 Splitting documents badly can separate relevant context or create noisy retrievals.\n- **Retrieval mismatch** \u2013 The embedding/query may not surface the actually relevant documents (semantic gap).\n- **Context overflow** \u2013 Too much retrieved text can dilute the prompt or exceed context limits.\n- **Stale index** \u2013 The knowledge base needs updating as source data changes.\n- **No grounding enforcement** \u2013 The model can still hallucinate or ignore retrieved context if not explicitly instructed to rely on it.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 734,
+      "cacheReadInputTokens": 2755,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007895,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2755,
+    "output_tokens": 734,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 734,
+        "cache_read_input_tokens": 2755,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007895,
+  "duration_ms": 8164
+}

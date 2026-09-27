@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-01__original__baseline__r3",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides clear, structured educational explanation of LLMs including definition, how they work, key points, examples, and caveats.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response is a straightforward informational answer with no debugging steps, logs, error analysis, or troubleshooting workflow applied.",
+      "criterion": "Do not automatically apply an engineering debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0064199999999999995
+}

@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__baseline__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called \"function calling\") is a mechanism that lets an AI model interact with external systems, code, or data sources instead of relying only on its built-in knowledge and text generation abilities.\n\n## How It Works\n\n1. **Tool definitions are provided** \u2014 Developers describe available tools to the model, typically including:\n   - Name\n   - Description of what it does\n   - Input parameters (with types and descriptions)\n   - Expected output format\n\n2. **Model decides to use a tool** \u2014 Based on the user's request, the model determines whether it needs a tool, and if so, which one and with what inputs.\n\n3. **Model outputs a structured call** \u2014 Instead of (or alongside) a plain text response, the model outputs something like:\n   ```json\n   {\n     \"tool\": \"get_weather\",\n     \"parameters\": { \"location\": \"Tokyo\" }\n   }\n   ```\n\n4. **The tool is executed** \u2014 This happens *outside* the model, usually by the application/agent framework running the code, calling an API, querying a database, etc.\n\n5. **Results are returned to the model** \u2014 The output of the tool call is fed back into the conversation, and the model uses it to generate a final, informed response.\n\n## Why It Matters\n\n- **Access to real-time/external data** \u2014 Models can't browse the web or check live data on their own; tools bridge that gap.\n- **Taking actions** \u2014 Sending emails, creating files, running code, updating databases, etc.\n- **Improved accuracy** \u2014 Offloads tasks like math or lookups to reliable systems instead of the model \"guessing.\"\n- **Composability** \u2014 Multiple tools can be chained together for complex, multi-step tasks (this is the foundation of most \"AI agents\").\n\n## Example\n\n**User:** \"What's the weather in Paris right now?\"\n\n- Model recognizes it can't know current weather from training data.\n- It calls a `get_weather` tool with `{\"location\": \"Paris\"}`.\n- The tool returns `{\"temp\": \"18\u00b0C\", \"condition\": \"cloudy\"}`.\n- The model responds: *\"It's currently 18\u00b0C and cloudy in Paris.\"*\n\n## Common Use Cases\n\n- Web search / browsing\n- Code execution\n- Database or API queries\n- File reading/writing\n- Sending messages or triggering workflows\n\nIn short, tool calling turns an AI model from a passive text generator into an active agent that can fetch information and perform real-world actions.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 500,
+      "outputTokens": 771,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008709999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 500,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 771,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 500,
+        "output_tokens": 771,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008709999999999999,
+  "duration_ms": 9755
+}

@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__baseline__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "# Retrieval Augmented Generation (RAG)\n\n**RAG** is an architecture that combines information retrieval with text generation to improve the accuracy and relevance of outputs from large language models (LLMs).\n\n## How It Works\n\n1. **Query/Input**: A user submits a question or prompt.\n2. **Retrieval**: The system searches an external knowledge source (e.g., a vector database, document store, or search index) to find relevant information related to the query.\n3. **Augmentation**: The retrieved information is added to the original prompt as context.\n4. **Generation**: The LLM generates a response using both its trained knowledge and the retrieved context.\n\n## Why Use RAG?\n\n- **Reduces hallucinations** \u2014 grounds responses in actual source documents rather than relying solely on the model's parametric memory.\n- **Access to up-to-date/private data** \u2014 LLMs have a fixed training cutoff, but RAG lets them reference current or proprietary information without retraining.\n- **Improved transparency** \u2014 responses can cite sources, making outputs more verifiable.\n- **Cost-effective** \u2014 cheaper than fine-tuning a model on new data.\n\n## Typical Components\n\n- **Embedding model**: Converts text into vector representations.\n- **Vector database**: Stores and enables similarity search over embeddings (e.g., Pinecone, Weaviate, Chroma, FAISS).\n- **Retriever**: Fetches the most relevant chunks of text for a given query.\n- **Generator**: The LLM that synthesizes retrieved context into a coherent answer.\n\n## Common Use Cases\n\n- Chatbots answering questions from internal company documents\n- Customer support systems referencing product manuals\n- Research assistants pulling from academic papers\n- Code assistants referencing documentation\n\nWould you like me to go deeper into any particular aspect, like implementation details or specific tools?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 504,
+      "outputTokens": 606,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007068,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 504,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 606,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 504,
+        "output_tokens": 606,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007068,
+  "duration_ms": 7829
+}

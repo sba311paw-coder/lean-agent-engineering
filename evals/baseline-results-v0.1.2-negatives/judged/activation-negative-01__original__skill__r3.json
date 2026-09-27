@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-01__original__skill__r3",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides clear educational explanation of LLMs, how they work, what they can do, and key characteristics with examples.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response is a straightforward informational answer with no debugging steps, troubleshooting questions, or engineering workflow applied.",
+      "criterion": "Do not automatically apply an engineering debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.005915999999999999
+}

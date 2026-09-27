@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__skill__r1",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides a clear, structured educational explanation of RAG including how it works, why it's used, and typical components.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response treats the question as a conceptual explanation request; the 'failure modes' section is educational context about the technique, not a debugging response to a user problem.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0071519999999999995
+}

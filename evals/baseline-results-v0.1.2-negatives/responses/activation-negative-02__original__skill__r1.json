@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__skill__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\nTool calling (also called function calling) is a mechanism that lets a large language model (LLM) request that an external action be performed, rather than just generating text.\n\n## How it works\n\n1. **Definition** \u2014 The developer describes available tools to the model (name, purpose, and expected input parameters, usually as a JSON schema).\n2. **Decision** \u2014 Given a user request, the model decides whether calling a tool is useful, and if so, which one and with what arguments.\n3. **Structured output** \u2014 Instead of returning plain text, the model returns a structured request (e.g., `get_weather(city=\"Tokyo\")`).\n4. **Execution** \u2014 The surrounding application (not the model itself) actually runs the tool \u2014 calling an API, querying a database, executing code, etc.\n5. **Result injection** \u2014 The tool's output is passed back to the model as additional context.\n6. **Final response** \u2014 The model uses that result to produce a natural-language answer for the user.\n\n## Why it matters\n\nLLMs on their own can only generate text based on training data \u2014 they can't fetch live data, do precise calculations, or take real-world actions. Tool calling bridges this gap by letting the model trigger real operations (search, database lookups, sending emails, running code, etc.) while keeping the model focused on reasoning and language.\n\n## Important distinction\n\nThe model's decision to call a tool is just a *suggestion* \u2014 it's the application's responsibility to actually execute the tool, validate the arguments, enforce permissions, and handle the result. The LLM choosing to call a tool is not the same as being authorized to do so; that boundary should be enforced in the application code, especially for sensitive actions (deletions, payments, sending messages, etc.).\n\n## Example flow\n\n```\nUser: \"What's the weather in Tokyo?\"\n   \u2193\nLLM: decides to call get_weather(city=\"Tokyo\")\n   \u2193\nApp: executes the actual weather API call\n   \u2193\nApp: returns result to LLM (\"22\u00b0C, cloudy\")\n   \u2193\nLLM: \"It's 22\u00b0C and cloudy in Tokyo right now.\"\n```\n\nThis pattern underlies most modern \"agentic\" AI systems, where models chain together multiple tool calls to complete multi-step tasks.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 715,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 2751,
+      "webSearchRequests": 0,
+      "costUSD": 0.018158,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 2751,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 715,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 2751,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 715,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 2751,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2751
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.018158,
+  "duration_ms": 8562
+}

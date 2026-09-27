@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-01__original__skill__r3",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "What is an LLM?",
+  "response": "An LLM (Large Language Model) is a type of machine learning model trained on large amounts of text data to understand and generate human language.\n\n**How it works, briefly:**\n- It's built on a neural network architecture (most commonly the \"Transformer\") that learns statistical patterns in language \u2014 grammar, facts, reasoning patterns, style, etc.\n- Training involves predicting the next word (or token) in a sequence, repeated across billions of examples, which teaches the model to represent meaning and context.\n- After this base training, models are often further refined (e.g., via instruction tuning or reinforcement learning from human feedback) to follow instructions and align with human preferences.\n\n**What it can do:**\n- Generate and summarize text\n- Answer questions\n- Translate languages\n- Write and explain code\n- Reason through multi-step problems\n- Hold conversations\n\n**Key characteristics:**\n- It doesn't \"know\" facts in a database sense \u2014 it generates responses based on patterns learned during training.\n- It has a fixed knowledge cutoff (a point after which it has no training data) unless connected to external tools or retrieval systems.\n- It can produce plausible-sounding but incorrect information (\"hallucination\").\n- Its behavior is probabilistic \u2014 given the same prompt, it can produce different outputs.\n\nExamples of LLMs include GPT models, Claude (which I'm part of), Gemini, and Llama.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 448,
+      "cacheReadInputTokens": 2745,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.005032999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2745,
+    "output_tokens": 448,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 448,
+        "cache_read_input_tokens": 2745,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.005032999999999999,
+  "duration_ms": 5864
+}

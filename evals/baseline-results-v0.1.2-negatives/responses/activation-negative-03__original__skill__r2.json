@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__skill__r2",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "Retrieval Augmented Generation (RAG) is a technique for improving LLM outputs by combining a retrieval step with generation.\n\n**How it works:**\n1. **Indexing** \u2013 A corpus of documents (docs, knowledge base, code, etc.) is split into chunks and converted into vector embeddings, then stored in a vector database (or another searchable index).\n2. **Retrieval** \u2013 When a user asks a question, the query is embedded and used to search the index for the most relevant chunks (via semantic similarity, keyword search, or a hybrid of both).\n3. **Augmentation** \u2013 The retrieved chunks are inserted into the LLM's prompt as context.\n4. **Generation** \u2013 The LLM generates an answer grounded in that retrieved context, rather than relying solely on what it memorized during training.\n\n**Why it's used:**\n- **Reduces hallucination** by grounding responses in real source material.\n- **Provides up-to-date or private knowledge** the model wasn't trained on (internal docs, recent events, proprietary data).\n- **Enables citations/traceability** since answers can be linked back to specific retrieved sources.\n- **Avoids costly fine-tuning** for knowledge that changes frequently.\n\n**Common components:**\n- Embedding model (converts text to vectors)\n- Vector store (e.g., FAISS, Pinecone, Chroma, pgvector)\n- Retriever (similarity search, often with re-ranking)\n- LLM (generates the final answer using retrieved context)\n\n**Typical use cases:** Q&A over internal documentation, customer support bots, code assistants referencing a codebase, and search-augmented chat applications.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 539,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 429,
+      "webSearchRequests": 0,
+      "costUSD": 0.007575199999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 429,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 539,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 429,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 539,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 429,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 429
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007575199999999999,
+  "duration_ms": 6254
+}

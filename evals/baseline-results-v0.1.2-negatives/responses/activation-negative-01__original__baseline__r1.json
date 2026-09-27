@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-01__original__baseline__r1",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "What is an LLM?",
+  "response": "An LLM (Large Language Model) is a type of AI system trained on massive amounts of text data to understand and generate human-like language. Here's a quick breakdown:\n\n**Core idea:**\nLLMs learn statistical patterns in language\u2014grammar, facts, reasoning patterns, styles\u2014by predicting the next word (or token) in a sequence, repeated across billions or trillions of examples during training.\n\n**Key characteristics:**\n- **Large**: Typically has billions to trillions of parameters (adjustable values the model learns)\n- **Trained on massive text**: Books, websites, code, articles, etc.\n- **Based on transformer architecture**: A neural network design (introduced in 2017) that's especially good at handling sequences and context using a mechanism called \"attention\"\n- **General-purpose**: Can perform many tasks (writing, coding, answering questions, summarizing, translating) without being explicitly programmed for each one\n\n**How it works (simplified):**\n1. During training, the model sees huge amounts of text and learns to predict missing or next words\n2. This forces it to internalize grammar, facts, reasoning patterns, and context\n3. After training, it can generate coherent text by predicting one token at a time based on the input it receives (the \"prompt\")\n\n**Examples of LLMs:**\n- GPT models (OpenAI)\n- Claude models (Anthropic) \u2014 like me\n- Gemini (Google)\n- Llama (Meta)\n\n**Important caveats:**\n- LLMs don't \"understand\" in the human sense\u2014they recognize patterns\n- They can be confidently wrong (\"hallucinate\")\n- Their knowledge is limited to what they were trained on plus any tools/context provided at runtime\n\nWant me to go deeper into any part\u2014like how transformers/attention work, or how LLMs are trained (pretraining vs. fine-tuning vs. RLHF)?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 494,
+      "outputTokens": 603,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007018000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 494,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 603,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 494,
+        "output_tokens": 603,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007018000000000001,
+  "duration_ms": 7248
+}

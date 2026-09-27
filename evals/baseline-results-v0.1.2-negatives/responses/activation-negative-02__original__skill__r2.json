@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__skill__r2",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\nTool calling (also called \"function calling\") is a mechanism that lets a large language model (LLM) invoke external functions, APIs, or actions instead of only generating plain text responses.\n\n## How it works\n\n1. **Definition**: Developers describe available tools to the model \u2014 typically as a name, description, and a schema of expected parameters (e.g., a `get_weather(city: string)` function).\n2. **Decision**: When given a prompt, the model decides whether answering requires calling one of these tools, based on the conversation context.\n3. **Structured output**: Instead of replying with prose, the model outputs a structured request (usually JSON) specifying which tool to call and with what arguments.\n4. **Execution**: The surrounding application (not the model itself) actually runs the function \u2014 calling a real API, querying a database, running code, etc.\n5. **Result injection**: The result of that execution is passed back to the model.\n6. **Final response**: The model incorporates the tool's result into its next reply to the user.\n\n## Why it matters\n\nLLMs are limited to reasoning over their training data and the current conversation \u2014 they can't natively browse the web, do precise math, query live databases, or take actions in the real world. Tool calling bridges this gap by letting the model delegate those tasks to reliable external systems while it handles the language understanding, decision-making, and synthesis of results.\n\n## Example\n\nA user asks: *\"What's the weather in Tokyo right now?\"*\n\n- The model recognizes it needs live data and calls a `get_weather` tool with `{\"city\": \"Tokyo\"}`.\n- The application executes the actual weather API call.\n- The result (e.g., `{\"temp\": 22, \"condition\": \"cloudy\"}`) is returned to the model.\n- The model replies: *\"It's currently 22\u00b0C and cloudy in Tokyo.\"*\n\n## Key point on responsibility\n\nThe model's tool call is just a **request** \u2014 it's a decision, not an action. The actual execution, validation, and permission-checking happen in the surrounding application layer, which is responsible for verifying the call is safe and authorized before running it, especially for sensitive actions like payments or deletions.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 689,
+      "cacheReadInputTokens": 2751,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0074442,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2751,
+    "output_tokens": 689,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 689,
+        "cache_read_input_tokens": 2751,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0074442,
+  "duration_ms": 9002
+}
