@@ -1,0 +1,34 @@
+{
+  "overall": {
+    "original/baseline": {
+      "pass_rate": 1.0,
+      "mean_score": 1.0,
+      "n": 9
+    },
+    "original/skill": {
+      "pass_rate": 1.0,
+      "mean_score": 1.0,
+      "n": 9
+    }
+  },
+  "by_category": {
+    "original/activation": {
+      "baseline": 1.0,
+      "skill": 1.0
+    }
+  },
+  "by_case": {
+    "activation-negative-01/original": {
+      "baseline": "1.00",
+      "skill": "1.00"
+    },
+    "activation-negative-02/original": {
+      "baseline": "1.00",
+      "skill": "1.00"
+    },
+    "activation-negative-03/original": {
+      "baseline": "1.00",
+      "skill": "1.00"
+    }
+  }
+}

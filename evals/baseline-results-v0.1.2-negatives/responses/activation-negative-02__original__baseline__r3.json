@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__baseline__r3",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called \"function calling\") is a capability that allows an AI model to interact with external systems, APIs, or code rather than just generating text responses. It lets the model take actions in the real world or fetch information it doesn't inherently know.\n\n## How It Works\n\n1. **Definition**: Developers define a set of \"tools\" (functions) the AI can use, each with a name, description, and expected input parameters (usually in a schema like JSON).\n\n2. **Decision**: When given a task, the model decides whether it needs to call a tool to complete it \u2014 based on the user's request and the tool descriptions available.\n\n3. **Invocation**: Instead of replying with plain text, the model outputs a structured request specifying which tool to call and with what arguments.\n\n4. **Execution**: The actual code/API call is executed *outside* the model \u2014 typically by the application or agent framework hosting the AI.\n\n5. **Response**: The result of that execution is fed back into the model's context, which then uses it to continue the conversation or complete the task.\n\n## Example\n\nIf a user asks, \"What's the weather in Tokyo?\", the model might call:\n\n```json\n{\n  \"tool\": \"get_weather\",\n  \"arguments\": { \"location\": \"Tokyo\" }\n}\n```\n\nThe application executes the actual weather API call, gets the result, and returns it to the model, which then responds naturally: *\"It's currently 22\u00b0C and sunny in Tokyo.\"*\n\n## Common Use Cases\n\n- **Retrieving live data** (weather, stock prices, search results)\n- **Performing calculations** the model isn't reliable at doing itself\n- **Interacting with databases or files** (reading, writing, querying)\n- **Sending communications** (emails, messages, notifications)\n- **Executing code** (running scripts, tests)\n- **Chaining multiple steps** in autonomous \"agent\" workflows\n\n## Why It Matters\n\nTool calling transforms an AI from a passive text generator into an **agent** capable of taking real actions, accessing up-to-date or private information, and completing multi-step tasks \u2014 which is the foundation of most modern \"AI agents\" (like the one you're talking to now).",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 500,
+      "outputTokens": 689,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007890000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 500,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 689,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 500,
+        "output_tokens": 689,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007890000000000001,
+  "duration_ms": 8587
+}

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Works with skills-compatible AI agents. Requires no specific model, API, framework, network access, or paid service.
 metadata:
   author: HumanInTheLoopAI
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Lean Agent Engineering
@@ -25,6 +25,11 @@ If the request is primarily informational, educational, creative,
 translation-oriented, or a simple general-purpose task, do not
 activate this skill unless the user is explicitly applying the
 information to an engineering task.
+
+When the skill does not apply, match the scope of the question: an
+explanation question gets an explanation only. Do not add builder-oriented
+extras such as failure modes, pitfalls, or debugging tips, and do not end
+with an offer to help build or debug.
 
 ## Core rule
 

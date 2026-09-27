@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-02__original__skill__r3",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides a clear, structured educational explanation of tool calling, including definition, how it works, why it matters, and an important distinction.",
+      "criterion": "Give a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The response only explains the concept and does not initiate any debugging steps, commands, or workflow.",
+      "criterion": "Do not automatically initiate a debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.006118
+}

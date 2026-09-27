@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-01__original__baseline__r2",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "What is an LLM?",
+  "response": "An **LLM (Large Language Model)** is a type of AI system trained on massive amounts of text data to understand and generate human-like language. Here's a quick breakdown:\n\n## Core Idea\nAn LLM learns statistical patterns in language \u2014 grammar, facts, reasoning styles, and context \u2014 by processing huge datasets (books, websites, code, etc.). It then uses that learned knowledge to predict and generate text, one piece at a time, based on the input it receives.\n\n## Key Characteristics\n\n- **\"Large\"** refers to the massive number of parameters (often billions) \u2014 the internal values the model adjusts during training to capture patterns in language.\n- **Transformer architecture**: Most modern LLMs (like GPT, Claude, Gemini, Llama) are built on a neural network design called the *transformer*, which is especially good at handling context and relationships between words across long passages.\n- **Training process**: Typically involves pretraining on vast text corpora, followed by fine-tuning (often with human feedback) to make outputs more helpful, accurate, and safe.\n\n## What They Can Do\n- Answer questions\n- Write and edit text\n- Summarize documents\n- Translate languages\n- Generate and explain code\n- Reason through multi-step problems\n\n## Limitations\n- Can produce plausible-sounding but incorrect information (\"hallucinations\")\n- Knowledge is generally limited to a training cutoff date (unless connected to external tools/data)\n- No true understanding or consciousness \u2014 it's pattern recognition and prediction at massive scale, not genuine comprehension\n\n**Examples**: GPT (OpenAI), Claude (Anthropic \u2014 that's me), Gemini (Google), Llama (Meta).\n\nWant me to go deeper into how they're trained, how they actually generate text, or how they compare to each other?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 494,
+      "outputTokens": 583,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.006818,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 494,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 583,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 494,
+        "output_tokens": 583,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.006818,
+  "duration_ms": 7109
+}
