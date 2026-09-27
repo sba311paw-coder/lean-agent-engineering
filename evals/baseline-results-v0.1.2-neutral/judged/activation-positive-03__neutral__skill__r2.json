@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly traces 'query \u2192 retrieval \u2192 chunks \u2192 prompt \u2192 LLM answer' and separates fixes into retrieval-side, context assembly, and generation-side sections.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Diagnose before fixing' instructs pulling failure cases and logging top-k results before applying fixes, and explicitly says 'guessing without this leads to adding complexity in the wrong place.'",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Advises isolating variables, e.g. 'consider query expansion or hypothetical-document embeddings (HyDE) \u2014 but only if you've confirmed retrieval, not generation, is the failure point' and 'Only add this if plain retrieval is demonstrably returning relevant-but-misranked chunks,' isolating each pipeline stage before changing it.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01136
+}

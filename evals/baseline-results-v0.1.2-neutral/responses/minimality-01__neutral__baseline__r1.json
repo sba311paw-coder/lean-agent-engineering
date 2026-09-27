@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Here's a clean way to wrap your existing email function as an MCP server so your agent can call it as a tool.\n\n## 1. Structure\n\n```\nemail_mcp/\n\u251c\u2500\u2500 server.py          # MCP server exposing the tool\n\u251c\u2500\u2500 email_sender.py    # your existing send_email() function\n\u2514\u2500\u2500 .env               # SMTP/API credentials (never passed by the agent)\n```\n\nKeep credentials in the server's environment, not in tool arguments \u2014 the LLM should never see or pass API keys/passwords.\n\n## 2. Server code (using the official `mcp` Python SDK)\n\n```python\n# server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom email_sender import send_email  # your existing function\nfrom pydantic import BaseModel, EmailStr\nfrom typing import Optional\n\nmcp = FastMCP(\"email-server\")\n\nclass SendEmailResult(BaseModel):\n    success: bool\n    message_id: Optional[str] = None\n    error: Optional[str] = None\n\n@mcp.tool()\ndef send_email_tool(\n    to: EmailStr,\n    subject: str,\n    body: str,\n    cc: Optional[list[EmailStr]] = None,\n) -> SendEmailResult:\n    \"\"\"\n    Send an email on behalf of the user.\n\n    Use this ONLY when the user has explicitly asked to send, reply to,\n    or forward an email, or has clearly confirmed a draft you proposed.\n    Do not use this to send emails speculatively.\n\n    Args:\n        to: Recipient email address.\n        subject: Email subject line.\n        body: Plain-text email body.\n        cc: Optional list of CC recipients.\n    \"\"\"\n    try:\n        result = send_email(to=to, subject=subject, body=body, cc=cc)\n        return SendEmailResult(success=True, message_id=result.get(\"id\"))\n    except Exception as e:\n        return SendEmailResult(success=False, error=str(e))\n\nif __name__ == \"__main__\":\n    mcp.run(transport=\"stdio\")\n```\n\nUsing `EmailStr` (pydantic) gives you input validation for free, and the docstring becomes the tool description the agent sees \u2014 be explicit about *when* to use it, since sending email is irreversible.\n\n## 3. Connecting your agent\n\nIf your agent runs locally and spawns the server as a subprocess, use stdio transport (as above) \u2014 most agent frameworks (Claude's MCP client, LangChain MCP adapters, etc.) support launching a stdio server directly:\n\n```json\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"email_mcp/server.py\"]\n    }\n  }\n}\n```\n\nIf the server needs to run elsewhere (separate service, multiple agents sharing it), switch to `transport=\"streamable-http\"` (or `sse` on older SDK versions) and give the agent the URL.\n\n## 4. Safety considerations specific to sending email\n\nSince this is an irreversible side-effecting action, I'd add a few guardrails before letting the agent call it freely:\n\n- **Human confirmation step**: have the agent draft the email and show it to the user, then only call the tool after explicit approval \u2014 enforce this in your agent's system prompt/policy, not just hope the model does it.\n- **Recipient allowlist/domain restriction** (optional): reject sends to unexpected domains unless explicitly permitted.\n- **Rate limiting**: cap sends per minute/hour to avoid runaway loops (agents can get stuck in retry loops).\n- **Dry-run flag**: an env var (`EMAIL_DRY_RUN=true`) that logs instead of sends, useful while testing the agent's behavior.\n- **Structured errors**: return `success/error` fields instead of raising \u2014 lets the agent see failures and decide whether to retry or tell the user, rather than crashing the whole run.\n- **Audit log**: log every send attempt (timestamp, to, subject, success) somewhere durable, since this is a real-world action taken on the user's behalf.\n\n## 5. Testing\n\nUse the SDK's dev tool to poke at it before wiring in the agent:\n\n```bash\nmcp dev server.py\n```\n\nThis opens an inspector where you can call `send_email_tool` manually and check the schema/response shape before letting the agent drive it.\n\nWant me to also sketch the confirmation-flow pattern (agent proposes draft \u2192 user approves \u2192 tool call), or is direct tool-calling fine for your use case?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 550,
+      "outputTokens": 2274,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.02384,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 836,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 550,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2274,
+    "output_tokens_details": {
+      "thinking_tokens": 836
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 550,
+        "output_tokens": 2274,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.02384,
+  "duration_ms": 26080
+}

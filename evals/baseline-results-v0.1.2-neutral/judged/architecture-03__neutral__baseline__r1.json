@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__baseline__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Chooses Anthropic Claude as LLM and shows raw SDK loop as the 'Python Agent App' approach, but uses generic placeholder functions (get_weather, calculate) rather than the user's actual two existing Python functions, since those weren't provided. The response doesn't ask for or integrate the user's specific functions, just illustrates with examples.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates concerns: 'LLM decides: answer directly, or call a tool' vs 'execute your Python function' \u2014 code shows LLM response parsed separately from FUNCTIONS[block.name](**block.input) execution, and the architecture diagram separates LLM from Tool Router from Functions.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Full loop shown: while True checks stop_reason, appends assistant tool_use content, executes function, appends tool_result back into messages, and loops until model returns final text \u2014 matches complete request/execute/respond cycle.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'No need for LangChain/heavy frameworks' and 'Add a framework only if you later need many tools, agents, or complex chains,' with a 'When to Add More' section tying infra additions to concrete future requirements (10+ tools, multi-agent, streaming UI).",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.013968000000000001
+}

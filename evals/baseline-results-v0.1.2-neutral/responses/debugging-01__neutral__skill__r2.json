@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since I can't see your code or logs, here's the fastest path to root cause \u2014 locate which boundary in the pipeline broke, rather than guessing at a fix:\n\n**Pipeline to check (find where it actually breaks):**\n\n```\nLLM emits tool call \u2192 your app parses it \u2192 app dispatches to tool/API \u2192 result returned \u2192 app feeds result back to LLM\n```\n\n**1. Isolate first (fastest signal)**\n- What's the actual symptom? No tool call is emitted, tool call is emitted but malformed, tool call is called but errors, or tool runs but result never reaches the LLM? Each points to a different layer.\n\n**2. Check the recent change itself**\n- Diff exactly what changed (tool schema/definitions, system prompt, SDK/library version, model name/version, parameter names, request format). Tool-calling breaks most often from:\n  - A tool schema edit (renamed param, changed type, removed required field) that no longer matches what the app expects when parsing the call.\n  - An SDK/model version bump that changed the tool-call response format (e.g., field name changes in the response object).\n  - A prompt/system-message edit that removed instructions the model relied on to invoke tools correctly.\n\n**3. Reproduce minimally**\n- Call the LLM directly with one tool and one simple prompt designed to trigger it. Log the raw response *before* your app touches it. Confirm: is a tool call present in the raw output at all?\n\n**4. Compare against known-good**\n- If you have the previous working commit/version, run the same test against it and diff the raw outputs. This pinpoints whether the break is model-side (different output shape) or app-side (parsing/dispatch logic).\n\n**5. Common fast fixes once located**\n- Schema mismatch \u2192 align tool definition with what your dispatcher expects.\n- App-side parsing error \u2192 check for silent exception swallowing around the tool-call handling code.\n- Version bump \u2192 check changelog for breaking changes to tool-call response format.\n\nCan you tell me the specific symptom (e.g., \"no tool call generated,\" \"tool call made but errors,\" \"error message: ...\") and what actually changed in the recent commit? That'll let me point to the exact fix instead of a general checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1366,
+      "cacheReadInputTokens": 2768,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0142176,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 655,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2768,
+    "output_tokens": 1366,
+    "output_tokens_details": {
+      "thinking_tokens": 655
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1366,
+        "cache_read_input_tokens": 2768,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0142176,
+  "duration_ms": 17595
+}

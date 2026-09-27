@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "This is a regression tied to a recent code change, so the fastest reliable path is root-cause debugging, not guessing at fixes. Here's a tight sequence:\n\n## 1. Confirm what actually broke\nSince it worked before and broke after a code change, check the diff first:\n```bash\ngit diff HEAD~1 -- <files touched near tool-calling>\n```\n(No `.git` available in this environment, so if you don't have version control, compare against your last known-working backup/copy of the file, or recall what you edited.)\n\nLook specifically for changes to:\n- Tool/function schema definitions (names, parameter types, required fields)\n- The system prompt or instructions describing available tools\n- The request payload sent to the LLM (missing `tools` array, wrong API param)\n- The response-parsing code that extracts tool calls\n\n## 2. Reproduce with the smallest possible input\nSend one minimal request that should trigger exactly one tool call. Don't debug through your full agent loop \u2014 isolate the LLM call + tool schema from everything else.\n\n## 3. Trace the architecture boundary where it fails\nWalk the pipeline and find where it diverges from expected:\n\n```\nLLM decision \u2192 structured tool call \u2192 AGENT APPLICATION \u2192 parses call \u2192 invokes TOOL\n```\n\nCheck in order:\n1. **Is the LLM even attempting a tool call?** Log the raw model response. If it's returning plain text instead of a structured tool call, the schema/prompt is likely malformed or the tool definitions aren't being sent at all.\n2. **Is the tool call malformed?** Check for schema mismatches \u2014 e.g., a renamed parameter, a type change (string\u2192enum), or a tool name mismatch between what's declared and what your dispatcher expects.\n3. **Is the agent app failing to parse/route the call?** Check for a change in how you extract `tool_calls` from the response (SDK/API version differences are common here).\n4. **Is the tool itself failing?** Check for an exception in the tool handler \u2014 auth, argument validation, a renamed function.\n\n## 4. Compare against a known-good example\nIf you have an older working request/response log, diff the tool schema and payload structure side-by-side against the current one. This usually pinpoints the exact field that changed.\n\n## 5. Common root causes for this exact symptom\n- Tool schema edited but names/params now mismatch the dispatcher's routing table\n- SDK/library upgrade changed the response shape (e.g., `tool_calls` vs `function_call`)\n- System prompt edited in a way that no longer instructs the model to use tools\n- A new required parameter added to a tool schema with no default, breaking validation\n- Model/version pinned differently, changing tool-calling behavior\n\n## 6. Fix and verify\nOnce you find the exact break point, apply the fix at that boundary only. Then verify with:\n- The same minimal reproduction from step 2, confirming a valid tool call round-trip (call \u2192 dispatch \u2192 tool execution \u2192 result returned to LLM \u2192 final response)\n\nIf you paste the relevant diff, tool schema, and the raw LLM response/error, I can pinpoint the exact failure point instead of you working through the checklist manually.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1021,
+      "cacheReadInputTokens": 2768,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0107676,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2768,
+    "output_tokens": 1021,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1021,
+        "cache_read_input_tokens": 2768,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0107676,
+  "duration_ms": 13607
+}

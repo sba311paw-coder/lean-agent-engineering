@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__baseline__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Designing a Safe Bulk-Delete Tool for Production Data\n\nBulk destructive operations triggered by an LLM need multiple layers of defense, since you can't fully rely on the model's judgment alone. Here's how I'd structure it:\n\n## 1. Don't let the tool actually delete in one shot\n\nSplit the action into two phases:\n\n- **`preview_delete(filters/ids)`** \u2014 returns the count and a sample of records that *would* be deleted, plus a confirmation token.\n- **`confirm_delete(token)`** \u2014 executes the deletion, but only if the token is valid, unexpired, and matches the previewed set.\n\nThis forces a \"propose \u2192 confirm\" pattern instead of the LLM directly causing side effects.\n\n## 2. Enforce hard limits in code, not prompts\n\n```python\nMAX_AUTO_DELETE = 10  # anything above this requires extra confirmation\nMAX_HARD_LIMIT = 100  # anything above this requires a human/admin, not the agent\n\ndef delete_records(ids: list[str], confirmation_token: str = None):\n    if len(ids) > MAX_HARD_LIMIT:\n        raise ToolError(\"Batch exceeds max allowed via agent. Requires manual admin action.\")\n    if len(ids) > MAX_AUTO_DELETE and not confirmation_token:\n        return {\"status\": \"confirmation_required\", \"count\": len(ids), \"sample\": ids[:5]}\n    ...\n```\n\n500 records should probably just be **rejected outright** or routed to a human-reviewed workflow, not something the agent can do even with confirmation.\n\n## 3. Require explicit human-in-the-loop confirmation for anything destructive/large\n\n- Surface the pending action to the *user* (not just trust the LLM's text) \u2014 e.g., \"Agent wants to delete 500 records. Type CONFIRM to proceed.\"\n- Use a real UI/CLI confirmation step outside the model's control, so a prompt injection or hallucination can't self-approve.\n\n## 4. Make deletes reversible\n\n- Soft-delete (flag `deleted_at`) instead of hard delete, with a retention/purge job later.\n- Or snapshot/export affected rows before deletion so you can restore.\n\n## 5. Audit logging\n\nLog who/what requested the delete, the filter criteria, record count, and the confirmation trail \u2014 attributed to the actual end user, not just \"the agent.\"\n\n## 6. Scope the tool's permissions at the DB layer\n\nThe service account/role the tool uses should ideally not have unrestricted `DELETE` on the whole table \u2014 e.g., row-level security, a stored procedure with built-in limits, or a soft-delete-only column grant. This way even a fully compromised or buggy tool call can't do catastrophic damage.\n\n## 7. Rate limit / cooldown\n\nLimit total deletions per time window regardless of individual call size, to catch loops or repeated agent calls.\n\n---\n\n**Bottom line:** treat the tool's input validation and limits as the actual security boundary \u2014 assume the LLM *will* eventually call it with bad/large/malicious arguments, and design so that alone can't cause damage. The model's reasoning is a UX layer, not an access control layer.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 544,
+      "outputTokens": 1046,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011548000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 544,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1046,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 544,
+        "output_tokens": 1046,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011548000000000001,
+  "duration_ms": 13263
+}

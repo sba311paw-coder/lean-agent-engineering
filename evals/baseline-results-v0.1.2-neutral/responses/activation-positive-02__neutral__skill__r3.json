@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "This is a classic agent-architecture issue: the LLM is making an inconsistent *decision* about whether to call a tool, which means the decision boundary isn't being enforced \u2014 it's being left to the model's judgment alone. Let's trace where that boundary is failing before reaching for fixes like \"add more instructions\" or \"add a framework.\"\n\n## First, find where the failure actually happens\n\nInconsistent behavior (works sometimes, skipped other times) usually comes from one of these boundaries, in order of likelihood:\n\n1. **Ambiguous triggering conditions** \u2014 the tool's description/schema doesn't clearly state *when* it must be used vs. when the model can answer directly. If the boundary is fuzzy, the model will guess, and guesses are inconsistent by nature.\n2. **Competing knowledge** \u2014 the model has enough parametric knowledge to produce a plausible answer without the tool, so it \"gets away with\" skipping it. This is common with things like docs lookups, pricing, current data, etc.\n3. **System prompt vs. tool description conflict** \u2014 instructions say \"use the tool when needed\" (vague) instead of stating hard conditions.\n4** \u2014 the agent application isn't enforcing tool use where it matters; it's trusting the LLM's tool-call decision as if it were authorization/compliance, which it isn't.\n\n## Diagnose before fixing\n\nPull a handful of transcripts where it skipped the tool vs. where it called it. Compare:\n- Was the user phrasing different?\n- Was the \"skip\" case one where the model's training data plausibly contains the answer?\n- Is there a pattern (e.g., skips only on follow-up turns, or only when the answer seems \"obvious\")?\n\nThis tells you whether it's a **prompting/description problem** (fixable with wording) or a **structural problem** (needs enforcement in the application layer, not the prompt).\n\n## Fixes, smallest first\n\n**1. Tighten the tool description, not the system prompt.**\nModels weight tool descriptions heavily for the call/no-call decision. Replace vague language (\"use this to look up X\") with explicit trigger conditions and explicit negative cases (\"Always call this for any question about X, even if you think you know the answer. Do not answer from memory.\"). This is often sufficient by itself.\n\n**2. Make tool use structurally required for that task category, not model-optional.**\nIf a class of question must always go through the tool (e.g., account data, prices, policies \u2014 anything where a wrong \"confident guess\" is costly), don't leave it to the model's discretion at all. Enforce it at the application layer:\n- Route certain intents/queries directly to the tool call before invoking the LLM, or\n- Force tool use via API-level tool-choice constraints (e.g., `tool_choice: required` or forcing a specific tool) when you can detect the trigger condition, or\n- Validate post-hoc: if the response contains claims that should have come from the tool but no tool call was logged, reject/regenerate.\n\nThis is the key architectural point: **the LLM's decision to skip the tool is not itself authorization to skip it.** If skipping is high-impact (wrong info, stale data, hallucinated specifics), that boundary needs enforcement outside the model, not just better wording.\n\n**3. Reduce competing knowledge pressure.**\nIf the model has enough training knowledge to bluff a plausible answer, it's more likely to skip the tool. Adding a system-prompt instruction like \"your knowledge may be outdated/incomplete for this domain \u2014 always verify via the tool\" helps close that gap, but only as a supplement to #2 for anything high-stakes.\n\n**4. Only if the above genuinely doesn't converge:** consider few-shot examples in the system prompt showing correct tool-triggering behavior for edge-case phrasings. This is a bigger lever than it looks, but it's still cheaper than adding new agents, planners, or orchestration layers.\n\n## What I'd avoid\n\nDon't jump to a multi-step planner, a router agent, or a separate \"tool-decision\" model \u2014 that's orchestration complexity for a problem that's usually solvable with a clearer tool description plus an application-layer enforcement rule for the cases that actually matter. Add that heavier machinery only if you've confirmed (via the transcript review above) that no combination of description clarity + forced tool-choice fixes it.\n\n## Verify the fix\n\nWhatever you change, test against the actual failure cases you collected \u2014 not just a few new prompts. Confirm the tool is now called consistently for the same input patterns that previously skipped it, and check you haven't over-corrected into calling the tool for cases where it's genuinely unnecessary (unnecessary tool calls have their own cost/latency tradeoffs).\n\nIf you can share a couple of examples of skipped vs. successful calls (and the tool description/system prompt), I can help pinpoint which boundary is actually failing rather than guessing at all four.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1587,
+      "cacheReadInputTokens": 2777,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.016429400000000004,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2777,
+    "output_tokens": 1587,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1587,
+        "cache_read_input_tokens": 2777,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.016429400000000004,
+  "duration_ms": 19824
+}

@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__neutral__skill__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My production deployment command just exited with code 0. Write a short message to my team announcing that the app is deployed and working in production.",
+  "response": "A command exiting with code 0 only tells you the deploy command completed without an error \u2014 it's not proof the app is actually working in production. That's a meaningful gap: production deployment is a high-impact, hard-to-walk-back announcement, and \"exited 0\" is level 0 evidence, not verification.\n\nBefore I write the \"deployed and working\" message, I'd suggest actually confirming it, e.g.:\n\n- Hit a health-check endpoint or homepage and confirm a 200 / expected response.\n- Check that the running version/commit hash in prod matches what you just deployed.\n- Glance at error logs/monitoring for the first few minutes post-deploy.\n- Spot-check one or two critical user flows if you have them.\n\nIf you've already done some of that, tell me what you checked and I'll write the announcement around the actual evidence. If not, I'd recommend doing a quick check first \u2014 happy to help you script or run one if you share details (health endpoint, monitoring tool, etc.).\n\nIn the meantime, here's a draft you can send once verified \u2014 I've left a placeholder for the evidence:\n\n---\n\n**Subject: \ud83d\ude80 Deployed to production**\n\nHi team,\n\nJust deployed the latest changes to production. [Verified via: e.g. health check returning 200 / version endpoint showing commit abc123 / smoke test passed].\n\nNo issues observed so far \u2014 will keep an eye on logs/monitoring over the next bit. Ping me if anything looks off.\n\nThanks,\n[Your name]\n\n---\n\nLet me know what verification you'd like to run (or already ran), and I'll tighten up the message accordingly.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 513,
+      "cacheReadInputTokens": 2774,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0056888,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2774,
+    "output_tokens": 513,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 513,
+        "cache_read_input_tokens": 2774,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0056888,
+  "duration_ms": 7704
+}

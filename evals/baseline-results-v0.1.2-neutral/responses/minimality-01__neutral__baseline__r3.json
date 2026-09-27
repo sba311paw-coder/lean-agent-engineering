@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Here's a practical approach for wrapping your existing email function as an MCP server:\n\n## 1. Decide: in-process vs. external MCP server\n\n**If you're using the Claude Agent SDK**, you likely don't need a separate subprocess at all. The SDK lets you register MCP tools *in-process* (similar to the TS SDK's `createSdkMcpServer`), which is simpler, faster, and avoids stdio/subprocess overhead. Only build a standalone MCP server if you want the email tool reusable across multiple different agents/clients (not just your app).\n\n**If you do want a standalone server** (e.g., for reuse, or to run it in a separate process/container), use the official `mcp` Python package with `FastMCP`.\n\n## 2. Standalone MCP server example\n\n```python\n# email_mcp_server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom your_app.email_utils import send_email_impl  # your existing function\n\nmcp = FastMCP(\"email-server\")\n\n@mcp.tool()\ndef send_email(to: str, subject: str, body: str, cc: str | None = None) -> dict:\n    \"\"\"\n    Send an email on behalf of the user.\n\n    Args:\n        to: Recipient email address.\n        subject: Email subject line.\n        body: Plain-text or HTML body content.\n        cc: Optional comma-separated CC addresses.\n    \"\"\"\n    try:\n        result = send_email_impl(to=to, subject=subject, body=body, cc=cc)\n        return {\"status\": \"sent\", \"message_id\": result.message_id}\n    except Exception as e:\n        return {\"status\": \"error\", \"error\": str(e)}\n\nif __name__ == \"__main__\":\n    mcp.run(transport=\"stdio\")  # or \"sse\" for a network-accessible server\n```\n\nKey points:\n- **Type hints + docstrings matter a lot** \u2014 the LLM uses them to decide when/how to call the tool. Be explicit about what fields mean.\n- **Never raise raw exceptions** \u2014 catch them and return structured `{\"status\": \"error\", ...}` so the agent can react sensibly instead of crashing.\n- **Keep SMTP/API credentials in env vars** loaded inside `send_email_impl`, not passed through as tool arguments \u2014 the agent/LLM should never see or set them.\n\n## 3. Register it with your agent\n\n```python\n# in your agent's MCP config\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"email_mcp_server.py\"]\n    }\n  }\n}\n```\n\n## 4. Guardrails (important for autonomous email sending)\n\nSince an agent sending real emails is high-stakes, consider adding:\n- **Human-in-the-loop confirmation** for sends to new/unknown recipients, or all sends initially.\n- **Allow-list / domain restrictions** to prevent sending to arbitrary addresses.\n- **Dry-run mode** (`dry_run: bool` param) so you can test agent behavior without actually sending.\n- **Rate limiting** to prevent runaway loops from spamming.\n- **Logging every send** (recipient, subject, timestamp, triggering context) for audit purposes.\n- **Explicit tool naming** like `send_email_draft_for_approval` vs `send_email` if you want a two-step flow (draft \u2192 human approves \u2192 send).\n\n## 5. Testing\n\nUse the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) to test the tool in isolation before wiring it into your agent \u2014 it lets you call `send_email` manually and see the exact schema the LLM will receive.\n\n---\n\nWant me to sketch the in-process version (if you're on the Claude Agent SDK) instead, since it's likely simpler for your case?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 550,
+      "outputTokens": 2312,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.02422,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1098,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 550,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2312,
+    "output_tokens_details": {
+      "thinking_tokens": 1098
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 550,
+        "output_tokens": 2312,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.02422,
+  "duration_ms": 26051
+}

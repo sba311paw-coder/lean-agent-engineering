@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response asks user to identify failure mode and 'get the actual request/response payload or log line' but doesn't itself reproduce or read an actual error; it's guidance to do so rather than doing it.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 2 'Check the recent diff against these usual suspects' explicitly lists likely regression causes tied to the code change, and section 4 recommends diffing against last known-good commit.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 3 'Trace the boundary, not just the model' walks through AGENT APP \u2192 LLM \u2192 decision \u2192 AGENT APP \u2192 TOOL, specifying log points at each stage.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "The response emphasizes finding root cause via logs/diff but doesn't explicitly frame a single testable hypothesis before fixing; step 5 says 'fix at the root' without a stated hypothesis-formation step.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.01032
+}

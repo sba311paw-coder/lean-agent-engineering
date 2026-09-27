@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__skill__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since this broke right after a code change, treat it as a regression \u2014 check the diff before touching anything else. Here's the fastest path to root cause:\n\n## 1. Read the actual error first\nWhat's the failure mode?\n- No tool call is emitted at all (LLM just responds in text)\n- Tool call is emitted but malformed (bad JSON, wrong schema)\n- Tool call is emitted but the app fails to execute it (exception, wrong handler)\n- Tool executes but returns an error/empty result\n- Result comes back but the LLM ignores it or hallucinates over it\n\nThe fix is completely different depending on which of these it is, so don't guess \u2014 get the actual request/response payload or log line.\n\n## 2. Check the recent diff against these usual suspects\nSince this is a regression, the bug is almost certainly in the change itself:\n- **Tool schema changed** \u2014 renamed a param, changed a type, changed required fields \u2014 but the LLM's understanding or the parser wasn't updated to match\n- **System prompt / tool description edited** \u2014 wording change that confuses the model about when/how to call the tool\n- **Tool name collision or removal** \u2014 a tool was renamed/removed but something still references the old name\n- **Model or API version bumped** \u2014 different tool-calling format (e.g. function_call vs tool_use blocks) that the parsing code doesn't handle\n- **Serialization change** \u2014 how tool definitions are passed to the API (e.g. JSON schema malformed after an edit)\n- **Response parsing logic changed** \u2014 the code that extracts tool calls from the LLM response no longer matches the actual response shape\n\n## 3. Trace the boundary, not just the model\nUsing the agent architecture: AGENT APP \u2192 LLM \u2192 decision \u2192 AGENT APP \u2192 TOOL. Find which boundary is broken:\n- Is the tool definition actually reaching the LLM correctly? (log the outgoing request)\n- Is the LLM's raw response actually structured as a tool call? (log the raw response before your code parses it)\n- Is your code correctly parsing that structure into an invocation? (log after parsing)\n- Is the tool executor receiving the right arguments? (log at the tool boundary)\n\nWhichever log point first shows something wrong is your root cause location.\n\n## 4. Compare against a known-good state\nIf you have git history, diff against the last known-working commit \u2014 specifically look for changes to: tool schemas, system/tool-use prompts, the request payload builder, and the response parser. This is usually the single fastest way to spot it.\n\n## 5. Fix at the root, then verify\nOnce you find the actual break point, fix that specific thing rather than patching around it (e.g. don't add prompt hacks to compensate for a schema mismatch). Verify with a minimal test: one tool call, one expected result, confirm end-to-end.\n\nIf you can share the actual error/log output or the diff, I can pinpoint it directly instead of you working through this checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 933,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 442,
+      "webSearchRequests": 0,
+      "costUSD": 0.011567200000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 442,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 933,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 442,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 933,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 442,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 442
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011567200000000001,
+  "duration_ms": 12973
+}

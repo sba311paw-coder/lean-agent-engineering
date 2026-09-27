@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__baseline__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks is unlikely to fix this by itself \u2014 wrong tool selection is almost always a prompt/design problem, not a framework limitation. Before you jump ship, it's worth knowing that LangChain, LlamaIndex, CrewAI, AutoGen, OpenAI's Assistants/Agents SDK, etc. all have the same underlying mechanism (LLM picks a tool based on name/description + conversation context), so the same failure mode can show up anywhere.\n\n**Things far more likely to fix it than switching frameworks:**\n\n1. **Tool descriptions are ambiguous or overlapping** \u2014 the model can't tell tools apart. Tighten descriptions, make names more distinct, add \"use this when X, NOT when Y\" guidance.\n2. **Too many tools exposed at once** \u2014 if the agent has 15+ tools available, accuracy drops. Filter/scope tools to what's relevant per step.\n3. **Missing few-shot examples** \u2014 showing 1-2 examples of correct tool choice in tricky cases helps a lot.\n4. **Weak system prompt** \u2014 no clear decision criteria for when to use which tool.\n5. **Model choice** \u2014 smaller/cheaper models are much worse at tool selection than frontier models regardless of framework.\n6. **No verification/retry step** \u2014 some setups just let a wrong call fail silently; adding a self-check (\"does this tool match the request?\") reduces errors.\n\n**If you still want to explore frameworks**, here's roughly how they differ on this specific issue:\n\n- **LangChain/LangGraph** \u2014 very flexible, but tool routing is entirely on you (prompt + descriptions). LangGraph gives more control via explicit graph edges, which can help if you want deterministic routing instead of pure LLM choice.\n- **CrewAI** \u2014 role-based agents with narrower tool sets per role, which naturally reduces ambiguity since each agent has fewer choices.\n- **OpenAI Agents SDK / Assistants API** \u2014 good built-in function-calling reliability, especially with strict JSON schemas, but less control over orchestration logic.\n- **Semantic Kernel** \u2014 similar to LangChain, decent for enterprise/.NET stacks.\n- **AutoGen** \u2014 better for multi-agent conversation patterns, not specifically better at single-agent tool selection.\n\nNone of these \"solve\" tool selection out of the box \u2014 they just give different levers to control it.\n\n**My actual suggestion:** stay on your current framework and try this first:\n- Reduce active tool count per call\n- Rewrite tool descriptions with explicit \"use when / don't use when\" language\n- Add 1-2 few-shot examples of correct selection near your trickiest confusion cases\n- If using a smaller model, test with a frontier model to see if it's a capability ceiling issue\n\nIf you tell me which framework/model you're currently using and give an example of a wrong tool pick, I can give much more targeted advice.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 517,
+      "outputTokens": 950,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010534,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 517,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 950,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 517,
+        "output_tokens": 950,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010534,
+  "duration_ms": 13125
+}

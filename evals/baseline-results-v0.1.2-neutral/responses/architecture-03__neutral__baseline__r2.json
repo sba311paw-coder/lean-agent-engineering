@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__baseline__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "# Simple Architecture for a Personal Python AI Agent\n\nFor a small, personal-use agent with two function calls, don't overengineer it. Skip heavy frameworks unless you specifically want to learn them. Here's a lean approach:\n\n## Core Architecture\n\n```\nUser Input \u2192 LLM (with function-calling) \u2192 Function Router \u2192 Execute \u2192 Return to LLM \u2192 Response\n```\n\n**Components:**\n\n1. **LLM client** \u2014 Anthropic API or OpenAI API, called directly via their Python SDK\n2. **Tool/function schemas** \u2014 JSON schemas describing your two functions (name, description, parameters)\n3. **Dispatch loop** \u2014 receives the model's tool-call request, runs the actual Python function, feeds the result back\n4. **(Optional) Memory** \u2014 a simple list of messages for conversation history\n\n## Minimal Implementation Pattern (Anthropic-style)\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ntools = [\n    {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a city\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"city\": {\"type\": \"string\"}},\n            \"required\": [\"city\"]\n        }\n    },\n    {\n        \"name\": \"search_files\",\n        \"description\": \"Search local files by keyword\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"query\": {\"type\": \"string\"}},\n            \"required\": [\"query\"]\n        }\n    }\n]\n\ndef get_weather(city): ...   # your existing function\ndef search_files(query): ...  # your existing function\n\nFUNCTIONS = {\"get_weather\": get_weather, \"search_files\": search_files}\n\nmessages = [{\"role\": \"user\", \"content\": \"What's the weather in Tokyo?\"}]\n\nresponse = client.messages.create(\n    model=\"claude-sonnet-4-5\",\n    max_tokens=1024,\n    tools=tools,\n    messages=messages\n)\n\nwhile response.stop_reason == \"tool_use\":\n    tool_use = next(b for b in response.content if b.type == \"tool_use\")\n    result = FUNCTIONS[tool_use.name](**tool_use.input)\n\n    messages.append({\"role\": \"assistant\", \"content\": response.content})\n    messages.append({\n        \"role\": \"user\",\n        \"content\": [{\n            \"type\": \"tool_result\",\n            \"tool_use_id\": tool_use.id,\n            \"content\": str(result)\n        }]\n    })\n\n    response = client.messages.create(\n        model=\"claude-sonnet-4-5\",\n        max_tokens=1024,\n        tools=tools,\n        messages=messages\n    )\n\nprint(response.content[0].text)\n```\n\n## Recommendations\n\n- **No framework needed** \u2014 LangChain/LlamaIndex add complexity you don't need for 2 tools. Native SDK tool-calling is sufficient and easier to debug.\n- **If you want structure later**, look at:\n  - **Pydantic** for validating function inputs/outputs\n  - **Anthropic's `tool_use` / OpenAI's `function calling`** (both work almost identically to above)\n- **Error handling**: wrap your function calls in try/except and return the error message to the model so it can retry or explain the failure.\n- **Persistence**: if you want memory across sessions, just serialize the `messages` list to a JSON file.\n- **CLI wrapper**: use `input()` in a loop, or `click`/`typer` if you want flags/subcommands later.\n\n## When to scale up\n\nOnly reach for LangChain, LangGraph, or an agent framework if you later need: multiple agents, complex branching logic, retries/observability at scale, or many (10+) tools with dynamic selection. For two functions and personal use, the ~40 lines above is the whole architecture.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 530,
+      "outputTokens": 1212,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013179999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 530,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1212,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 530,
+        "output_tokens": 1212,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013179999999999999,
+  "duration_ms": 12320
+}

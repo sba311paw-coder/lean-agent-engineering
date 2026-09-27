@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__baseline__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "# Setting Up an Email MCP Server for Your Agent\n\nSince you already have a working send-email function, wrapping it as an MCP server is pretty straightforward. Here's the recommended approach:\n\n## 1. Use the Python MCP SDK\n\nInstall the official SDK:\n\n```bash\npip install mcp\n```\n\n## 2. Wrap Your Existing Function as a Tool\n\nUse `FastMCP` for the simplest setup \u2014 it handles protocol boilerplate so you just define tools as decorated functions.\n\n```python\nfrom mcp.server.fastmcp import FastMCP\nfrom your_app.email_utils import send_email  # your existing function\n\nmcp = FastMCP(\"email-server\")\n\n@mcp.tool()\ndef send_email_tool(to: str, subject: str, body: str) -> str:\n    \"\"\"\n    Send an email to a recipient.\n\n    Args:\n        to: Recipient email address\n        subject: Email subject line\n        body: Email body content\n    \"\"\"\n    try:\n        send_email(to=to, subject=subject, body=body)\n        return f\"Email sent to {to}\"\n    except Exception as e:\n        return f\"Failed to send email: {e}\"\n\nif __name__ == \"__main__\":\n    mcp.run()\n```\n\nThat's it for the core server \u2014 MCP handles exposing this as a discoverable tool with a schema derived from your type hints and docstring.\n\n## 3. Key Design Decisions\n\n**Transport:** For local use (agent and server on same machine), use `stdio` (the default in the example above). If your agent runs remotely or needs multiple clients, use `streamable-http` instead:\n```python\nmcp.run(transport=\"streamable-http\")\n```\n\n**Guardrails \u2014 important for send-side tools:**\n- Add validation (e.g., recipient domain allowlist, rate limiting) *inside* the tool, not just in the agent's prompt. Agents can be manipulated into sending unintended emails, so don't rely solely on the LLM's judgement.\n- Consider a `dry_run` parameter or a confirmation step for sensitive sends.\n- Log every send (to, subject, timestamp) for auditability.\n- Return clear success/failure strings \u2014 this becomes part of what the LLM sees and reasons about next.\n\n**Secrets:** Keep SMTP credentials/API keys in environment variables or a secrets manager, loaded inside your existing `send_email` function \u2014 don't pass them through as tool arguments (the LLM shouldn't see or set credentials).\n\n**Granularity:** If you'll need more than one email-related action later (e.g., check inbox, send with attachments), add them as separate tools now rather than one mega-tool with many optional params \u2014 it's easier for the LLM to pick the right tool.\n\n## 4. Connect It to Your Agent\n\nIf your agent uses the standard MCP client:\n\n```python\nfrom mcp import ClientSession, StdioServerParameters\nfrom mcp.client.stdio import stdio_client\n\nserver_params = StdioServerParameters(\n    command=\"python\",\n    args=[\"email_mcp_server.py\"],\n)\n\nasync with stdio_client(server_params) as (read, write):\n    async with ClientSession(read, write) as session:\n        await session.initialize()\n        tools = await session.list_tools()\n        # pass tools to your agent's tool-calling loop\n```\n\nIf you're using Claude's Agent SDK specifically, you can register this MCP server directly in your agent config (via `mcpServers` in the SDK's config), and it'll handle spawning/connecting automatically.\n\n## 5. Testing\n\nTest the server standalone with the MCP inspector before wiring it into the agent:\n\n```bash\nnpx @modelcontextprotocol/inspector python email_mcp_server.py\n```\n\nThis lets you call `send_email_tool` manually and verify behavior before the LLM is in the loop.\n\n---\n\nWant me to sketch out the allowlist/rate-limiting logic, or help set up the `streamable-http` variant if this needs to run as a persistent service?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 550,
+      "outputTokens": 1280,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013900000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 550,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1280,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 550,
+        "output_tokens": 1280,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013900000000000001,
+  "duration_ms": 14324
+}

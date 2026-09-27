@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__baseline__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "# Architecture for a Small Personal AI Agent\n\nFor a small personal agent with two tool functions, keep it simple \u2014 you don't need a heavy framework. Here's a pragmatic approach:\n\n## Core Architecture\n\n```\nUser Input \u2192 LLM (with function-calling) \u2192 Tool Router \u2192 Your 2 Functions \u2192 Response\n```\n\n**Basic loop:**\n1. Send user message + conversation history + tool schemas to the LLM\n2. LLM decides: answer directly, or call a tool\n3. If tool call requested \u2192 execute your Python function \u2192 feed result back to LLM\n4. LLM produces final natural-language answer\n5. Repeat\n\n## Recommended Stack\n\n**1. LLM Provider**\n- **Anthropic Claude** (Messages API) or **OpenAI** \u2014 both have native \"tool use\" / function calling support\n- Since you're already in a Claude environment, the `anthropic` Python SDK is a natural fit\n\n**2. Tool-calling mechanism \u2014 use native function calling, not string parsing**\nBoth Anthropic and OpenAI let you define tools as JSON schemas. The model returns structured tool-call requests instead of you having to regex/parse text.\n\n**3. No need for LangChain/heavy frameworks**\nFor 2 functions, raw SDK + a ~50-line loop is more reliable and easier to debug than LangChain/LlamaIndex. Add a framework only if you later need many tools, agents, or complex chains.\n\n## Minimal Implementation Sketch (Anthropic SDK)\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ndef get_weather(city: str) -> str:\n    return f\"Sunny in {city}\"\n\ndef calculate(expression: str) -> str:\n    return str(eval(expression))  # sandbox this in real use\n\ntools = [\n    {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a city\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"city\": {\"type\": \"string\"}},\n            \"required\": [\"city\"],\n        },\n    },\n    {\n        \"name\": \"calculate\",\n        \"description\": \"Evaluate a math expression\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"expression\": {\"type\": \"string\"}},\n            \"required\": [\"expression\"],\n        },\n    },\n]\n\nFUNCTIONS = {\"get_weather\": get_weather, \"calculate\": calculate}\n\ndef run_agent(user_input, history=None):\n    messages = (history or []) + [{\"role\": \"user\", \"content\": user_input}]\n\n    while True:\n        response = client.messages.create(\n            model=\"claude-sonnet-5\",\n            max_tokens=1024,\n            tools=tools,\n            messages=messages,\n        )\n\n        if response.stop_reason != \"tool_use\":\n            return response.content[0].text, messages\n\n        messages.append({\"role\": \"assistant\", \"content\": response.content})\n\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                result = FUNCTIONS[block.name](**block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": str(result),\n                })\n\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n```\n\n## Key Design Choices\n\n| Concern | Recommendation |\n|---|---|\n| **Tool definitions** | JSON schema, matched 1:1 to your function signatures |\n| **Loop control** | `while True` until model stops requesting tools; cap iterations (e.g., max 5) to avoid infinite loops |\n| **State/history** | Just a Python list of messages in memory; use SQLite/JSON file only if you need persistence across runs |\n| **Error handling** | Wrap tool calls in try/except; return error string to model so it can retry/adjust |\n| **Config/secrets** | `.env` + `python-dotenv` for API key |\n| **CLI interface** | `input()` loop or `argparse` for one-shot mode |\n\n## When to Add More\n\nOnly reach for **LangChain**, **LlamaIndex**, or **Pydantic-AI** if you later need:\n- Many tools (10+) with complex orchestration\n- Multi-agent handoffs\n- Built-in memory/vector store integration\n- Streaming UI (then consider adding **Gradio** or **Streamlit**)\n\nFor your current scope (2 functions, personal use), the ~50-line raw SDK loop above is the right amount of complexity \u2014 easy to understand, debug, and extend later if needed.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 530,
+      "outputTokens": 1477,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.01583,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 530,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1477,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 530,
+        "output_tokens": 1477,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.01583,
+  "duration_ms": 15041
+}

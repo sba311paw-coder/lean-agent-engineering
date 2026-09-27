@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly walks through a 'Capability-gap check' analyzing what LangChain provides vs. what the current two-function setup already does, concluding the existing script 'is already an agent in the architecture-relevant sense.'",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'don't migrate' and recommends 'keep what you have' since a direct API call plus explicit function dispatch is simpler to debug, test, and secure.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides a concrete bulleted list: 'When migration would actually be justified' including multi-provider needs, many tools needing standardized schemas, memory/RAG/branching chains, or LangGraph multi-agent orchestration.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008820000000000001
+}

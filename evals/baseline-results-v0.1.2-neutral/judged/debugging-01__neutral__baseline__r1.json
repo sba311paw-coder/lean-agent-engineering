@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "Response never asks the user to reproduce the failure or share actual error output up front; it only offers a generic checklist and asks at the end 'If you paste the actual error message... I can pinpoint the fix' \u2014 reproduction is deferred, not actively guided.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly instructs to check if the recent change altered tool schema/name/params and 'Compare the JSON schema you're sending now vs. before the change (diff it if you have version history)', and section 6 checks for dependency/SDK version bumps in the recent change.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Sections 2-4 walk through tracing data flow: request payload -> model response -> parsing of tool_calls -> message history/tool_call_id matching in the conversation state.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "Response provides a checklist of things to check but never frames a specific testable hypothesis to test before applying a fix; it jumps straight from diagnostics to 'the fix' without hypothesis formation being made explicit.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.010134
+}

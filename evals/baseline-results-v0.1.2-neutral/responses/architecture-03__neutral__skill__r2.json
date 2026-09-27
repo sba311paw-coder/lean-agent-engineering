@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__skill__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "For a small personal agent that answers questions and calls two existing Python functions, you don't need a framework, orchestration layer, or multiple agents. Here's the minimal reliable design:\n\n## Architecture\n\n```\nUSER\n |\n v\nYOUR SCRIPT (agent application)\n |-- builds prompt + tool schemas\n v\nLLM API (e.g. Anthropic Messages API)\n |-- returns text OR a tool_use request\n v\nYOUR SCRIPT\n |-- if tool_use: validate args, call your Python function directly\n |-- feed result back to LLM\n v\nLLM -> final text\n |\n v\nUSER\n```\n\nYour script is the \"agent application\" \u2014 it owns the loop, validates arguments, calls your two functions, and decides when to stop. The LLM only decides *which* function to call and with what arguments; it never executes anything itself.\n\n## Tools/stack\n\n- **LLM access**: official SDK for whatever model you're using (e.g. `anthropic` Python SDK). No agent framework needed.\n- **Tool calling**: use native tool-use/function-calling support in the API (pass JSON schemas for your two functions). This is a solved, standard-library-adjacent feature \u2014 don't hand-roll parsing of LLM text to decide what to call.\n- **Your two functions**: expose each with a small JSON schema (name, description, parameter types). Call them directly in Python when the model requests it \u2014 no plugin system, no MCP server, no subprocess needed for local functions in the same codebase.\n- **Loop**: a plain `while` loop: send messages \u2192 get response \u2192 if tool call, run it and append result \u2192 repeat until model returns final text. ~30-50 lines of code.\n- **Config**: environment variable for your API key (`os.environ`), nothing more elaborate.\n\n## What to deliberately skip\n\n- **LangChain/agent frameworks** \u2014 unnecessary for 2 tools and single-user local use; adds abstraction and debugging overhead for no real gain here.\n- **MCP server** \u2014 MCP is for exposing tools across processes/clients (e.g., to Claude Desktop or other agents). If your functions live in the same Python process as the agent, just call them directly.\n- **Multi-agent orchestration** \u2014 one agent, one loop is correct at this scale.\n- **Vector DB/RAG** \u2014 only add if you actually need retrieval over a document corpus; nothing in your description suggests that.\n- **Persistent memory store** \u2014 a simple in-memory list of messages for the session is enough unless you need cross-session memory.\n\n## One thing worth doing properly\n\nIf either function has side effects (writes files, sends something, deletes anything, hits a paid API), validate arguments in your script before calling it \u2014 don't let the LLM's tool-call arguments run unchecked just because the model \"decided\" to call it. For purely read-only/computational functions, this is low-risk and you can keep validation minimal (type/range checks).\n\nIf you tell me what the two functions actually do, I can point out whether either needs stricter guarding.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 979,
+      "cacheReadInputTokens": 2781,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0103502,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2781,
+    "output_tokens": 979,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 979,
+        "cache_read_input_tokens": 2781,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0103502,
+  "duration_ms": 12962
+}

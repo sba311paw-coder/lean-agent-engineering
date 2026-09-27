@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__skill__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "This is a classic \"tool succeeded but the LLM never actually saw the result\" bug \u2014 the failure boundary is between **AGENT APPLICATION \u2192 LLM (final response)**, not the tool itself. Since the tool output is correct in logs, don't touch the tool. Trace what happens *after* the tool returns.\n\n**Most likely root causes, in order of probability:**\n\n1. **The tool result never gets appended to the conversation history sent to the LLM.** Your app logs the raw tool return value separately from what's actually sent in the follow-up completion call. These are easy to conflate \u2014 \"I logged it\" \u2260 \"the model received it.\"\n\n2. **Message format/role mismatch.** If you're using function/tool calling (OpenAI-style, Anthropic tool_use, etc.), the tool result message needs the correct `tool_call_id` / `tool_use_id` matching the original call. A mismatch can cause the API to silently drop or ignore it, and your app may fall back to a generic completion without erroring loudly.\n\n3. **Silent exception swallowed after the tool call** (e.g., JSON parsing, formatting, or serialization of the tool output throws), caught by a broad `except`/`catch`, and the code falls through to a hardcoded/generic fallback response instead of surfacing the error.\n\n4. **A separate \"final answer\" call that doesn't include full history** \u2014 e.g., you generate the tool result, then call the LLM again but only pass the original user message, not the tool result message.\n\n5. **System prompt conflict** \u2014 instructions telling the model to \"always answer helpfully\" or similar can cause it to produce a generic answer if it's *unsure* the tool data is authoritative, especially if the tool result is buried in a malformed or oddly-structured message.\n\n**How to isolate it (smallest useful test):**\n\nLog \u2014 or print \u2014 the **exact message array/payload** you send to the LLM for the *final* completion call, right before you call it. Not the tool's raw output, the literal request body.\n\n- If the tool result is missing from that payload \u2192 bug is in your app's history-building logic (cause #1 or #4).\n- If it's present but malformed/wrong role/wrong ID \u2192 cause #2.\n- If it's present and correctly formatted, but the model still ignores it \u2192 try the same payload in a bare API call outside your app (isolates app logic from model behavior) and check your system prompt for conflicting instructions (cause #5).\n\n**Fix:** once you find which boundary drops the data, the fix is almost always making sure the tool response message (with correct role/ID) is included in the message history for the follow-up LLM call \u2014 no framework or extra layer needed.\n\n**Verify:** after the fix, print the final payload again and confirm the tool result is present verbatim, then confirm the model's answer references the actual value (not just that the call succeeded).\n\nIf you want, paste the message-building code around the tool call and I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 2303,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 459,
+      "webSearchRequests": 0,
+      "costUSD": 0.0253352,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1376,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 459,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 2303,
+    "output_tokens_details": {
+      "thinking_tokens": 1376
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 459,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2303,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 459,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 459
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0253352,
+  "duration_ms": 28978
+}

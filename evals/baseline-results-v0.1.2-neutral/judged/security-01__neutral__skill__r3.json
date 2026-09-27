@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"the LLM's decision to call the delete tool is not authorization... The LLM can propose a deletion. It should never be the thing that executes it unchecked.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorization must be enforced at the application/tool boundary\" and \"Check the caller's actual permissions/role for this action... Enforce a hard cap on batch size per call... reject anything larger regardless of what the LLM requested.\"",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists soft-delete defaults, human-approval gate for bulk deletions, two-step preview/confirm pattern, audit logging, and post-execution verification as safeguards specifically for destructive actions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010238
+}

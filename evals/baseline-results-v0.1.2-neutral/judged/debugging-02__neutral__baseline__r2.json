@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Title states 'It's Probably Not the Embedding Model' and explicitly says 'Before switching embedding models, I'd want more context' and lists 'cheaper wins to try' before switching.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a table breaking down Retrieval, Ranking, Chunking, Generation, and Query mismatch stages with symptoms and fixes, covering retrieval, context construction (chunking), and generation explicitly.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Includes 'Quick test: Log the retrieved chunks for a few failing queries and check manually' and ends by asking for 'a concrete failing example (query + what was retrieved + what the answer should've been)' before recommending a fix.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00969
+}

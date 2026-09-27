@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response jumps straight to generic fixes (system prompt tightening, tool descriptions, few-shot examples) without first tracing when/why the agent skips the tool\u2014no diagnostic step to identify the boundary between cases where it calls vs. skips the tool.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "No request for examples, logs, or evidence of failure cases before recommending architectural changes like a two-step classifier/router pipeline or fine-tuning; only at the very end does it ask for the system prompt/tool description, which is not evidence-gathering about the actual failure pattern.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "Suggests adding a 'lightweight classifier/router' as a separate pipeline stage and mentions fine-tuning, which are additional architectural/framework elements rather than avoiding unnecessary complexity.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.0,
+  "case_pass": false,
+  "judge_cost_usd": 0.010388
+}

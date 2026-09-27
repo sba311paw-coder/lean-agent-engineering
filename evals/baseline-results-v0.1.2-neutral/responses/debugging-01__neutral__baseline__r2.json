@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since I can't see your code or logs, here's a fast, structured way to pin this down. Tool-calling breakage after a code change is almost always one of a handful of things \u2014 work through these in order of likelihood/speed:\n\n## 1. Diff-check the actual change (fastest)\n- `git diff` (or your VCS equivalent) against the last working commit. Look specifically at:\n  - Tool/function **schema definitions** (name, parameters, required fields)\n  - The **system prompt or tool-list registration** call\n  - Any **serialization** touching the request payload (JSON encoding, pydantic models, etc.)\n\n## 2. Check the request actually sent to the model\n- Log or print the raw outgoing payload right before the API call.\n- Common breakers:\n  - Tool name changed but not updated everywhere it's referenced (routing/dispatch table)\n  - Schema now has invalid JSON Schema (e.g., missing `type`, bad `enum`, nested `$ref` issues)\n  - Tools array accidentally empty, `None`, or malformed\n  - System prompt no longer instructs the model to use tools (if you generate it dynamically)\n\n## 3. Check the response parsing/dispatch side\n- Did the change alter how you parse the model's tool-call response (e.g., renamed a field like `tool_calls` vs `function_call`, or changed SDK version response shape)?\n- Add a raw log of the model's response object before your parsing logic touches it.\n\n## 4. SDK/API version mismatch\n- Did the change bump a dependency (Anthropic/OpenAI SDK, `pydantic`, etc.)? Check `requirements.txt`/`package.json` diff too \u2014 sometimes \"code change\" is really a lockfile change.\n- Breaking changes in tool-call response format between SDK versions are a classic culprit.\n\n## 5. Isolate with a minimal repro\n- Strip down to a single tool, single call, no surrounding app logic. If that works, bisect by adding pieces back (other tools, memory/context, retries, streaming) until it breaks again.\n\n## 6. Check silent failures\n- Exceptions swallowed in a try/except around the tool-call handler?\n- Tool execution succeeding but result not being fed back into the conversation correctly (wrong role, missing `tool_use_id`/`tool_call_id` linkage)?\n\n---\n\nIf you can share the actual error/behavior (exception, stack trace, or what \"stopped working\" looks like \u2014 no calls at all? calls with wrong args? calls that never get responses?) plus the relevant snippet, I can give you a targeted fix instead of this general checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 517,
+      "outputTokens": 1034,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011374,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 182,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 517,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1034,
+    "output_tokens_details": {
+      "thinking_tokens": 182
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 517,
+        "output_tokens": 1034,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011374,
+  "duration_ms": 14205
+}

@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Tool Returns Data But Agent Doesn't Use It\n\nThis is a common issue with tool-calling agents. Here's a systematic checklist to find the cause:\n\n## 1. Check the message/conversation flow\n\nThe most common cause: the tool result isn't actually being appended back into the conversation history before the final generation call. Verify your loop looks like:\n\n```\n1. User message \u2192 Agent\n2. Agent decides to call tool \u2192 returns tool_use block\n3. You execute the tool\n4. You append a tool_result message (with matching tool_use_id) back into messages[]\n5. You call the model AGAIN with the full history including that tool_result\n6. Model generates final response using the tool_result\n```\n\n**Common bug:** Step 5 is skipped, or the tool result is logged/printed but never added to the `messages` array sent back to the model.\n\n## 2. Verify the tool_use_id matches\n\nIf you're using Claude's tool-calling format, the `tool_result` block must reference the exact `tool_use_id` from the model's `tool_use` block. A mismatch causes some SDKs/APIs to silently drop or ignore the result.\n\n## 3. Check the shape/format of the tool_result content\n\nThe result needs to be in the expected content format, e.g.:\n```json\n{\n  \"type\": \"tool_result\",\n  \"tool_use_id\": \"toolu_123\",\n  \"content\": \"Sunny, 72\u00b0F in San Francisco\"\n}\n```\nIf `content` is a raw object instead of a string/content-block array, some frameworks fail to parse it and silently produce an empty follow-up.\n\n## 4. Look for premature termination\n\nIf your agent loop checks `stop_reason == \"tool_use\"` and exits after the tool call rather than looping back for a final generation, you'll never get the synthesized answer \u2014 just the raw tool call step.\n\n## 5. Check for a system prompt / instruction that discourages restating tool output\n\nSometimes overly aggressive prompts like \"be concise\" or \"don't repeat information\" cause the model to assume the user already sees the tool output and skip mentioning it.\n\n## 6. Add logging at each hop\n\nTemporarily log:\n- The exact payload sent back to the model (post-tool-call)\n- The raw model response before any post-processing/parsing in your app\n\nThis usually reveals whether it's a **plumbing bug** (result never reaches the model) vs. a **model behavior** issue (result reaches the model but isn't surfaced).\n\n---\n\n**Quick question to narrow this down:** What are you using to build the agent \u2014 the Claude Agent SDK directly, LangChain, a custom loop, or something else? And when you log the second API call, does the tool_result message actually show up in the payload?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 533,
+      "outputTokens": 864,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009706,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 533,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 864,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 533,
+        "output_tokens": 864,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009706,
+  "duration_ms": 10803
+}

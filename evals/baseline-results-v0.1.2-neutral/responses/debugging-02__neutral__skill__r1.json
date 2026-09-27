@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models is a plausible fix, but it's premature without diagnosing where the failure actually happens. RAG has several independent stages, and a wrong final answer could originate at any of them. Let's find the actual failing boundary first.\n\n**Where RAG can break, in order:**\n\n1. **Ingestion/chunking** \u2014 chunks too large/small, split mid-context, losing key info\n2. **Embedding/retrieval** \u2014 relevant docs aren't retrieved (this is the \"wrong embedding model\" hypothesis)\n3. **Ranking/top-k** \u2014 right docs retrieved but ranked too low to make the cut\n4. **Context assembly** \u2014 retrieved docs are correct but truncated, poorly formatted, or contradictory\n5. **LLM generation** \u2014 retrieval was fine but the model ignored context, hallucinated, or misread it\n\nSwapping embedding models only helps if the failure is specifically #2.\n\n**How to check quickly:**\n\n- Take 5\u201310 failing queries.\n- Log/print what chunks were actually retrieved for each.\n- Ask: *is the correct answer present in the retrieved chunks?*\n  - **No** \u2192 retrieval problem (could be embeddings, could be chunking, could be top-k too low)\n  - **Yes** \u2192 generation problem \u2014 the model had the right info and still answered wrong (embedding swap won't fix this)\n\nIf it is a retrieval problem, before changing models, also rule out cheaper causes:\n\n- Chunk size/overlap (bad chunking breaks retrieval regardless of embedding quality)\n- top-k too low\n- Query/document mismatch (e.g., short keyword queries vs. long prose chunks)\n- Metadata/filter bugs silently excluding the right documents\n- Embedding the wrong field (e.g., titles only, stale index, mismatched embedding dims after a partial reindex)\n\nOnly if none of these explain it, and retrieval genuinely surfaces semantically irrelevant chunks, does upgrading the embedding model make sense \u2014 and even then the choice depends on your domain (general text vs. code vs. multilingual vs. long documents) and eval results, not a generic recommendation.\n\n**What would help me actually answer \"which model\":**\n\n- A few concrete failing query examples + what was retrieved vs. expected\n- Current embedding model, chunk size, top-k\n- Domain (legal, code, support docs, etc.)\n- Language(s)\n\nWith that I can tell you whether it's a retrieval issue at all, and if so, what to try \u2014 reranking, hybrid search (BM25 + embeddings), or a specific embedding model, in that order of effort-to-impact.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 853,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 438,
+      "webSearchRequests": 0,
+      "costUSD": 0.0107512,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 438,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 853,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 438,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 853,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 438,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 438
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0107512,
+  "duration_ms": 11703
+}

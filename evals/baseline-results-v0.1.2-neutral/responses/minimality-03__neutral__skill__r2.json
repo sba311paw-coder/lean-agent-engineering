@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "Short answer: probably none yet. Let's check the capability gap first before picking a framework.\n\n**You've said you already have:**\n- Logging that shows tool-call failures\n- Tests that surface latency\n\nThat means you already have visibility into the two things you listed as motivating this. Adding a \"large observability framework\" (e.g. full OpenTelemetry collector pipeline, LangSmith, Langfuse, Arize Phoenix, Helicone, etc.) is a meaningful addition of infrastructure, cost, and often a new external service dependency \u2014 that's not justified just because \"observability\" sounds like the right category of thing to have.\n\n**Questions to answer before adding anything:**\n\n1. **What exact capability is missing?** Do you need:\n   - Historical/aggregated metrics across many runs (not just single-run logs)?\n   - Distributed tracing across multiple agent/tool hops?\n   - A dashboard/UI for non-engineers to inspect traces?\n   - Alerting on failure-rate or latency thresholds?\n   - Cost tracking per call?\n\n   If the answer is \"no, I just want to see failures and latency,\" your logs + tests already do that.\n\n2. **Can existing tools solve it?** Python's standard `logging` module plus structured log fields (`extra={\"tool\": ..., \"latency_ms\": ..., \"status\": ...}`) piped to something you already have (stdout, a file, existing log aggregator) often covers single-agent debugging completely. If you already ship logs somewhere (CloudWatch, Datadog, whatever you use for the rest of your stack), route agent logs there too \u2014 no new framework needed.\n\n3. **Is the real need scale, not tooling?** If you're running one agent for personal/small use, a \"large observability framework\" is disproportionate. If you're running many agents in production with multiple engineers needing to debug traces across sessions, that's a different, justified case.\n\n**If there's a genuine gap** (e.g., you need trace correlation across nested tool calls, or multi-run analytics), the smallest steps in order:\n- Structured logging with a trace/session ID you already control (no new dependency).\n- OpenTelemetry SDK alone (vendor-neutral, you control the backend, no lock-in) if you need standardized tracing.\n- Only then consider an LLM-specific SaaS (Langfuse, LangSmith, Phoenix) \u2014 and only one, based on whether you need self-hosted vs. hosted, and whether your stack (LangChain, raw API calls, etc.) matches its integration.\n\nCan you tell me: is this a single agent for yourself/small team, or something with multiple engineers/production scale? And what specifically feels missing beyond what your current logs/tests show \u2014 is it aggregation across many runs, a UI, alerting, or something else? That'll tell us whether you need a framework at all, or just a small local change (e.g., structured JSON logging + a simple script to summarize failure/latency stats).",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 948,
+      "cacheReadInputTokens": 2773,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0100386,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2773,
+    "output_tokens": 948,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 948,
+        "cache_read_input_tokens": 2773,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0100386,
+  "duration_ms": 12728
+}

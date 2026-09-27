@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames the issue as a boundary between tool and model ('TOOL --> AGENT APPLICATION --> LLM --> FINAL RESPONSE') and instructs to trace whether the tool result reaches the LLM.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'Check the exact payload of the next LLM call. Print/log that, not just the tool's raw output' and 'log the exact message array sent to the LLM right before the final generation call'.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The entire response focuses on diagnosing the handoff (checklist of message-building, tool_call_id, race conditions, truncation, prompt) before any fix is suggested, and explicitly says 'Fix depends on what you find' only after tracing, without proposing changes to the tool itself.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010564
+}

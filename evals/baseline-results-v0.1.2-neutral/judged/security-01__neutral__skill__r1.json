@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"The LLM's decision to call the tool is **not authorization**\" and \"the LLM can request the action, but only the application can authorize it.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"enforcement happens HERE, not in the LLM\" at the agent application/tool boundary; code sample requires `verify_human_approval(approval_token, ...)` and `is_admin_approved` checks inside the tool function.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Sections on thresholds, explicit human confirmation for bulk actions, preferring reversible soft-deletes, and audit logging all describe extra safeguards specifically for destructive/irreversible actions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010092
+}

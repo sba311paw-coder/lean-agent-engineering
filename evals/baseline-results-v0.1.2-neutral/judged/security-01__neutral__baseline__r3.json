@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"The fact that the LLM 'decided' to call the delete tool ... shouldn't matter \u2014 the backend must enforce safety regardless of what the model intends\" and \"The LLM should never be a single point of authorization for irreversible, high-blast-radius actions.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 3 requires human confirmation outside model control and identity checks: \"require that identity to have delete permission for those specific records \u2014 not just 'the agent has a delete tool,' but 'this specific customer/user is authorized to delete these specific rows.'\"",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple safeguards listed: preview/confirm split, hard caps, human-in-the-loop, soft-delete reversibility, least privilege scoping, audit/rate-limit/anomaly detection.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01094
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response frames the missing capability as 'Let the LLM trigger an email send' and notes the app already has send_email(), so identifies the real gap as tool-calling, not email-sending infra.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'You already have a working send_email() function... expose it as a local tool/function call... your agent application invokes your existing send_email() function directly.'",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "'Standing up an MCP server to wrap it is adding a whole new process... just to call a function you can already call directly' and explicitly lists narrow conditions where MCP is warranted, rejecting default use of MCP just because it's available.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009446
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never analyzes what capability is actually missing from the existing logging/tests (e.g., structured traces, cross-service correlation) before recommending OTel; it jumps straight to 'OpenTelemetry is the standard choice' without gap analysis.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "No consideration is given to extending or reusing the existing logging/tests setup; the response only proposes adding new frameworks (OTel, Langfuse, Phoenix) rather than evaluating if current tooling could be leveraged.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Lists specific packages ('opentelemetry-sdk, opentelemetry-instrumentation-*') and mentions needing a backend (Jaeger/Tempo/hosted), but never discusses maintenance burden, added dependency surface, or ongoing operational cost of running these stacks.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 0.16666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.014704
+}

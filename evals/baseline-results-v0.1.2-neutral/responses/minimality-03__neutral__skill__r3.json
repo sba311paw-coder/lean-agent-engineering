@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "Short answer: probably none, yet.\n\nYou already said logging and tests show you tool-call failures and latency \u2014 that means the capability you need (visibility into failures/latency) already exists. Adding a \"large observability framework\" (Langfuse, Arize Phoenix, LangSmith, OpenTelemetry-based stacks, etc.) is a new dependency, often a new service/credential/network call, and ongoing maintenance. Before reaching for one, run it through the capability-gap test:\n\n1. **What exact capability is missing?** Is it just \"I can see this in logs/tests but not aggregated over time / across runs / in production\"? Or do you actually need per-request tracing across many concurrent sessions, cost tracking, or a dashboard for non-engineers?\n\n2. **Does your existing setup already cover it?**\n   - Structured logging (e.g., `logging` with JSON formatter) + grepping/log aggregation can get you failure rates and latency percentiles with zero new frameworks.\n   - Python's `time.perf_counter()` around tool calls + a counter/histogram is a 10-line solution for latency.\n   - If you're on any cloud, you likely already have a log sink (CloudWatch, GCP Logging, etc.) that can do queries/alerts without adding an LLM-specific framework.\n\n3. **Can a small, focused tool solve it instead of a \"large framework\"?**\n   - If you want traces specifically for LLM/tool calls (nested spans, prompt/response capture), **OpenTelemetry** (vendor-neutral, standard library-adjacent) is the smallest standard building block \u2014 you can self-host or export to whatever backend later, no vendor lock-in.\n   - If you want an LLM-specific UI (traces, evals, cost) with minimal setup, something like **Langfuse** (self-hostable, open source) is lighter-weight than commercial APM platforms and integrates in a few lines.\n\n4. **When would a large framework actually be justified?**\n   - Multiple agents/services in production.\n   - Need for team-wide dashboards, alerting, cost attribution across users/models.\n   - Compliance/audit requirements for prompt/response retention.\n   - Your logs/tests are already too noisy or siloed to answer \"what's failing and why\" without manual digging.\n\nIf none of those apply yet, don't add one \u2014 instrument what you have (structured logs + a few metrics) and revisit when you hit an actual limitation the current setup can't answer. If you tell me the actual pain point (e.g., \"I need this across 50 concurrent agent instances in prod\" vs. \"I want a nicer local dashboard while developing\"), I can help you pick the smallest thing that closes that specific gap.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 873,
+      "cacheReadInputTokens": 2773,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009288600000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2773,
+    "output_tokens": 873,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 873,
+        "cache_read_input_tokens": 2773,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009288600000000001,
+  "duration_ms": 13184
+}

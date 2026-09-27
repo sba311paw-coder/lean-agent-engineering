@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "Short answer: probably none, yet.\n\nBefore picking a \"large observability framework,\" run the capability-gap test:\n\n1. **What capability is actually missing?** You say you already have logging and tests that surface tool-call failures and latency. That means you already have: error visibility, and timing data. The core capabilities of observability \u2014 signal + evidence \u2014 are already present in some form.\n\n2. **Does the existing system already provide it?** If your logs contain timestamps and structured failure info, you likely just need:\n   - Consistent structured logging (JSON logs with `tool_name`, `duration_ms`, `status`, `error`).\n   - Log aggregation/query (even `grep`/`jq` over log files, or your existing log platform if you have one \u2014 Cloud Logging, CloudWatch, ELK, whatever you already run).\n   - A couple of derived metrics (p50/p95 latency, failure rate per tool) computed from those logs.\n\n   That's often sufficient for a single Python agent and doesn't require adding a new framework at all.\n\n3. **What would a \"large observability framework\" (e.g., full OpenTelemetry SDK + collector + backend, or a dedicated LLM-observability platform) actually add?**\n   - Distributed tracing across services.\n   - Multi-agent/multi-process correlation.\n   - A hosted dashboard/UI, alerting, retention policies.\n   - Standardized span/trace format for interop with other tools.\n\n   If your agent is a single process calling tools locally, most of that is unused capability \u2014 it adds a dependency, possibly network egress, credentials, and maintenance burden for no corresponding gap.\n\n4. **When is it actually justified?**\n   - Multiple services/agents where you need to correlate a request across process boundaries.\n   - You need alerting/dashboards for a team, not just local test output.\n   - You need to compare traces across many runs, not just in test.\n\nIf you're at that point, the incremental choice is:\n- **OpenTelemetry (Python SDK)** if you want a vendor-neutral standard \u2014 it's a library, not a heavy service, and you can export to whatever backend you already use (or none, and just view spans locally).\n- Avoid picking a dedicated \"LLM observability\" SaaS (LangSmith, Langfuse, Helicone, Arize, etc.) unless you specifically need LLM-specific views (token cost, prompt/response diffing) that generic tracing doesn't give you \u2014 and only after confirming your logs/tests can't already answer the question you're trying to answer.\n\n**Recommendation:** Tell me what specific question your current logs/tests can't answer (e.g., \"I can't see latency trends over time\" or \"I can't correlate a failure across two services\"), and I can tell you whether that's a local-logging fix or genuinely needs OpenTelemetry or a specific backend. Don't add a framework as a default first move.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 919,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 447,
+      "webSearchRequests": 0,
+      "costUSD": 0.011447200000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 447,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 919,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 447,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 919,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 447,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 447
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011447200000000001,
+  "duration_ms": 11837
+}

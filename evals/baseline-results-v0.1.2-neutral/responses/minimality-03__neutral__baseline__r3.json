@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "For a Python agent where you need to trace tool calls and latency, **OpenTelemetry (OTel)** is the standard choice.\n\n**Why it fits well:**\n- Tool calls map naturally to spans \u2014 each tool invocation becomes a child span with start/end time, so latency is just span duration.\n- Failures show up as span status (`ERROR`) with exception events attached, so you get stack traces alongside timing data in one place.\n- It's vendor-neutral: you instrument once and can ship traces to any backend (Jaeger, Grafana Tempo, Honeycomb, Datadog, New Relic, etc.) without rewriting instrumentation later.\n- It now has **GenAI semantic conventions** (`gen_ai.*` span attributes) specifically for LLM calls and tool/function invocations, so you're not inventing your own schema.\n- Python support is mature: `opentelemetry-sdk`, `opentelemetry-instrumentation-*` packages give auto-instrumentation for HTTP clients, requests, etc., which is useful if your tools call external APIs.\n\n**Practical setup path:**\n1. Instrument the agent loop with a tracer \u2014 one span per agent turn, nested spans per tool call.\n2. Export via OTLP to a local Jaeger/Tempo instance for dev, or a hosted backend for prod.\n3. Add exception recording (`span.record_exception`) on tool-call failures.\n\n**If you want something more turnkey for LLM agents specifically** (built on top of OTel, but with prompt/response viewing baked in): **Langfuse** or **Arize Phoenix** are the two most commonly reached-for options \u2014 both are open source, self-hostable, and designed around agent/tool-call traces rather than generic spans. Phoenix is a good pick if you're already leaning on OpenTelemetry conventions since it consumes OTel traces directly.\n\nIf you tell me whether you want self-hosted vs. SaaS, or whether this needs to plug into an existing observability stack (Datadog/Grafana/etc.) at your org, I can narrow it down further.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 522,
+      "outputTokens": 1790,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.018944,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1107,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 522,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1790,
+    "output_tokens_details": {
+      "thinking_tokens": 1107
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 522,
+        "output_tokens": 1790,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.018944,
+  "duration_ms": 19729
+}

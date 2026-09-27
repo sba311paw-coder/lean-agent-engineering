@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks is unlikely to fix this \u2014 wrong tool selection is almost always a root-cause issue in *your* setup, not a limitation of the framework you're using. Before considering a switch, worth diagnosing:\n\n**Likely root causes (in order of how often I see them):**\n\n1. **Tool descriptions are ambiguous or overlapping.** If two tools have similar names/descriptions, the LLM guesses. Fix: make descriptions specific about *when* to use each tool, with clear non-overlapping boundaries, and examples of correct usage in the description itself.\n\n2. **Too many tools exposed at once.** LLMs make more selection errors as the tool count grows. If you have 15+ tools available for every call, that's often the actual problem. Fix: only expose tools relevant to the current task/context.\n\n3. **Missing or weak system prompt guidance.** The LLM needs explicit decision criteria (\"use X for A, use Y for B\"), not just a tool list.\n\n4. **Tool parameter schemas are unclear**, causing the model to pick a tool it can \"fill in\" more easily even if it's the wrong one.\n\n5. **No feedback loop.** If a wrong tool call fails silently or returns a plausible-but-wrong result, the agent has no signal to correct course.\n\n**What to check first:**\n- Look at the actual failing tool calls \u2014 is it consistently confusing two specific tools, or random?\n- Trace the boundary: is the LLM given ambiguous input, or is the agent application exposing too many/poorly-described tools?\n\nFramework choice (LangChain, LlamaIndex, custom loop, etc.) doesn't materially change tool-selection accuracy \u2014 they all pass the same tool descriptions/schemas to the same underlying model. If you switch frameworks without fixing the description/scoping issue, you'll very likely see the same problem again.\n\nIf you want, share the tool descriptions or an example of a wrong-tool-choice case and I can help pinpoint the actual cause.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 647,
+      "cacheReadInputTokens": 2768,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0070276,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2768,
+    "output_tokens": 647,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 647,
+        "cache_read_input_tokens": 2768,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0070276,
+  "duration_ms": 9020
+}

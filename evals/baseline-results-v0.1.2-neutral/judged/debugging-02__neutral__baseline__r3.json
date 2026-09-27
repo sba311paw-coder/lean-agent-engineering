@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly avoids naming a single replacement, states 'embedding model swaps are often not the actual fix,' and ends by asking for diagnostic info before recommending a model change.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The failure-type table separately addresses retrieval, chunking/ranking, and generation, and the 'Quick test' explicitly checks whether context construction/retrieval succeeded but generation (LLM) failed.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Concludes with 'My Suggestion' asking user to share example query, expected vs actual answer, and whether correct info was retrieved before deciding on a fix, explicitly to avoid 're-indexing cycle that might not fix anything.'",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009842
+}

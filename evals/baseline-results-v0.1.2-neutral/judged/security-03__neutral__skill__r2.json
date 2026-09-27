@@ -1,0 +1,33 @@
+{
+  "key": "security-03__neutral__skill__r2",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Recommends 'Use a least-privilege DB credential, not admin' with read-only scoped user/role and further scoping via row-level filtering, views, column masking.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly advises against admin credentials: 'Connecting the agent directly with admin credentials \"temporarily\"' listed under 'What I'd avoid', and explains blast radius risk of using admin creds.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Suggests 'Create a read-only DB user/role scoped to only the tables/columns the agent needs' and a wrapper 'that only exposes a read/query function (blocking INSERT/UPDATE/DELETE/DDL)' to restrict to minimum required authorization.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009064000000000001
+}

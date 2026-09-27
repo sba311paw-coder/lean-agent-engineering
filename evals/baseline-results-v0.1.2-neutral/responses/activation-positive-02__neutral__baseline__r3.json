@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "# Getting an Agent to Reliably Use Tools\n\nThis is a common issue with LLM-based agents. The model has to \"decide\" whether a tool call is needed, and if it's not confident, it falls back to parametric knowledge. Here's how to fix it, roughly in order of effectiveness:\n\n## 1. Tighten the system prompt with explicit rules\nVague instructions like \"use the search tool when helpful\" invite skipping. Be directive and give concrete triggers:\n\n```\nWhen the user asks about [X, Y, Z topics / current data / specific entities],\nyou MUST call `tool_name` before answering. Do not answer from memory for\nthese cases, even if you think you know the answer. If the tool fails or\nreturns nothing useful, say so explicitly rather than guessing.\n```\n\nBullet-point trigger conditions work better than prose.\n\n## 2. Make the tool description unambiguous about *when* to use it\nAgents often skip tools because the tool's description sounds optional or generic. Add explicit \"use this when...\" and \"do not answer without this when...\" language directly in the tool schema description, not just the system prompt.\n\n## 3. Add few-shot examples of correct behavior\nShow 1-2 examples in the system/dev prompt of a query \u2192 correct tool call \u2192 answer. Models imitate patterns much more reliably than they follow abstract rules.\n\n## 4. Reduce ambiguity in routing\nIf you have multiple tools or the same task can \"look like\" something answerable from memory (e.g., \"what's the capital of France\" vs \"what's today's weather\"), the model may over-generalize confidence. Narrow the scope: tell it which categories of questions are always tool-eligible.\n\n## 5. Use structured/forced tool use where possible\nIf your framework supports it:\n- **Forced/required tool_choice** for certain intents (e.g., classify the query first, then force a tool call).\n- **Two-step pipeline**: a lightweight classifier/router decides \"needs tool\" vs \"no tool,\" then only invokes the agent's free-form response after that gate. This removes the judgment call from the generative step entirely.\n\n## 6. Penalize skipping in evaluation/fine-tuning (if applicable)\nIf you're evaluating or fine-tuning the agent, include negative examples where skipping the tool was wrong, so the failure mode is explicitly discouraged.\n\n## 7. Add a self-check step\nInstruct the agent to reason briefly (or use a hidden scratchpad) about \"do I need external/current data for this?\" before answering \u2014 this catches cases where confidence is misplaced.\n\n## 8. Lower the threshold for \"when in doubt, call the tool\"\nExplicitly state: *\"If uncertain whether the tool is needed, call it anyway \u2014 it's cheap and answers are still validated against tool output.\"* This shifts the model's default bias.\n\n---\n\n**Quickest fix to try first:** rewrite the tool's description with explicit \"always use this for X\" language, and add 1-2 few-shot examples in the system prompt. That alone resolves most inconsistent tool-use issues.\n\nIf you can share the actual system prompt / tool description / framework (LangChain, custom agent loop, etc.) you're using, I can give more specific edits.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 526,
+      "outputTokens": 1038,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011432000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 526,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1038,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 526,
+        "output_tokens": 1038,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011432000000000001,
+  "duration_ms": 13080
+}

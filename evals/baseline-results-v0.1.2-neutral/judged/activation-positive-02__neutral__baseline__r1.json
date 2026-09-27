@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response jumps straight to a numbered list of fixes without first analyzing or asking about the specific boundary conditions (which queries trigger skips vs. calls) before recommending changes.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Only at the very end does it say 'If you tell me what tool and what kind of queries are being skipped, I can help you draft the exact wording' - this comes after already prescribing 8 solutions, not before changing approach.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Solutions like tool description edits, system prompt tweaks, tool_choice, temperature, and few-shot examples are all lightweight/native SDK features; no new frameworks or heavy libraries are suggested.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.009874
+}

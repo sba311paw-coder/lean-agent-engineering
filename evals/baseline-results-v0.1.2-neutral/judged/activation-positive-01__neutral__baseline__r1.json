@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response walks through the full loop: model call \u2192 tool call \u2192 tool execution \u2192 append result \u2192 second model call \u2192 final response, tracing where things could break.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes LLM-side issues (system prompt causing terse replies, max_tokens truncation) from Agent App execution issues (missing second model call, message format/role/tool_call_id mismatches, serialization).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists distinct boundaries: message formatting/role, missing round-trip call, serialization, token truncation, prompt instructions, and framework-specific issues (LangChain/LlamaIndex/CrewAI).",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Provides a diagnostic checklist and does ask clarifying questions at the end ('Which framework...', 'share a snippet'), but frames these as follow-up after already giving a full list of concrete fixes/code snippets rather than investigating first before proposing fixes.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011176
+}

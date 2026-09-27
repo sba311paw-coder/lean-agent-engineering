@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Tool Runs but Result Missing from Final Response\n\nThis is a common issue with a few likely causes. Let's narrow it down:\n\n## Most Common Causes\n\n**1. Tool result not being fed back into the conversation loop**\nThe most frequent culprit \u2014 the tool executes, but your code doesn't append the tool result message back into the message history before calling the model again. Check that your loop looks like:\n\n```\n1. Model calls tool \u2192 returns tool_use block\n2. You execute tool \u2192 get result\n3. You append a tool_result message (with matching tool_use_id) to messages\n4. You call the model AGAIN with updated messages\n5. Model reads tool_result and generates final response\n```\n\nIf step 3 or 4 is skipped/malformed, the model never \"sees\" the data.\n\n**2. `tool_use_id` mismatch**\nThe `tool_result` block must reference the exact `id` from the `tool_use` block. If it's mismatched or missing, providers often silently drop or ignore it.\n\n**3. Stopping after first response instead of looping**\nIf your code treats the tool call as the \"final answer\" and doesn't re-invoke the model with the tool output, you'll never get a synthesized response \u2014 you'll just get the raw tool call.\n\n**4. System prompt/instructions suppressing tool output**\nIf your system prompt says something like \"be concise\" or \"don't repeat data,\" the model may summarize away the actual values. Check if instructions are causing it to omit rather than include results.\n\n**5. Result truncation or wrong content type**\nIf the tool result is a huge object dumped as unstructured text (not proper JSON/string content in the `content` field), some models may ignore or fail to parse it.\n\n**6. Multi-turn framework issue (e.g., LangChain/LlamaIndex agents)**\nIf you're using an orchestration framework, check that the agent executor's `max_iterations` isn't cutting off before the final synthesis step, and that the tool's return type matches what the framework expects (string vs. dict).\n\n## Quick Checklist to Fix It\n\n- [ ] Print/log the exact messages array sent on the **second** API call \u2014 does it contain the tool_result?\n- [ ] Verify `tool_use_id` matches between call and result\n- [ ] Confirm you're calling the model a second time after tool execution (not just returning tool output directly)\n- [ ] Check `content` field type of your tool_result (should be string or structured content blocks, not a raw Python object)\n- [ ] Temporarily remove/simplify your system prompt to see if instructions are causing suppression\n- [ ] Check `max_iterations`/`max_turns` if using a framework\n\n---\n\nIf you can share a snippet of your agent loop code (or which framework \u2014 raw API, LangChain, OpenAI Assistants, etc.) and how you're structuring the tool_result message, I can pinpoint the exact bug.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 533,
+      "outputTokens": 921,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010276,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 533,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 921,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 533,
+        "output_tokens": 921,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010276,
+  "duration_ms": 11047
+}

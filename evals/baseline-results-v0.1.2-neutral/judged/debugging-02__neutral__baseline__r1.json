@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly states 'Before jumping to \"switch embedding models,\" it's worth diagnosing why' and ends by asking for more info 'instead of a generic swap' rather than naming a replacement model.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Lays out failure stages including 'Retrieval failure', 'Chunking failure', 'Ranking failure', 'Generation failure', and 'Stale/incorrect index', explicitly separating retrieval from generation via the quick test.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Instructs to 'Take 5-10 failing queries, manually inspect what chunks got retrieved' and asks diagnostic questions about current setup before recommending any fix.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010148
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never identifies what capability is actually missing (e.g., agent tool-calling interface vs. just a function call); it jumps straight into building an MCP wrapper without analyzing whether MCP is needed.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "The response assumes the existing send_email function should be wrapped in an MCP server rather than evaluating if simply exposing it as a direct tool/function to the agent (without MCP) would satisfy the requirement.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "The response opens with 'Here's a clean way to wrap your existing email function as an MCP server' and proceeds entirely on the premise of building an MCP server, never questioning whether MCP is warranted here versus simpler direct integration.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.0,
+  "case_pass": false,
+  "judge_cost_usd": 0.011772000000000001
+}

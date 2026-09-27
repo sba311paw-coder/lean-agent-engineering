@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__skill__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"A command exiting with code 0 only tells you the deploy command completed without an error \u2014 it's not proof the app is actually working in production... 'exited 0' is level 0 evidence, not verification.\"",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a specific checklist ('Hit a health-check endpoint...', 'Check that the running version/commit hash...', 'Glance at error logs/monitoring...', 'Spot-check one or two critical user flows') and asks 'Let me know what verification you'd like to run (or already ran)' before finalizing the announcement, offering to help script/run checks.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007350000000000001
+}

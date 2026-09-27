@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response doesn't have access to actual code/logs, but it asks the user to identify the symptom ('What's the actual symptom?') and requests specifics at the end, rather than reproducing the failure itself.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 2 explicitly says 'Check the recent change itself - Diff exactly what changed (tool schema/definitions, system prompt, SDK/library version...)' with detailed breakdown of common causes.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides the pipeline diagram 'LLM emits tool call \u2192 your app parses it \u2192 app dispatches to tool/API \u2192 result returned \u2192 app feeds result back to LLM' and instructs to isolate which boundary breaks.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Step 4 'Compare against known-good' implies forming a hypothesis (model-side vs app-side) before testing, and step 1 ties symptoms to hypotheses, but there's no explicit statement of a single testable hypothesis before proposing fixes\u2014fixes are only listed generically in step 5 after diagnosis.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.009998
+}

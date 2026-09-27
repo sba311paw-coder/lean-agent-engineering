@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "This is a classic case of \"the model isn't the problem \u2014 a boundary between the tool and the model is.\" The fact that the log shows the correct temperature tells you the **tool call succeeded**, but it doesn't tell you the tool result actually reached the LLM as input to the final answer. Trace that boundary specifically:\n\n```\nTOOL (weather API) --> AGENT APPLICATION --> LLM --> FINAL RESPONSE\n```\n\nLogging happens in the application layer, often right after the tool executes \u2014 before (or independently of) whatever code path builds the message the LLM actually sees. So \"it's in the logs\" is not evidence that it's in the prompt.\n\n**Checklist, in order of likelihood:**\n\n1. **Is the tool result actually appended to the conversation sent to the model?**\n   Check the exact payload of the next LLM call. Print/log that, not just the tool's raw output. It's common to log the tool's return value but then have a bug where the result never gets pushed into `messages` (wrong variable, overwritten object, no-op, etc.).\n\n2. **Is the tool result linked to the correct tool call?**\n   Most providers require the tool result message to carry the matching `tool_call_id`/`tool_use_id`. If that ID is missing, wrong, or duplicated, some APIs silently ignore or reject the tool message, and the model falls back to answering from general knowledge.\n\n3. **Race condition / ordering bug.**\n   If the tool call is async, check whether the final-answer generation is triggered before the tool result promise resolves. This is extremely common: the request that builds the \"final\" model call reads from a variable that hasn't been populated yet.\n\n4. **Context truncation.**\n   If you have message-trimming/summarization logic for long conversations, check whether it's dropping the tool result message (especially if it's large or if trimming happens between the tool response and the final generation step).\n\n5. **System prompt / instructions.**\n   Some prompts explicitly or implicitly encourage the model to give a \"helpful general answer\" rather than grounding in tool output, especially if the instructions don't say something like \"always use the tool result as the source of truth for factual answers.\" Check if there's competing guidance nudging it toward a generic response.\n\n**Fastest way to isolate it:** log the *exact* message array sent to the LLM right before the final generation call (not the tool's raw output, the actual serialized messages/tool-result blocks). That single log line will tell you definitively whether this is an application bug (tool result never reached the model) or a prompting/model behavior issue (result reached the model but was ignored).\n\n**Fix depends on what you find:**\n- Missing/misrouted tool result \u2192 fix the message-building code to append it with the correct role and ID before the final LLM call.\n- Race condition \u2192 await the tool result before triggering the final generation.\n- Truncation \u2192 exclude tool result messages from trimming, or move trimming to run before tool call resolution, not after.\n- Prompt-level ignoring despite correct context \u2192 add explicit instruction like \"Use the tool result exactly as returned; do not substitute a general answer when a tool result is present.\"\n\n**Verify:** rerun with the same query, confirm the message log shows the tool result present in the final LLM call's input, and confirm the final response reflects the correct temperature. A single successful run isn't proof \u2014 run it 2\u20133 times and with a different city to rule out a coincidental correct answer.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1791,
+      "cacheReadInputTokens": 2785,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.018471,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 699,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2785,
+    "output_tokens": 1791,
+    "output_tokens_details": {
+      "thinking_tokens": 699
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1791,
+        "cache_read_input_tokens": 2785,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.018471,
+  "duration_ms": 23967
+}

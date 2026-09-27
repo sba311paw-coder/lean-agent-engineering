@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__skill__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response identifies the actual need as 'the LLM should be able to decide send an email and have that happen' and checks for process/language boundary or multi-client sharing, finding none exist.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'you likely don't need an MCP server here at all' and recommends 'Wrap, don't rewrite. Keep your existing send_email(to, subject, body) function as the source of truth.'",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly argues against using MCP just because it's an option: 'an MCP server is added complexity with no corresponding gap it closes' and only lists specific scenarios ('When an MCP server would make sense') where it's actually justified.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009628000000000001
+}

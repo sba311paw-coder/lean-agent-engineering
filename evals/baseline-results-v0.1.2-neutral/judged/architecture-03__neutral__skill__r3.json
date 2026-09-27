@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__skill__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response names 'YOUR SCRIPT' as the Python Agent App and 'Claude (Anthropic API)' as the LLM, and generically refers to 'two existing Python functions' / 'function A/B', but never gives concrete names or examples for the two functions\u2014only placeholders.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Diagram and text explicitly separate 'LLM ... decides' from 'YOUR SCRIPT \u2014 if tool call requested, validate + run the actual Python function', and orchestration loop is described as plain Python controlling execution.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicit loop description: 'send message + tool definitions to Claude ... if Claude returns a tool_use block, call the matching Python function yourself, feed the result back ... if Claude returns text, that's your final answer' plus the ASCII diagram showing the round trip.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "'What to avoid (unless you hit a real gap)' section explicitly rejects LangChain, MCP, vector DB, multi-agent setups unless a concrete need arises, and closing line reiterates 'Add complexity later only if you find a concrete gap'.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011518
+}

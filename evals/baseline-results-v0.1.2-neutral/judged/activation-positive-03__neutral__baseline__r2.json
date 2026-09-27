@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response frames the problem as failures at 'retrieval, context assembly, prompting, or generation' and organizes fixes into sections 1 (retrieval), 2 (context), 3 (generation), 4 (verification), but it never asks the user to actually trace/inspect their own pipeline to locate which boundary is failing before prescribing fixes for all of them.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "The response opens with 'Improve retrieval quality first' and immediately lists architectural changes (chunking, embedding model swap, hybrid retrieval, reranker, query rewriting) with no request for logs, failure examples, or diagnostic evidence; the 'Evaluate systematically' step and request for stack details/failure cases come only at the very end, after the changes are already recommended.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Mentions 'A/B test each change... against this eval set \u2014 don't guess' and 'test embedding quality with known query-document pairs,' which gestures at isolating variables, but there is no explicit isolation experiment (e.g., manually check if correct chunk was retrieved vs. whether the model ignored good context) to separate retrieval failures from generation failures.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.3333333333333333,
+  "case_pass": false,
+  "judge_cost_usd": 0.024328000000000002
+}

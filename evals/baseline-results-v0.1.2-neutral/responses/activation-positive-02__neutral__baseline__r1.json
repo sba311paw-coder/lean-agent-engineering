@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "# Fixing Inconsistent Tool Calling\n\nThis is a common issue with agent/LLM tool use. The inconsistency usually comes from the model deciding it \"already knows\" the answer and short-circuiting the tool call. Here's how to fix it, roughly in order of impact:\n\n## 1. Make tool descriptions unambiguous about *when* to use them\nVague descriptions let the model rely on judgment (and judgment varies run to run). Be explicit and directive:\n\n```\n\"description\": \"ALWAYS call this to get current weather data. \nNever answer weather questions from memory, even if you think you know \nthe answer, because conditions change constantly and your training \ndata is outdated.\"\n```\n\nWeak tool descriptions are the #1 cause of this behavior.\n\n## 2. Add explicit system-prompt instructions\nReinforce the rule at the system level, not just in the tool schema:\n\n```\n\"For any question about [X], you MUST call the [tool_name] tool before \nanswering. Do not answer from prior knowledge, even if confident.\"\n```\n\nRepetition across the tool description AND system prompt significantly increases compliance.\n\n## 3. Force tool use when appropriate\nIf your SDK/API supports it, use tool_choice to force a call:\n- Anthropic API: `tool_choice: {\"type\": \"tool\", \"name\": \"your_tool\"}` forces that specific tool\n- `tool_choice: {\"type\": \"any\"}` forces *some* tool call (any tool)\n\nYou can even do this conditionally \u2014 detect intent via a cheap classifier/regex, then force the tool call for matching queries.\n\n## 4. Restructure your prompt: give it a decision rule, not just a suggestion\nModels respond better to concrete triggers than to open-ended discretion:\n\n```\nBefore answering, ask yourself: \"Does this question involve real-time, \nuser-specific, or file-based data?\" If yes \u2192 call the tool. If no \u2192 \nanswer directly.\n```\n\n## 5. Lower temperature / increase determinism\nHigher temperature increases variance in whether the model takes the \"easy path\" (answering directly) vs the \"correct path\" (tool call). Try `temperature: 0` or low values for tool-heavy agents.\n\n## 6. Check tool naming/placement\n- Tools listed later in a long tool array sometimes get less attention \u2014 order matters somewhat.\n- Ambiguous or overlapping tool names/descriptions cause the model to hedge by not calling any.\n\n## 7. Add few-shot examples in the system prompt\nShow 1\u20132 examples of the exact query pattern paired with the correct tool call. This is often more effective than prose instructions alone.\n\n## 8. Post-hoc guardrail (belt and suspenders)\nIf reliability is critical, add a validation layer: detect certain query patterns programmatically and reject/retry the response if no tool call was made, prompting the model with \"You must use a tool for this.\"\n\n---\n\n**Fastest fix to try first:** rewrite the tool description to be more assertive (\"ALWAYS use this for...\") and add a matching line to the system prompt. If you tell me what tool and what kind of queries are being skipped, I can help you draft the exact wording.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 526,
+      "outputTokens": 1022,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011272,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 526,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1022,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 526,
+        "output_tokens": 1022,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011272,
+  "duration_ms": 12962
+}

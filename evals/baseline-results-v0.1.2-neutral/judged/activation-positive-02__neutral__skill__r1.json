@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The 'Locate the actual boundary that's failing' section traces the decision point through the architecture diagram and lists specific checks (enforcement, ambiguity, tool description framing) to pinpoint where the failure occurs.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The 'How to verify the fix' section explicitly recommends building a ~15-20 prompt eval set and measuring tool-call rate before/after, stating 'That gives you actual evidence instead of an anecdotal seems better now' before endorsing bigger architectural changes like step 3/4.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The 'What I would not do' section explicitly rejects adding 'a new orchestration layer, a router agent, or a second LLM call' as unwarranted, and fixes are ordered 'smallest first' starting with sharpening tool description rather than new frameworks.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01228
+}

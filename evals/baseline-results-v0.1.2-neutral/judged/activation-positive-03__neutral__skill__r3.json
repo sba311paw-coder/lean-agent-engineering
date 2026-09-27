@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly separates 'Retrieval failure', 'Context failure', and 'Generation failure' as distinct boundaries, and sections 2-4 trace each boundary separately with specific causes/fixes.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'Diagnose first \u2014 don't guess: Pull 10-20 examples of poorly-grounded answers and classify each' before any architecture changes, and section 5 emphasizes building an eval set and tracking metrics before/after changes rather than assuming fixes work.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "'Don't add a reranker, hybrid search, *and* prompt changes all at once \u2014 you won't know what fixed it' explicitly recommends isolating changes to identify causal impact.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01199
+}

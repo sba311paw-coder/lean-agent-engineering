@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly traces the architecture: 'AGENT APPLICATION -> LLM (decision) -> AGENT APPLICATION -> TOOL' and identifies 'the LLM decision step' as inconsistent, then enumerates specific boundary points (tool description, ambiguous queries, system prompt, context crowding, tool exposure bug) to isolate where the failure occurs.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Ends with: 'Can you share the tool's description/schema and the system prompt, plus 1\u20132 example queries that succeeded and 1\u20132 that skipped the tool? That will let me pinpoint which of the above is actually happening rather than treating all five as equally likely.' This requests evidence before any architecture change is made.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicit 'What NOT to do' section: 'don't assume more capability (a second verification agent, a retry loop) before ruling out 1\u20133 above; that's adding orchestration complexity to solve a prompt-clarity problem.'",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011476
+}

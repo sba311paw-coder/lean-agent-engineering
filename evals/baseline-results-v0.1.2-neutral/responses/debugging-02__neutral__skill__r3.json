@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models is a possible fix, but it's rarely the actual root cause \u2014 and swapping it blindly can cost you time/money and even make things worse. Before touching the embedding model, let's figure out *where* in the pipeline things are actually breaking.\n\n**RAG failure points, roughly in order of likelihood:**\n\n1. **Chunking** \u2014 chunks too large/small, splitting mid-thought, losing context (e.g., splitting a table or a Q&A pair apart). This is the #1 cause of \"wrong answers\" in RAG.\n2. **Retrieval** \u2014 right chunks aren't being retrieved (top-k too small, similarity threshold wrong, no reranking, metadata filters excluding relevant docs).\n3. **Query/document mismatch** \u2014 user queries are phrased very differently from document text (embedding models struggle with short queries vs. long passages) \u2014 this is where a different embedding model *could* help.\n4. **Stale/incomplete index** \u2014 source docs updated but not re-embedded/re-indexed.\n5. **Prompt construction** \u2014 retrieved chunks are correct but the generation prompt buries them, truncates them, or the LLM ignores them in favor of parametric knowledge.\n6. **Generation** \u2014 LLM hallucinating despite correct context (rare if context is actually relevant and prompt is decent).\n\n**Fastest diagnostic step:** Pick 3-5 failing queries and manually inspect what chunks were actually retrieved for each (log/print the retrieved context before it hits the LLM).\n\n- If the retrieved chunks **don't contain the answer** \u2192 problem is chunking or retrieval (embedding model *might* be a factor, but check chunk boundaries first \u2014 that's cheaper to fix and more commonly the culprit).\n- If the retrieved chunks **do contain the answer** but the model still answers wrong \u2192 problem is prompting or generation, not embeddings at all. Changing the embedding model won't help.\n\nCould you tell me:\n- What are you using for chunking (size/strategy) and retrieval (top-k, reranker, vector DB)?\n- What's a specific example query + wrong answer you're seeing?\n\nThat'll tell us whether an embedding model swap is even the right lever to pull, versus a cheaper fix like adjusting chunk size or adding a reranker.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 746,
+      "cacheReadInputTokens": 2764,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008016800000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2764,
+    "output_tokens": 746,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 746,
+        "cache_read_input_tokens": 2764,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008016800000000001,
+  "duration_ms": 12637
+}

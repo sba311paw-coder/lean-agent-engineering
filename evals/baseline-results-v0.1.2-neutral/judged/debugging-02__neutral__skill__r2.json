@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'Switching embedding models isn't necessarily the right fix here' and defers model choice to only after localization, ending with a request for evidence rather than a recommendation.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes retrieval failure vs. generation failure (step 1), and within retrieval discusses context construction issues like chunking, metadata/filtering, top-k, and index staleness (step 2).",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Concludes with 'Can you share a couple of concrete failing examples (query + retrieved chunks + expected answer)?' explicitly asking to collect evidence before any fix or migration.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009014
+}

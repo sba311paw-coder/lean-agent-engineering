@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "Poor grounding in a RAG (retrieval-augmented generation) system usually comes from failures at one of several stages: retrieval, context assembly, prompting, or generation. Here's a systematic way to diagnose and fix it.\n\n## 1. Improve retrieval quality first\nMost grounding problems are actually retrieval problems in disguise \u2014 the model can't ground answers in documents it never received.\n\n- **Chunking strategy**: Avoid arbitrary fixed-size chunks that split ideas mid-sentence. Use semantic or structure-aware chunking (by section/heading, sliding window with overlap, or recursive splitting). Include some overlap (10\u201320%) so context isn't lost at boundaries.\n- **Embedding model fit**: Make sure your embedding model matches your domain (e.g., legal/medical text may need a domain-tuned or larger model). Test embedding quality with known query-document pairs.\n- **Hybrid retrieval**: Combine dense vector search with keyword/BM25 search. Pure semantic search often misses exact terms, IDs, or numbers that matter for grounding.\n- **Re-ranking**: Add a cross-encoder reranker (e.g., cohere-rerank, bge-reranker) after initial retrieval to reorder the top-k results by actual relevance to the query \u2014 this alone often fixes a lot of \"almost right\" retrievals.\n- **Metadata filtering**: If documents have dates, authors, sections, filter/boost by metadata when the query implies it (e.g., \"latest policy\" \u2192 filter by most recent date).\n- **Query transformation**: Rewrite/expand the user's query before retrieval (e.g., HyDE \u2014 generate a hypothetical answer and embed that; or multi-query expansion) to improve recall for vague or short queries.\n\n## 2. Increase retrieved context quality/quantity\n- Retrieve more candidates (top 10\u201320) then rerank down to top 3\u20135 for the prompt, rather than retrieving only 3\u20135 directly.\n- Include surrounding context (parent chunk / full section) not just the matched snippet, so the model has enough context to answer accurately.\n\n## 3. Constrain the generation step\n- **Explicit grounding instructions**: Tell the model clearly to only answer using the provided context, and to say \"I don't know\" or \"not found in the documents\" if the answer isn't there.\n- **Citation requirements**: Force the model to cite which chunk/source supports each claim (e.g., \"[source: doc3, para2]\"). This forces it to tie statements to retrieved text and makes ungrounded claims easier to spot.\n- **Lower temperature** for factual QA tasks \u2014 reduces hallucination-prone creative extrapolation.\n- **Structured output**: Ask for answer + supporting quote/citation in a schema (JSON) rather than free text \u2014 this makes it easier to programmatically verify grounding.\n\n## 4. Add a verification/grounding check layer\n- **Post-hoc fact-checking**: After generation, run a second pass (or a smaller/cheaper model) that checks whether each claim in the answer is supported by the retrieved context (natural language inference-style check).\n- **Attribution scoring**: Some frameworks (e.g., RAGAS, TruLens, DeepEval) provide automated \"faithfulness\"/\"groundedness\" metrics you can run in eval pipelines to catch regressions.\n\n## 5. Evaluate systematically\n- Build a small eval set of Q&A pairs with known correct answers/sources from your own docs.\n- Track metrics: retrieval recall@k, faithfulness/groundedness score, answer correctness.\n- A/B test each change (chunking, reranking, prompt wording) against this eval set \u2014 don't guess.\n\n## Quick wins to try first\n1. Add a reranker after retrieval (highest ROI for effort).\n2. Force citations in the output format.\n3. Add \"answer only from context, say 'not found' otherwise\" to the system prompt.\n4. Increase overlap/context size per chunk.\n\nIf you can share more about your current stack (chunk size, retrieval top-k, whether you rerank, what vector DB, and a couple of example failure cases), I can give more targeted suggestions.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 528,
+      "outputTokens": 1445,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.015506,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 67,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 528,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1445,
+    "output_tokens_details": {
+      "thinking_tokens": 67
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 528,
+        "output_tokens": 1445,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.015506,
+  "duration_ms": 18293
+}
