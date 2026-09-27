@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "This is a common issue with tool-calling agents. Here's a breakdown of the likely causes and fixes, roughly in order of impact:\n\n## 1. Tool description isn't compelling enough\nThe model decides whether to call a tool based on how well the description matches the query. If the description is vague, the model may think \"I already know this.\"\n\n**Fix:** Make the tool description state *when to use it* explicitly, including cases that overlap with the model's parametric knowledge.\n\n```\n\"Use this tool to get current/live/authoritative data about X. \nAlways call this tool for questions about X, even if you think \nyou already know the answer, because your training data may be \noutdated or incomplete.\"\n```\n\n## 2. System prompt doesn't enforce the policy\nIf tool use is optional-sounding, models will take the shortcut.\n\n**Fix:** Add explicit instructions like:\n- \"For any question about [domain], you MUST call [tool] before answering. Do not rely on internal knowledge for these topics.\"\n- \"If a user asks about X, never answer from memory \u2014 always retrieve fresh data first.\"\n\nThis is more reliable than hoping the tool description alone does the job.\n\n## 3. Ambiguous trigger conditions\nIf the agent only *sometimes* calls the tool, check whether the failing queries are phrased differently than the successful ones. Models are sensitive to phrasing \u2014 \"what's the latest version of X\" vs \"tell me about X\" may route differently.\n\n**Fix:** List example trigger phrases/queries in the tool description or system prompt so the model generalizes better.\n\n## 4. Model doesn't see the tool as necessary for the task\nSometimes the model believes it can answer \"well enough\" without a tool call, especially for general knowledge questions where the tool exists for precision/freshness.\n\n**Fix options:**\n- Use **forced tool choice** if your framework supports it (e.g., Anthropic's API supports `tool_choice: {\"type\": \"tool\", \"name\": \"your_tool\"}` for specific turns, or `\"type\": \"any\"` to force *some* tool call).\n- For a subset of intents, hardcode routing (classify intent first, then force the tool) instead of leaving it fully to the model's discretion.\n\n## 5. Few-shot examples\nAdd 1\u20132 examples in the system prompt showing the correct behavior (question \u2192 tool call \u2192 tool result \u2192 answer), especially for edge cases where it currently fails.\n\n## 6. Evaluate systematically\nBuild a small eval set of prompts that should trigger the tool, and track the miss rate as you tweak the prompt/description. This turns \"sometimes skips it\" into a measurable, fixable metric rather than a vibe.\n\n---\n\nIf you can share the tool's current description and system prompt (or the framework you're using \u2014 Claude Agent SDK, LangChain, etc.), I can give more targeted suggestions, including whether forced tool-choice is viable for your use case.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 527,
+      "outputTokens": 926,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010313999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 527,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 926,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 527,
+        "output_tokens": 926,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010313999999999999,
+  "duration_ms": 11919
+}

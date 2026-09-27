@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__original__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The pipeline diagram traces LLM -> Agent runtime -> Tool -> back to Agent runtime -> LLM -> extraction -> user output, clearly mapping the architecture.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Boundaries explicitly separate 'Agent runtime' actions (execution, capture, message formatting, appending to history, extraction) from 'LLM' actions (emitting tool_call, generating final response with tool data), e.g. boundary 4 vs boundary 5 distinguish loop/runtime behavior from LLM's actual output content.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists 7 distinct failure boundaries (execution->capture, formatting, history append, second call happening, LLM incorporating result, final extraction, streaming) each with concrete failure modes.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Ends with 'What I need to narrow this down further' asking for framework, agent loop code, and logs before pinpointing the fix, and explicitly states 'the failure is almost always at a boundary... the failure is likely occurring' without prescribing a fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012862
+}

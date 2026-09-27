@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__original__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Replacing the embedding model should be one of the last steps, not the first\" and step 6 explicitly defers embedding model evaluation until other checks are done.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response walks through retrieval (step 1, 4), context construction/chunking (step 2), and generation (step 5), covering the full pipeline.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "\"Log the top-k chunks returned for a few failing queries\" and \"Build a small eval set (20-30 query/expected-answer pairs)... measure improvement objectively\" emphasize gathering evidence before acting.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009306
+}

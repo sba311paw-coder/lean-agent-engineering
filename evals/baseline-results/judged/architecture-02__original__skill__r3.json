@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__original__skill__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly identifies 'AGENT APPLICATION \u2192 LLM' handoff as first investigation point and lists checks like whether tool result is sent back, formatted correctly, and second LLM call happening.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Advises to 'Log the exact outgoing payload for the LLM call that produces the final response' and check the messages array for the tool_call_id/role pairing sent to the model.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Response never suggests modifying the tool; instead it says the tool\u2192app boundary is confirmed fine and focuses entirely on tracing the app\u2192LLM handoff before any code changes.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00932
+}

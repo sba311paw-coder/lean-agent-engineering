@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists generic root causes (ambiguous descriptions, too many tools, missing examples, etc.) but doesn't actually trace the user's specific agent architecture or ask about it before offering analysis; it asks for details only at the very end.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "No specific 'first incorrect boundary' is identified in the user's actual system; instead it offers a generic checklist of possible causes without pinpointing which one is likely first or most probable.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'Switching frameworks is rarely the fix' and 'Honest recommendation: try the cheap fixes first... since they'll transfer to any framework' before suggesting any architectural change.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.009392
+}

@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Pipeline diagram 'Query \u2192 Retrieval \u2192 Context assembly \u2192 Prompt \u2192 LLM \u2192 Answer' with distinct failure points (1) retrieval, (2) context assembly/ordering, (3) prompt/grounding instructions, (4) generation ignoring context\u2014explicitly tracing boundaries.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Repeatedly instructs to log/read chunks, verify recall via logging before reranking, and 'What I'd avoid adding right away' section says add fixes 'only after logs show precision/ordering is genuinely the gap \u2014 not as a first guess.'",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Verification section proposes a held-out Q&A set with known correct source passages to measure Recall@k and grounding rate in isolation from other changes, and gating reranker addition on confirmed isolated diagnosis ('only if you've confirmed via logging that recall is fine and precision/ordering is the actual gap').",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011082
+}

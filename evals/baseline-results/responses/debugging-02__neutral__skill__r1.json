@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Before jumping to \"swap the embedding model,\" it's worth diagnosing where the failure is actually happening \u2014 a different embedding model is one of the least likely fixes and adds cost/migration effort without evidence it's the bottleneck.\n\n**RAG pipeline has several boundaries where \"wrong answers\" can originate:**\n\n```\nQuery \u2192 Embed \u2192 Retrieve (vector search) \u2192 Rerank/Filter \u2192 Context assembly \u2192 LLM \u2192 Answer\n```\n\nThe fix is completely different depending on which stage fails.\n\n## Quick triage first\n\nPull 5\u201310 failing examples and check:\n\n1. **Are the right chunks even being retrieved?** Print the top-k retrieved chunks for a failing query. If the correct answer isn't in there at all \u2192 retrieval problem. If it *is* in there but the answer is still wrong \u2192 generation/prompting problem, not embeddings.\n\n2. **If retrieval is the problem, is it embeddings or something else?**\n   - Chunking too large/small or splitting mid-sentence/mid-table\n   - Wrong `k` (too few chunks retrieved)\n   - Missing metadata filters (wrong document set searched)\n   - Stale/incomplete index (docs not re-indexed after update)\n   - Query/document mismatch (short keyword-y queries vs. long prose docs)\n\n3. **If chunks are correct but the answer is wrong:**\n   - Prompt doesn't instruct the model to only use provided context\n   - Context window truncation dropping the relevant chunk\n   - Model hallucinating despite good context (check the prompt structure)\n\n## Where embedding model choice actually matters\n\nOnly after ruling out the above \u2014 if retrieval genuinely returns irrelevant chunks even with reasonable queries, *then* embedding model quality/domain-fit is worth examining. Considerations then:\n\n- **Domain match**: general-purpose embeddings (e.g., OpenAI `text-embedding-3-*`, Cohere embed-v3) often underperform on specialized jargon (legal, medical, code) \u2014 a domain-tuned or larger model may help.\n- **Dimensionality/model size** isn't usually the bottleneck compared to chunking strategy.\n- **Benchmark before switching**: run the same failing queries against a candidate model's embeddings on your actual corpus and measure retrieval recall \u2014 don't switch on reputation alone.\n\n## Bottom line\n\nSwapping embedding models is a real lever, but it's usually not the first or biggest one. In practice, most \"wrong RAG answers\" trace back to chunking, retrieval `k`, or prompt/context assembly \u2014 not the embedding model itself.\n\nCan you share what a failing query/answer pair looks like, and whether the correct info shows up in the retrieved chunks? That'll tell us which boundary is actually broken.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 909,
+      "cacheReadInputTokens": 2684,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0096308,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2684,
+    "output_tokens": 909,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 909,
+        "cache_read_input_tokens": 2684,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0096308,
+  "duration_ms": 11766
+}

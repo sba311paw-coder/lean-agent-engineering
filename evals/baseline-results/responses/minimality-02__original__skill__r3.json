@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__original__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I have a small Python agent that needs to call two functions and return the results to the user. The current implementation works with the model API directly. Should I replace it with LangChain because I am building an AI agent?",
+  "response": "Short answer: no, not for this. Adding LangChain here is very likely unnecessary complexity for what you're describing.\n\n**Capability-gap check first:**\n\n1. **What capability is actually needed?** Call two functions, return results to the user. That's it.\n2. **Does your existing setup already provide it?** Yes \u2014 you're already calling the model API directly and presumably already have the two functions. This is just: model decides/produces args \u2192 your code calls function A and function B \u2192 format result \u2192 return.\n3. **Can the application solve it directly?** Almost certainly yes, with plain Python:\n   - Use the model API's native tool/function-calling support (OpenAI, Anthropic, etc. all support this directly).\n   - Parse the tool call(s) from the response.\n   - Call your two Python functions.\n   - Feed results back to the model (or just return them, if no further reasoning is needed).\n4. **What would LangChain add here?** An abstraction layer, its own agent executor, prompt templates, callback system, versioning churn, and a bunch of indirection \u2014 for a task that's two function calls. That's real maintenance cost and debugging overhead for zero functional gain.\n5. **What evidence justifies adding it?** None yet. \"It's an AI agent\" isn't itself a reason \u2014 that's the framing this skill specifically warns against (don't add a framework just because the task is AI-labeled).\n\n**When LangChain (or similar) would earn its place:**\n- You need multi-step planning across many tools with dynamic tool selection.\n- You need built-in memory/retrieval chains, multiple LLM providers behind one interface, or complex agent loops (ReAct, plan-and-execute) that you don't want to hand-roll.\n- Your team already standardizes on it across many agents and the abstraction cost is amortized.\n\nNone of that applies to \"call two functions and return results.\"\n\n**Recommendation:** Keep the direct API implementation. Use the model provider's native function/tool-calling feature if you aren't already, since that gives you structured function selection without any framework. If you later hit an actual capability gap (e.g., you need 10+ tools with dynamic routing, or multi-agent orchestration), reassess then \u2014 add the smallest thing that closes that specific gap, not a full framework preemptively.\n\nIf you want, share the two-function flow and I can show you the minimal direct-API version (tool-calling loop) so you have something concrete to compare against a LangChain version.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 777,
+      "cacheReadInputTokens": 2715,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008317,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2715,
+    "output_tokens": 777,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 777,
+        "cache_read_input_tokens": 2715,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008317,
+  "duration_ms": 11213
+}

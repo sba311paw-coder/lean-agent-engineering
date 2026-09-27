@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__original__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My Python agent already has logging and tests that show me tool-call failures and latency. I am considering adding a large observability framework because I saw it recommended for AI agents. Should I add it?",
+  "response": "Short answer: probably not, unless you have a specific gap that logging+tests don't cover.\n\n**When a big observability framework earns its keep:**\n- Multiple agents/services and you need distributed tracing across process boundaries\n- You need to reconstruct full conversation/tool-call chains across sessions for debugging production incidents\n- Multiple people need a shared dashboard (not just you reading logs)\n- You need aggregate analytics across many users/runs (cost trends, drift detection, eval scoring at scale)\n- Compliance/audit requirements for retention and access control\n\n**What you already have covers a lot:**\n- Logging \u2192 tool-call failures, latency (you said so yourself)\n- Tests \u2192 catch regressions before they ship\n\n**What logging+tests typically *don't* give you** that's worth checking before deciding:\n- Token/cost tracking per call or per session\n- Ability to replay/inspect a specific failed run's full context (prompt, tool args, model output) without re-triggering it\n- Trend visualization over time (is latency creeping up week over week?)\n- Alerting when failure rate crosses a threshold\n\nIf one of those is actually biting you, you might not need a \"large framework\" \u2014 a lightweight addition (structured logging to a queryable store like SQLite/Postgres, or a simple metrics counter) often closes the gap without the dependency weight, config surface, and vendor lock-in that comes with a full observability platform.\n\n**Rule of thumb:** add the framework when you're spending real time doing something manually that it would automate (e.g., grepping logs across sessions to debug one incident), not because it's recommended in general for \"AI agents.\" Recommendation \u2260 requirement \u2014 scope it to your actual pain point.\n\nIf you tell me what specific problem you're hitting (debugging a specific failure type, cost tracking, multi-agent tracing, etc.), I can help you figure out if a lighter-weight solution would work instead.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 544,
+      "outputTokens": 619,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007278,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 544,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 619,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 544,
+        "output_tokens": 619,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007278,
+  "duration_ms": 9522
+}

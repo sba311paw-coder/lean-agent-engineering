@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__original__skill__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I have a Python application with an existing function that can send email successfully. I want my AI agent to send an email when appropriate. Should I add an MCP server for email, or can I use what I already have? Help me decide based on the minimum reliable architecture.",
+  "response": "# Short answer: Use what you already have. Don't add an MCP server.\n\nYou already have a working, tested Python function that sends email. That's the capability. An MCP server for email would just wrap that same capability in a new process boundary, a new protocol, and a new set of things that can fail \u2014 without adding anything you don't already have.\n\n## Applying the capability-gap test\n\n1. **What capability is missing?** None. Sending email already works.\n2. **Does an existing skill/tool already provide it?** Yes \u2014 your function.\n3. **Can the application solve it directly?** Yes \u2014 expose your existing function as a tool the LLM can call.\n4. **Simpler local solution?** Yes, this *is* the simpler local solution.\n5. **Does an MCP server add new permissions, processes, network surface, or maintenance?** Yes \u2014 a new process, a new IPC/transport layer, new failure modes (server down, protocol mismatch, serialization issues), and another thing to deploy/monitor.\n6. **What evidence justifies the added complexity?** None presented. You're not integrating a third-party service you don't control, you're not sharing this tool across multiple separate agent processes/languages, and there's no isolation requirement mentioned.\n\nMCP earns its cost when you need to share a tool across multiple, independently-running agents/processes (possibly in different languages), or integrate an external service that only speaks MCP. Wrapping your own in-process Python function is not that case.\n\n## The minimum reliable architecture\n\n```\nAGENT APPLICATION\n   |\n   v\nLLM (decides: \"send email now, with this content\")\n   |\n   v  structured tool call (function name + args)\nAGENT APPLICATION  <-- enforces authorization here, not the LLM\n   |\n   v\nyour existing send_email() function\n   |\n   v\nresult -> back to LLM -> final response to user\n```\n\nConcretely:\n- Register `send_email(to, subject, body)` as a plain tool/function the LLM can call (whatever tool-calling mechanism your agent framework already uses \u2014 function calling, a simple dispatch dict, etc.).\n- **The LLM's decision to call the tool is not authorization.** Since sending email is external-facing and hard to undo, enforce checks at the application boundary before actually calling your function:\n  - Validate the recipient (e.g., allow-list, or restrict to the user's own email `sba311paw@gmail.com` if it's meant to be self-notifications).\n  - Consider a confirmation step for anything going to a *new* or arbitrary recipient, since this is a \"send external message\" action \u2014 one of the high-impact categories worth extra care.\n  - Rate-limit / dedupe if the agent could plausibly loop and send repeatedly.\n- Treat any email *content* sourced from tool output, retrieved documents, or user-uploaded files as untrusted data \u2014 don't let injected instructions in that content change *who* it's sent to or trigger unintended sends.\n\n## Verification before you call it done\n- Unit test: tool dispatch correctly calls `send_email` with expected args given a sample LLM tool-call output.\n- Integration test: end-to-end run where the agent decides to send an email in a scripted scenario, and you confirm (via test inbox or mock) that exactly the intended email went out.\n- Confirm the authorization check actually blocks an out-of-policy recipient in a test case \u2014 don't just confirm the happy path works.\n\n**Bottom line:** no new server, no new dependency. Wire your existing function in as a tool, put the authorization/validation logic in your application layer (not in the LLM's hands), and verify with a real send in a controlled test.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1167,
+      "cacheReadInputTokens": 2732,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.012220400000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2732,
+    "output_tokens": 1167,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1167,
+        "cache_read_input_tokens": 2732,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012220400000000001,
+  "duration_ms": 15415
+}

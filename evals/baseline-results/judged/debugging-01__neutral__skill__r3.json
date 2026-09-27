@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response never asks the user to reproduce the failure directly; it suggests logging raw model/tool outputs (an indirect diagnostic) and only at the end asks the user to 'share the actual error/log output' rather than actively reproducing the failure itself.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section '1. Check recent changes first' explicitly instructs diffing the recent change against the working version and lists specific areas (schemas, prompts, SDK versions, serialization, parsing logic).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section '2. Locate the failing boundary' traces the LLM \u2192 agent \u2192 tool \u2192 result \u2192 LLM flow step by step, checking each hop with logging.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Section 4 lists 'Common root causes' and section 5 says 'Once you find the exact broken boundary, fix only that piece' implying a hypothesis-then-fix approach, but it never explicitly instructs forming and testing a specific hypothesis before applying a fix.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.014084
+}

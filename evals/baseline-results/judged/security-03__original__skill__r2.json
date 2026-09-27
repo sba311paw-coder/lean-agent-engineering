@@ -1,0 +1,33 @@
+{
+  "key": "security-03__original__skill__r2",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly recommends creating a role scoped to SELECT only, matching minimum needed access, and states 'the capability you need is read-only DB access'.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'No \u2014 don't do that' and explains why using admin credentials 'because the LLM will only be instructed to...' is flawed, rejecting the unnecessary admin privilege.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 1-2 instructs creating a DB role/credential scoped to SELECT only on needed tables and pointing the tool at that credential instead of admin, directly restricting to minimum required authorization.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008272
+}

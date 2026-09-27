@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__skill__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Agent doesn't include tool result in final response\n\nThis is a classic \"boundary\" bug \u2014 the tool works, so the failure is somewhere between the tool result and the LLM's final response. Let's trace it systematically rather than guessing.\n\n## Where the bug likely lives\n\n```\nLLM decides to call tool\n      |\n      v\nAGENT APPLICATION -> calls weather tool -> gets result   \u2705 (you confirmed this works)\n      |\n      v\nAGENT APPLICATION -> feeds result back to LLM            <-- most likely broken here\n      |\n      v\nLLM -> generates final response                          <-- or here\n```\n\nSince the tool itself is fine, the bug is in the **application's result-handling logic** or in **how the result is presented to the LLM**, not in the tool.\n\n## Most common root causes, in order of likelihood\n\n**1. The tool result isn't actually being appended to the conversation/message history**\nCheck that after the tool call, your code does something like:\n```\nmessages.append({role: \"tool\", tool_call_id: ..., content: toolResult})\n```\nbefore calling the LLM again. A surprisingly common bug: the result is logged/printed for debugging but never added to the message array sent back to the model.\n\n**2. Wrong tool_call_id / mismatched correlation**\nIf you're using an API that requires matching the tool result to a specific `tool_call_id` (OpenAI, Anthropic tool use), a mismatched or missing ID can cause the model to silently ignore or fail to associate the result.\n\n**3. The result is malformed or too large and gets truncated/dropped**\nIf the weather tool returns nested JSON, binary data, or an oversized payload, some pipelines silently drop or truncate it before it reaches the model.\n\n**4. The agent loop terminates before the second LLM call**\nCheck if your orchestration loop treats \"tool call made\" as the end of the turn \u2014 i.e., it never actually re-invokes the LLM with the tool result to get a final answer. This is common in hand-rolled agent loops.\n\n**5. System/developer prompt discourages restating tool output**\nLess likely, but worth ruling out \u2014 if your prompt says something like \"be concise\" or \"don't repeat raw data,\" the model may be deliberately omitting it.\n\n## How to isolate it (smallest useful test)\n\n1. **Log the exact payload** sent to the LLM in the follow-up call \u2014 confirm the tool result is actually present in the message list with correct role/ID.\n2. If it's present and correct \u2192 the bug is in the LLM call/response handling (check for wrong response parsing, or a truncated completion).\n3. If it's missing or malformed \u2192 the bug is in the application's tool-result handling step, before the LLM ever sees it.\n\n## Fix\n\nOnce you find which side it's on:\n- Missing from payload \u2192 fix the append/serialization step.\n- Present but ignored \u2192 check prompt instructions and confirm the model call includes the tool result as a proper message (not just system context or a log line).\n- Loop ends early \u2192 ensure your orchestration always makes one more LLM call after tool execution before returning to the user.\n\n## Verify\n\nAfter the fix, re-run the same weather query and confirm:\n- The tool result appears in the exact message array sent to the LLM (unit-level check).\n- The final user-facing response contains the actual weather data (end-to-end check).\n\nDon't consider it fixed just because the code runs without error \u2014 confirm the data round-trip explicitly.\n\nIf you can share the relevant snippet (the agent loop / tool-call handling code), I can pinpoint the exact line rather than working from these general patterns.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1154,
+      "cacheReadInputTokens": 2704,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.012084800000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2704,
+    "output_tokens": 1154,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1154,
+        "cache_read_input_tokens": 2704,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012084800000000001,
+  "duration_ms": 14486
+}

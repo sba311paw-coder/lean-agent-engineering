@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__original__skill__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'What capability is missing? None. Sending email already works.'",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'Use what you already have. Don't add an MCP server' and recommends registering existing send_email() as a tool.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States MCP would 'just wrap that same capability... without adding anything you don't already have' and only 'earns its cost' for cross-process/language sharing or external-only-MCP services, none of which apply here.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0099
+}

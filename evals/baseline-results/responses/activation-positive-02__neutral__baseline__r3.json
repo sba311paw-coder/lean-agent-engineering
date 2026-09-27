@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "# Fixing Inconsistent Tool-Calling in Agents\n\nThis is a common issue with LLM-based agents. The model is essentially making a judgment call each time about whether it \"needs\" the tool or thinks it already knows the answer. Here's how to fix it systematically:\n\n## 1. Tighten the tool description\nThe model decides whether to call a tool largely based on its description. Vague descriptions lead to inconsistent behavior.\n\n**Weak:**\n```\n\"Get weather information\"\n```\n\n**Strong:**\n```\n\"Get current, real-time weather data for a location. ALWAYS use this tool \nwhen asked about weather \u2014 never answer from memory, as weather changes \nconstantly and your training data is outdated.\"\n```\n\nExplicitly state *when* to use it and *why* not to rely on internal knowledge.\n\n## 2. Add explicit system-level instructions\nDon't just rely on the tool description \u2014 reinforce it in your system prompt:\n\n```\nWhen the user asks about [topic X], you MUST call the [tool_name] tool. \nDo not answer from your own knowledge, even if you believe you know the answer. \nYour training data may be outdated or incomplete for this domain.\n```\n\nRepetition across both the tool description and system prompt significantly improves compliance.\n\n## 3. Reduce ambiguity in trigger conditions\nIf the agent sometimes calls the tool and sometimes doesn't for similar-looking queries, the model may be inconsistently classifying intent. Give concrete examples:\n\n```\nExamples that REQUIRE the tool:\n- \"What's the weather in Paris?\"\n- \"Is it raining in Tokyo?\"\n\nExamples that do NOT require the tool:\n- \"What causes rain?\"\n- \"Explain how weather forecasting works\"\n```\n\n## 4. Use tool_choice forcing (if your framework supports it)\nMany APIs (including Claude's) let you force tool use for certain query types:\n- `tool_choice: \"required\"` \u2014 forces *a* tool call\n- `tool_choice: {\"type\": \"tool\", \"name\": \"get_weather\"}` \u2014 forces a *specific* tool\n\nIf you can classify intent upstream (even with a lightweight router/classifier), you can force the call rather than hoping the model chooses correctly.\n\n## 5. Penalize/verify at the orchestration layer\nAdd a validation step: after the model responds, check if it referenced information that should have come from a tool but didn't call one. If so, reject the response and re-prompt with an explicit instruction to use the tool.\n\n## 6. Lower temperature for tool-selection decisions\nHigher temperature increases variance in decision-making, including whether to invoke tools. If your framework allows separate decoding parameters for the \"decide to call tool\" step vs. generation, lowering temperature there helps consistency.\n\n## 7. Consider few-shot examples in context\nShow 2\u20133 examples in the conversation (or system prompt) of the *exact* pattern: user asks \u2192 model calls tool \u2192 model responds using tool output. This anchors the behavior more strongly than description text alone.\n\n---\n\n**Quick diagnostic:** Can you share the tool description and a couple of example prompts where it worked vs. didn't? That'll help pinpoint whether it's a description problem, an ambiguous-trigger problem, or something else (e.g., the tool failing silently and the model falling back to its own knowledge).",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 527,
+      "outputTokens": 1082,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011874,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 527,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1082,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 527,
+        "output_tokens": 1082,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011874,
+  "duration_ms": 12588
+}

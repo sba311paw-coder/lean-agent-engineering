@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-01__original__skill__r3",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response gives a clear educational explanation of LLMs, covering definition, how it works, capabilities, examples, and caveats.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "No debugging workflow steps (e.g., reproduce/investigate/fix) applied; response explicitly notes 'no build/debug workflow was needed \u2014 just a direct explanation.'",
+      "criterion": "Do not automatically apply an engineering debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0064080000000000005
+}

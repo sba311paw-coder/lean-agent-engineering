@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Before jumping to \"switch embedding models,\" it's worth diagnosing *why* your RAG agent is giving wrong answers\u2014embeddings are just one of several possible culprits. Let me lay out the diagnostic path first, then embedding recommendations.\n\n## First, figure out where the failure is happening\n\nRAG failures usually come from one of these stages:\n\n1. **Retrieval failure** \u2014 the right chunks never get pulled from the vector store\n2. **Chunking failure** \u2014 right document, but split so context is lost/fragmented\n3. **Generation failure** \u2014 right chunks retrieved, but the LLM ignores or misuses them\n4. **Data/index staleness** \u2014 the underlying content is outdated or wasn't indexed correctly\n\n**Quick test:** Take a failing query, manually inspect the top-k retrieved chunks. Do they actually contain the answer?\n- If **no relevant chunks retrieved** \u2192 likely embedding model or chunking issue\n- If **relevant chunks ARE retrieved** but answer is still wrong \u2192 it's a prompting/generation issue, not embeddings, and switching models won't help\n\n## If it is retrieval, common causes besides \"bad embedding model\"\n\n- **Chunk size/overlap** \u2014 too large dilutes relevance signal; too small loses context\n- **Domain mismatch** \u2014 general-purpose embeddings underperform on legal/medical/code-heavy/niche jargon text\n- **Query-document mismatch** \u2014 short queries vs. long passages embed differently; consider query rewriting or HyDE\n- **Wrong similarity metric** \u2014 cosine vs. dot product mismatches with normalization\n- **No reranking step** \u2014 embeddings get you candidates; a reranker often fixes \"close but wrong\" retrieval more than a better embedding model does\n\n## If you've confirmed it's genuinely an embedding quality issue\n\nGood current options (as of my knowledge):\n\n| Model | Notes |\n|---|---|\n| **OpenAI text-embedding-3-large** | Strong general-purpose, easy API, good multilingual |\n| **Voyage AI voyage-3-large / voyage-code-3** | Often outperforms OpenAI on retrieval benchmarks (MTEB), has domain-specific variants (code, finance, law) |\n| **Cohere embed-v4** | Good multilingual + supports compression for storage efficiency |\n| **BAAI/bge-large-en-v1.5** or **bge-m3** | Strong open-source option, self-hostable, bge-m3 supports multi-vector/hybrid retrieval |\n| **NVIDIA NV-Embed** | Competitive on MTEB, self-hostable |\n\n**Practical suggestion:** Before committing to a switch, run a small eval (20\u201350 representative Q&A pairs) against 2\u20133 candidate models using something like `MTEB` custom eval or a simple retrieval@k script, since real-world performance on *your* data often differs from published benchmarks.\n\n---\n\nWant help building a quick retrieval diagnostic script, or do you already know it's specifically an embedding-quality problem?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 514,
+      "outputTokens": 1002,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011048,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 514,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1002,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 514,
+        "output_tokens": 1002,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011048,
+  "duration_ms": 12433
+}

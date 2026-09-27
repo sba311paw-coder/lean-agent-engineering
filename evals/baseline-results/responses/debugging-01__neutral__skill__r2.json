@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "# Debugging Tool-Calling Integration Failure\n\nSince this broke after a recent code change, this is a regression \u2014 check the diff first before guessing at fixes. Here's the fast, systematic path:\n\n## 1. Check recent changes first\n```\ngit diff HEAD~1 HEAD  -- <relevant files>\n```\nLook specifically for changes to:\n- Tool/function schema definitions (names, parameter types, required fields)\n- System prompt or instructions referencing tools\n- The agent application layer that parses/dispatches tool calls\n- SDK/library version bumps (check lockfile diff)\n- API client config (model name, endpoint, headers)\n\nMost tool-calling breakage traces to one of these five things.\n\n## 2. Locate the failing boundary\nUsing the agent architecture model \u2014 the bug is at one specific hop:\n\n```\nLLM \u2192 (structured tool call) \u2192 AGENT APPLICATION \u2192 TOOL/API\n```\n\nAsk in order:\n\n- **Is the LLM even attempting a tool call?** Log the raw model response. If no tool call is emitted at all, the issue is upstream (system prompt, tool schema not being sent, wrong model, or tool_choice setting).\n- **Is the tool call malformed?** If the model emits a call but with wrong name/args, check if a schema/tool definition changed shape without the LLM-facing description being updated.\n- **Is the agent app failing to parse or route it?** Check if the dispatcher's tool-name matching, JSON parsing, or validation logic changed.\n- **Is the tool/API itself failing?** Check for auth, network, or signature changes in the actual function being called.\n\n## 3. Reproduce minimally\nStrip down to the smallest case: one tool, one simple prompt that should obviously trigger it. If that still fails, the bug is structural, not prompt-specific.\n\n## 4. Compare against last-known-good\nIf you have a previous working request/response log or commit, diff the actual JSON payload sent to the API (tool schemas, tool_choice, message format) \u2014 not just the code. Schema drift (e.g., a param renamed, a required field made optional) is the most common silent breaker.\n\n## 5. Form one hypothesis, test it, fix root cause\nDon't shotgun-fix multiple things at once \u2014 change one variable, re-run, confirm/deny.\n\n## 6. Verify\nRe-run the exact failing scenario and confirm the tool call completes end-to-end (not just \"no error thrown\" \u2014 check the tool actually executed with correct arguments and returned expected data).\n\n---\n\n**To help you get more specific:** what does \"stopped working\" mean exactly \u2014 no tool call attempted, malformed arguments, dispatch/routing error, or the tool executes but returns wrong results? And what changed in the recent commit (schema, SDK version, prompt, dispatcher logic)? That'll narrow it to one of the boundaries above immediately.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 936,
+      "cacheReadInputTokens": 2688,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0099016,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2688,
+    "output_tokens": 936,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 936,
+        "cache_read_input_tokens": 2688,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0099016,
+  "duration_ms": 13020
+}

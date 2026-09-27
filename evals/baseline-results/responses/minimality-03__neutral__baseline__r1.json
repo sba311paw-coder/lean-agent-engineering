@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__baseline__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "# Observability for a Python Agent (Tool Calls + Latency)\n\nSince you already have logging and tests surfacing tool-call failures and latency, you want a framework that adds **structured tracing, metrics, and correlation** without requiring a rewrite. Here's how I'd think about it:\n\n## Top recommendation: OpenTelemetry (OTel)\n\n**Why it fits:**\n- **Vendor-neutral standard** \u2014 instrument once, export anywhere (Jaeger, Prometheus, Grafana, Datadog, Honeycomb, etc.)\n- **Traces + metrics + logs** in one framework \u2014 perfect for capturing tool-call spans (each tool call = a span with duration, status, error attributes) and latency histograms\n- **Python SDK is mature**: `opentelemetry-sdk`, `opentelemetry-instrumentation-*` auto-instruments requests/httpx/DB calls, and you can manually wrap your agent's tool-call layer\n- **No vendor lock-in** \u2014 you choose the backend later (self-hosted or SaaS)\n\n### Basic shape for your use case:\n```python\nfrom opentelemetry import trace\nfrom opentelemetry.trace import Status, StatusCode\n\ntracer = trace.get_tracer(\"agent.tools\")\n\ndef call_tool(name, fn, *args, **kwargs):\n    with tracer.start_as_current_span(f\"tool.{name}\") as span:\n        try:\n            result = fn(*args, **kwargs)\n            span.set_status(Status(StatusCode.OK))\n            return result\n        except Exception as e:\n            span.set_status(Status(StatusCode.ERROR, str(e)))\n            span.record_exception(e)\n            raise\n```\nThis gives you per-tool latency, error rate, and failure attribution automatically exportable to any backend.\n\n## Alternatives worth knowing about\n\n| Framework | Best if... |\n|---|---|\n| **LangSmith / Langfuse** | Your agent uses LangChain/LangGraph specifically \u2014 great LLM-call/tool-call visualization out of the box |\n| **Arize Phoenix** | You want LLM-eval + tracing combined, open-source, OTel-compatible under the hood |\n| **Datadog APM** | You're already in the Datadog ecosystem and want a managed all-in-one |\n| **Prometheus + Grafana** | You mainly care about metrics/dashboards, less about per-request trace detail |\n\n## My suggestion\n\nStart with **OpenTelemetry** as the instrumentation layer regardless of backend \u2014 it's the closest thing to an industry standard, keeps you backend-agnostic, and several of the \"LLM-native\" tools (Phoenix, some Langfuse deployments) are OTel-compatible anyway, so you're not boxing yourself in.\n\nIf your agent is LLM-orchestration-heavy (lots of chained tool/model calls you want to visualize as traces), pairing OTel with **Langfuse** (open-source, self-hostable) is a strong combo \u2014 OTel for infra-level metrics/latency, Langfuse for LLM-specific trace visualization.\n\n---\n\nWant help wiring OTel spans directly around your existing tool-call wrapper and test failures, or scaffolding a `docker-compose` for a local Jaeger/Prometheus/Grafana stack to visualize this?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 523,
+      "outputTokens": 1097,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.012016,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 523,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1097,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 523,
+        "output_tokens": 1097,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012016,
+  "duration_ms": 12977
+}

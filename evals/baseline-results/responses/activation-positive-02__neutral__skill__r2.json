@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "This is a classic **agent-architecture boundary issue**, not necessarily a \"the model is dumb\" issue. Let me walk through where this typically breaks and how to fix it systematically rather than guessing.\n\n## Locate the failing boundary first\n\nPer the architecture:\n\n```\nUSER -> AGENT APPLICATION -> LLM -> tool decision -> AGENT APPLICATION -> TOOL\n```\n\nThe LLM is only one link. Before changing prompts, check which stage is actually inconsistent:\n\n1. **Is the tool call decision itself inconsistent?** (LLM sometimes chooses to call, sometimes doesn't, given similar inputs)\n2. **Is the tool call being made but silently swallowed or failing** in the application layer, causing a fallback to LLM knowledge?\n3. **Is there inconsistent input** \u2014 same-looking user questions actually differ in phrasing/context in ways that push the LLM toward \"I already know this\"?\n\nDon't assume #1 until you've ruled out #2 with logs/traces.\n\n## Likely root causes, in order of frequency\n\n**1. Tool description/necessity is ambiguous to the model**\nIf the LLM believes it \"already knows the answer,\" it will skip the tool unless instructed the tool is authoritative. Fix: make the tool description explicit about *when it must be used*, not just what it does \u2014 e.g., \"Always use this for current/user-specific/precise data; do not answer from memory for these cases.\"\n\n**2. No enforcement \u2014 the LLM's choice is being treated as sufficient**\nRemember: *the LLM decision is not itself authorization or ground truth*. If correctness requires the tool (e.g., live data, user-specific data, exact figures), don't leave it optional. Enforce it at the application layer:\n- Detect intent categories that *require* the tool and route deterministically (don't let the LLM decide for that class of query).\n- Or use structured output / forced tool_choice for those intents.\n\n**3. System prompt is descriptive, not directive**\n\"You have access to a search tool\" is weaker than \"For any question about X, you must call tool Y before answering \u2014 never answer X from memory.\"\n\n**4. Non-obvious bug (intermittent) \u2192 needs proper debugging, not a prompt tweak**\nIf it's genuinely nondeterministic even with the same input, treat it as a debugging task:\n- Reproduce the failure with the exact same prompt several times.\n- Compare a failing trace vs. a succeeding trace side by side \u2014 check system prompt, tool schema, message history, temperature.\n- Form one hypothesis (e.g., \"long conversation history causes tool-use instructions to be diluted/truncated\").\n- Test the smallest fix (e.g., pin critical tool-use instructions closer to the end of context, or reduce temperature for tool-selection determinism).\n\n## Fixes, cheapest first\n\n1. **Tighten the tool description** \u2014 state explicit conditions for mandatory use.\n2. **Tighten the system prompt** \u2014 directive language, not suggestion.\n3. **Lower temperature / add few-shot examples** of correct tool-use decisions for ambiguous cases.\n4. **Application-level routing** \u2014 for known high-stakes intents, don't rely on LLM choice at all; force the tool call deterministically.\n5. **Add a verification step** \u2014 after the LLM answers, check whether the answer type required tool grounding (e.g., contains a fact category that should have come from the tool) and reject/retry if it didn't call the tool.\n\n## What not to do\n\n- Don't just add more tools or another agent/orchestration layer \u2014 that adds complexity without fixing a decision-consistency problem.\n- Don't treat \"the model called the tool once\" as proof of a fix \u2014 verify across multiple repeated runs and multiple phrasings of the same underlying request.\n\n**To help further**, it'd be useful to know: is this fully nondeterministic on identical input, or does it vary based on how the question is phrased? That determines whether this is a prompt/tool-schema fix or an application-layer enforcement fix.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1306,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 452,
+      "webSearchRequests": 0,
+      "costUSD": 0.015321000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 452,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1306,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 452,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1306,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 452,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 452
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.015321000000000001,
+  "duration_ms": 17316
+}

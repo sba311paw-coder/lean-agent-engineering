@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__original__skill__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My weather tool executes successfully and returns the correct temperature. I can see the result in the Agent App logs, but the final LLM response ignores the temperature and gives a generic answer. Where should I investigate first?",
+  "response": "## Where to look first\n\nYou've confirmed the tool executes correctly and the result appears in the Agent App logs. That means the boundary between **TOOL \u2192 AGENT APPLICATION** is fine. The break is somewhere in the next hop:\n\n```\nTOOL/API\n   |\n   v  <-- confirmed OK (logs show correct result)\nAGENT APPLICATION\n   |\n   v  <-- INVESTIGATE HERE FIRST\nLLM\n   |\n   v\nFINAL RESPONSE\n```\n\n**First place to check: how the agent application feeds the tool result back into the LLM's context.** Specifically:\n\n1. **Is the tool result actually being sent back to the LLM at all?**\n   Check the request payload for the *next* LLM call (not just the logs of the tool call itself). Confirm the tool result message is present in the messages array sent to the model \u2014 with the correct `tool_call_id`/role pairing that your LLM API expects. A common bug: the app logs the tool result for debugging, but a serialization step, truncation, or conditional drops it before it reaches the actual API request.\n\n2. **Is the tool result formatted/associated correctly?**\n   If the tool-result message doesn't match the corresponding tool-call ID, many APIs will silently ignore or mishandle it, and the model responds as if no tool output existed.\n\n3. **Is there a second LLM call happening at all?**\n   Some agent loops mistakenly return the *first* LLM response (the one that requested the tool call) as the \"final response,\" never actually looping back with the tool result. Check whether your app is invoking the LLM a second time post-tool-execution, or just returning stale output from the first turn.\n\n4. **Is there truncation/summarization/middleware between tool output and the prompt?**\n   Some agent frameworks summarize or drop tool outputs above a certain size, or a system prompt/history-trimming step evicts the tool message before the final generation call.\n\n## Suggested diagnostic step (smallest test first)\n\nLog the **exact outgoing payload** for the LLM call that produces the final response \u2014 not the tool execution log, but the actual list of messages/context sent to the model on that turn. Compare it against what you expect: does it contain the tool result message?\n\n- If the tool result is **missing** from that payload \u2192 bug is in the agent application (context assembly).\n- If the tool result **is present** but the LLM still ignores it \u2192 the issue is prompt-level (e.g., system prompt encourages generic answers, or the tool-result message role/format confuses the model) \u2014 check the exact message formatting/role used for tool outputs.\n\nThis lets you pinpoint whether the failure is in the **application's context-building logic** or in the **LLM's handling of well-formed input**, rather than guessing at the model.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 887,
+      "cacheReadInputTokens": 2723,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0094186,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2723,
+    "output_tokens": 887,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 887,
+        "cache_read_input_tokens": 2723,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0094186,
+  "duration_ms": 12969
+}

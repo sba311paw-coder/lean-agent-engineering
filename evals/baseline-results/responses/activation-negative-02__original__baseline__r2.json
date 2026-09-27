@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__baseline__r2",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called \"function calling\") is a capability that lets an AI model interact with external systems, APIs, or code rather than just generating text responses. Instead of only answering from its trained knowledge, the model can request that a specific action be performed on its behalf.\n\n## How It Works\n\n1. **Definition**: Developers define a set of \"tools\" (functions) the model is allowed to use, each with a name, description, and expected input parameters (often in JSON schema format).\n2. **Model decides**: When given a prompt, the model determines whether answering requires using a tool, and if so, which one and with what arguments.\n3. **Structured output**: Instead of plain text, the model outputs a structured request \u2014 e.g., `get_weather(location=\"Tokyo\")`.\n4. **Execution**: The actual code/API call is executed *outside* the model, by the application or agent framework running it.\n5. **Result returned**: The tool's output is sent back to the model, which uses it to formulate a final natural-language response (or call another tool).\n\n## Example Flow\n\n```\nUser: \"What's the weather in Tokyo right now?\"\n\nModel \u2192 tool call: get_weather({ \"location\": \"Tokyo\" })\nSystem \u2192 executes function \u2192 returns: { \"temp\": \"18\u00b0C\", \"condition\": \"cloudy\" }\nModel \u2192 \"It's currently 18\u00b0C and cloudy in Tokyo.\"\n```\n\n## Why It Matters\n\n- **Overcomes limitations**: Models don't have real-time data, can't do reliable math, and can't take actions in the world on their own \u2014 tools fill these gaps.\n- **Enables agents**: Chaining multiple tool calls together lets an AI perform multi-step tasks (search the web, run code, query a database, send an email, etc.), which is the foundation of \"AI agents.\"\n- **Reliability**: Structured calls with defined schemas reduce ambiguity compared to parsing free-form text for intent.\n\n## Common Types of Tools\n\n- **Search/retrieval** (web search, database queries)\n- **Code execution** (running Python, calculations)\n- **APIs** (weather, calendars, third-party services)\n- **File/system operations** (reading/writing files, running shell commands)\n\nIn short, tool calling turns an AI from a passive text generator into an active agent that can fetch information and perform tasks in the real world.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 500,
+      "outputTokens": 748,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.00848,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 500,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 748,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 500,
+        "output_tokens": 748,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.00848,
+  "duration_ms": 8927
+}

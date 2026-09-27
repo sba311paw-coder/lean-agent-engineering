@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__original__baseline__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I am building a small Python AI agent for my own use. It needs to answer questions, call two existing Python functions when necessary, and return the results to me. I do not need multiple agents, distributed services, or production scale yet. What architecture should I start with?",
+  "response": "# Simple Single-Process Agent Architecture\n\nFor your use case, skip anything resembling multi-agent orchestration, message queues, or microservices. You want a **single Python process with a tight loop**: LLM call \u2192 check for function call \u2192 execute \u2192 feed result back \u2192 final answer.\n\n## Core structure\n\n```\nyour_agent/\n\u251c\u2500\u2500 main.py          # entry point, the loop\n\u251c\u2500\u2500 tools.py         # your two existing functions + their schemas\n\u2514\u2500\u2500 llm_client.py    # wrapper around the API you're using (OpenAI/Anthropic/etc.)\n```\n\n## The pattern\n\n1. **Tool/function schemas**: Wrap your two existing functions with a JSON schema description (name, description, parameters) so the LLM knows when/how to call them.\n\n2. **Single loop**:\n   - Send user message + tool schemas to the LLM.\n   - If the LLM responds with plain text \u2192 return it, done.\n   - If the LLM responds with a \"tool call\" \u2192 parse arguments, call your actual Python function, get the result.\n   - Send the tool result back to the LLM as a new message in the conversation.\n   - Repeat until you get a plain text answer.\n\n3. **No need for**:\n   - Agent frameworks (LangChain, LangGraph, CrewAI, AutoGen) \u2014 they add abstraction overhead you don't need for two tools and one agent.\n   - Persistent state/DB \u2014 an in-memory list of messages is enough.\n   - Async/distributed execution \u2014 unless your functions are slow/IO-heavy, keep it synchronous.\n\n## Minimal skeleton (using function-calling style, provider-agnostic pseudocode)\n\n```python\nmessages = [{\"role\": \"user\", \"content\": user_input}]\n\nwhile True:\n    response = llm.chat(messages, tools=[tool_schema_1, tool_schema_2])\n\n    if response.tool_call is None:\n        return response.text  # done\n\n    result = call_actual_function(response.tool_call.name, response.tool_call.args)\n    messages.append(response.raw)  # assistant's tool call message\n    messages.append({\"role\": \"tool\", \"name\": response.tool_call.name, \"content\": str(result)})\n```\n\n## When to add complexity\n\n- **More tools later**: just add more schemas to the same list \u2014 no architecture change needed.\n- **Long conversations**: add simple message-history trimming/summarization.\n- **Reliability**: add a try/except around function calls and feed errors back to the LLM so it can retry or explain.\n- **If you outgrow this** (many tools, need retries/observability/parallel tool calls), *then* consider a lightweight framework \u2014 but start here first.\n\nThis gets you a working, understandable agent in under 100 lines, with an obvious upgrade path if your needs grow.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 563,
+      "outputTokens": 876,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009886,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 563,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 876,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 563,
+        "output_tokens": 876,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009886,
+  "duration_ms": 10620
+}

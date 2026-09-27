@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__baseline__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response immediately proceeds with a full migration guide without first assessing whether the two-function agent truly needs LangChain; only late, in section 5 ('Things to watch out for'), does it note 'for just two tools and a simple loop, LangChain/LangGraph adds real dependency weight and some abstraction overhead' and ask 'whether you actually need the framework' \u2014 this evaluation is buried at the end rather than framing the whole answer.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "The response never recommends staying with the simpler direct-API implementation; it provides two full LangChain/LangGraph code paths as the primary recommendation and only appends a caveat about overhead, without concluding that the simpler approach may be sufficient.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "It explicitly lists justifying evidence: 'anticipating growth (multi-step planning, memory, more tools, tracing via LangSmith) that justifies it,' giving concrete signals for when the framework is warranted.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.017126
+}

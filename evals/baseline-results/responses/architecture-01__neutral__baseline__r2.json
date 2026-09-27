@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks is rarely the fix for \"wrong tool selection\" \u2014 that's almost always a design/prompt/architecture problem that will follow you to whatever framework you pick. Before jumping ship, it's worth diagnosing *why* it's picking wrong tools, since the fix is usually cheap.\n\n**Common root causes (framework-agnostic):**\n\n1. **Ambiguous or overlapping tool descriptions** \u2014 if two tools sound similar, the model guesses. Tighten descriptions, add explicit \"use this when X, NOT when Y\" guidance.\n2. **Too many tools exposed at once** \u2014 models degrade at tool selection past ~15-20 tools. Consider grouping/namespacing or dynamically loading only relevant tools per task.\n3. **Missing few-shot examples** \u2014 a couple of examples of correct tool choice in ambiguous cases helps a lot.\n4. **Poor parameter schemas** \u2014 vague param names/descriptions cause misuse even when the right tool is picked.\n5. **No intermediate reasoning step** \u2014 forcing a \"which tool and why\" thought before invocation reduces errors.\n6. **Weaker model for the orchestration step** \u2014 sometimes tool-selection is delegated to a smaller/cheaper model that isn't up to the disambiguation task.\n\n**If you've already ruled those out**, here's how frameworks actually differ on this:\n\n- **LangGraph** \u2014 explicit state machines let *you* constrain which tools are even reachable at a given node, sidestepping selection ambiguity entirely (rather than relying on the model to always choose correctly).\n- **LlamaIndex agents** \u2014 decent built-in tool-retrieval (RAG-over-tools) for cases where you have many tools and want semantic routing instead of stuffing them all in context.\n- **OpenAI's Assistants/Responses API + function calling** \u2014 no real advantage here over others; same underlying problem.\n- **Claude with tool use (native)** \u2014 often better at tool selection than wrapper frameworks *because* there's no extra prompt-mangling layer between you and the model; sometimes going more raw/framework-light fixes things.\n- **Instructor / outlines-style structured output** \u2014 helps with param correctness, not tool selection.\n\n**Honest recommendation:** try the cheap fixes first (better descriptions, fewer tools per call, a routing/reasoning step) since they'll transfer to any framework. If you still want architectural help, a state-machine approach like LangGraph (or just hand-rolled routing logic) gives you the most control over *constraining* choices rather than hoping the model picks right.\n\nIf you can share what tools you're dealing with and roughly how many, I can give more specific advice on whether this is a prompt/schema issue or something structural.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 518,
+      "outputTokens": 893,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009966000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 518,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 893,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 518,
+        "output_tokens": 893,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009966000000000001,
+  "duration_ms": 11785
+}

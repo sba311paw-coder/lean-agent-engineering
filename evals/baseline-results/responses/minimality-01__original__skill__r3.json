@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__original__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I have a Python application with an existing function that can send email successfully. I want my AI agent to send an email when appropriate. Should I add an MCP server for email, or can I use what I already have? Help me decide based on the minimum reliable architecture.",
+  "response": "# Short answer: You almost certainly don't need an MCP server for this.\n\nYou already have the capability. An MCP server would be redundant complexity for a gap that doesn't exist.\n\n## Applying the capability-gap test\n\n1. **What exact capability is missing?** None. You said the function already sends email successfully. The capability exists.\n2. **Does an existing skill/system already provide it?** Yes \u2014 your own function.\n3. **Can the application solve it directly?** Yes \u2014 expose that function to the LLM as a tool call in your agent loop. That's it.\n4. **Does adding an MCP server introduce new permissions, processes, credentials, or maintenance?** Yes \u2014 a new process to run/monitor, a new transport layer (stdio/HTTP), potentially duplicated SMTP/API credentials, another moving part that can fail independently of your app.\n5. **What evidence justifies that cost?** None presented. There's no cross-agent reuse need, no separate-process isolation requirement, no third-party client (like Claude Desktop) that needs to call it externally.\n\nMCP earns its complexity when you need to **share a tool across multiple independent agent hosts/processes** that don't share code, or you need a standardized protocol boundary for tools you don't control. Neither applies here \u2014 this is one Python app with one function.\n\n## Minimum reliable architecture\n\nWire your existing function directly into your agent's tool-calling loop:\n\n```\nLLM decides \"send_email\" tool call + args (structured output)\n        \u2193\nAgent application validates args (recipient, content policy, etc.)\n        \u2193\nAgent application calls your existing send_email() function directly\n        \u2193\nFunction result returned to LLM\n        \u2193\nLLM produces final response\n```\n\nNo new server, no new protocol, no new dependency.\n\n## What actually matters here (regardless of MCP vs. direct call)\n\nSending email is a **high-impact, hard-to-reverse action** (per the \"protect high-impact actions\" principle). The architecture choice (MCP vs. direct function call) is the easy part \u2014 the enforcement boundary is what needs attention:\n\n- **The LLM's decision to call `send_email` is not authorization.** Enforce checks in your agent application layer, not in the LLM's judgment:\n  - Validate recipient (e.g., allowlist domains, or restrict to addresses tied to the current user context)\n  - Rate-limit / dedupe to prevent runaway loops sending repeated emails\n  - Consider a human-confirmation step before dispatch if the action is irreversible and consequential (e.g., emailing external parties vs. internal notifications)\n- **Verify success**, don't just assume the function call didn't throw. Check the actual return value/status from your email provider (e.g., SMTP response code, provider API success field) before telling the user \"email sent.\"\n- **Log the call** (recipient, subject, timestamp, triggering context) for auditability, since this is an irreversible external action.\n\n## When to reconsider MCP\n\nRevisit this only if a real gap shows up later, e.g.:\n- Multiple different agents/hosts (not just your Python app) need to send email through a shared, centrally-governed service.\n- You want an external, sandboxed process boundary between the LLM host and the email-sending capability for isolation reasons.\n- You're integrating with a third-party agent client that only speaks MCP.\n\nUntil one of those is true, adding MCP is complexity without a corresponding capability gain \u2014 skip it.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1112,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 487,
+      "webSearchRequests": 0,
+      "costUSD": 0.013521,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 487,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1112,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 487,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1112,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 487,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 487
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013521,
+  "duration_ms": 15456
+}

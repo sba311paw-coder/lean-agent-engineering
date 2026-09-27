@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"the LLM's decision to call the tool is not authorization\" and explicit warning against confirmation being 'another LLM turn' since that's 'still the LLM deciding, not real authorization'",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorization must be enforced at the application/tool boundary\" and design shows tool-layer validation of ownership/scope plus separate approve_pending_delete endpoint requiring authenticated human action",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple safeguards specified for destructive actions: threshold-based approval gating, soft-delete preference, per-record ownership checks, rate-limiting, and audit logging",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011113999999999999
+}

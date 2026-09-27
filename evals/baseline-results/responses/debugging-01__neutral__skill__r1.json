@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__skill__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "# Fixing a broken tool-calling integration\n\nSince this broke right after a code change, treat it as a regression \u2014 find the diff, don't guess blindly. Here's the fast path:\n\n## 1. Check recent changes first\nSince this is not a git repo (no version history to diff), you'll need to manually identify what changed:\n- What was the last edit \u2014 prompt/system message, tool schema, SDK version, model name, endpoint, or handler code?\n- Did you bump the SDK or switch models? Tool-call formats (e.g., function-calling JSON schema) can differ between model versions.\n\n## 2. Reproduce with the smallest possible case\nStrip it down to one tool, one simple prompt that should trigger it, and log the raw request/response. Don't debug through the full agent loop.\n\n## 3. Locate the failing boundary\nWalk the architecture and find *where* it breaks:\n\n| Boundary | Check |\n|---|---|\n| LLM \u2192 Agent app | Is the model actually emitting a tool call, or plain text? Log the raw model output. |\n| Agent app \u2192 Tool | Is the tool call being parsed correctly? Check schema validation, argument parsing. |\n| Tool \u2192 Result | Does the tool execute and return a result? Check for exceptions/auth errors. |\n| Result \u2192 LLM | Is the tool result being fed back in the correct format? |\n\nMost \"tool calling stopped working\" bugs live in one of two spots:\n- **Tool schema/definition** got malformed or renamed (e.g., a field the model needs no longer matches what the app expects).\n- **Response parsing** changed \u2014 the app expects one shape (e.g., `tool_calls` array) but the model/SDK now returns another.\n\n## 4. Common root causes after a code change\n- Tool schema edited but name/parameters mismatch what the handler expects.\n- System prompt changed in a way that discourages/confuses tool use.\n- SDK/model version bump changed the tool-call response format.\n- A new validation/permission check silently rejects the call.\n- Async/ordering bug \u2014 result not returned before the next LLM turn.\n\n## 5. Fix and verify\nOnce you find the boundary, apply the smallest fix there (don't rewrite the integration). Then verify with:\n- The same minimal reproduction case, confirming tool call \u2192 execution \u2192 correct result \u2192 correct final response.\n- Not just \"no exception thrown\" \u2014 actually confirm the intended tool ran and its result influenced the output.\n\n---\n\nIf you can share the actual error/log output (raw model response, exception trace, or the diff of what changed), I can help pinpoint the exact boundary instead of the general checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 844,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 443,
+      "webSearchRequests": 0,
+      "costUSD": 0.010665,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 443,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 844,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 443,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 844,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 443,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 443
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010665,
+  "duration_ms": 11595
+}

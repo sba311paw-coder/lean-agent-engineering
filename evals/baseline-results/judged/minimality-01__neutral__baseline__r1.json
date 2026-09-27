@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly asks 'do you need MCP at all?' and notes that if it's a single app you control, you could just register send_email as a plain function-calling tool \u2014 correctly identifying that the missing capability is just tool-calling registration, not necessarily an MCP server.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It says 'you could just register `send_email` as a plain function-calling tool ... no MCP needed' but only as a brief caveat, then immediately pivots to 'If either of those apply, MCP is a good call. Here's how to set it up' and spends the rest of the response (sections 2-5) building a full MCP server around the existing function rather than emphasizing/defaulting to reusing it directly.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Response conditions the MCP recommendation on specific criteria ('Multiple different agents/clients... need this tool', 'want the email capability to run as an isolated process', 'reuse it across projects') rather than recommending MCP simply because it exists or was mentioned by the user.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.018624
+}

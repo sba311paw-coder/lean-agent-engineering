@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__original__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration worked yesterday, but after a recent code change it started failing. I want to fix it quickly. What should I do first?",
+  "response": "Since this worked yesterday and broke after a code change, don't guess \u2014 treat it as a regression and find the root cause before touching anything. Here's the fastest path:\n\n## 1. Check the actual diff first\nBefore anything else: `git diff` (or your VCS equivalent) against yesterday's working state.\n\n- Since this isn't a git repo in the current environment, check whatever change-tracking you have (editor history, deploy log, PR, commit on another branch/machine).\n- You're looking specifically for changes to: tool schema/definitions, system prompt, the function-calling config (e.g. tool_choice, model version pin), the request-building code, or the response-parsing code.\n\nThis alone often reveals the answer immediately \u2014 most tool-calling regressions come from a small schema/prompt/parsing change, not the model.\n\n## 2. Reproduce the failure minimally\nRun the exact failing case and capture the **raw** request and response at the LLM boundary \u2014 not just your app's logs. You need to see:\n\n- The exact tool definitions sent to the model.\n- The exact model response (did it call a tool at all? with what name/args? or did it return plain text?).\n- What your application code did with that response.\n\n## 3. Locate the failing boundary\nUsing the architecture (`AGENT APP \u2192 LLM \u2192 decision \u2192 AGENT APP \u2192 TOOL`), figure out which hop is actually broken:\n\n| Symptom | Likely boundary |\n|---|---|\n| Model never emits a tool call | Prompt/tool schema/tool_choice config, or model swap |\n| Model calls tool but with wrong/malformed args | Tool schema mismatch, description change |\n| Model calls correctly but app throws | Parsing/validation code in the app |\n| Tool is called but errors | Tool/API itself, or auth/permissions |\n\nDon't assume \"the model is being weird\" until you've ruled out the app-side code \u2014 that's the far more common cause after \"a recent code change.\"\n\n## 4. Form one hypothesis, test it\nOnce you see where it breaks (e.g., \"tool schema now has an invalid type field\" or \"response parser expects old field name\"), make the smallest fix for that specific cause \u2014 not a broader rewrite.\n\n## 5. Verify\nRe-run the same failing case and confirm the tool call now completes end-to-end, not just that it \"runs without error.\"\n\n---\n\n**Quick question that'll narrow this down fast:** what did the \"recent code change\" touch \u2014 the tool definitions/schemas, the prompt, the SDK/model version, or the code that handles the tool call result? If you paste the diff or the error/response, I can pinpoint the boundary directly instead of walking the whole checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 850,
+      "cacheReadInputTokens": 2703,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0090446,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2703,
+    "output_tokens": 850,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 850,
+        "cache_read_input_tokens": 2703,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0090446,
+  "duration_ms": 11475
+}

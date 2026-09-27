@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__original__baseline__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists potential causes (tool descriptions, too many tools, prompts, model choice, framework ordering) but doesn't explicitly trace the agent's actual architecture/pipeline step-by-step; it's a generic checklist rather than a systematic trace of this agent's flow.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It suggests pulling failure cases to see 'what tool was picked, what should have been picked' which points toward finding the boundary, but never explicitly identifies or names a 'first incorrect boundary' concept\u2014it's left as future diagnostic work rather than actually identified.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "'Short answer: probably not. Replacing the whole framework is a big, expensive move' and provides a detailed list of cheaper fixes to try first, explicitly discouraging unnecessary replacement.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009232
+}

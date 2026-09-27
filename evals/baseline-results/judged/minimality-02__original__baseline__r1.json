@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__original__baseline__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly analyzes the flow ('call two functions and return results') and estimates it as 'maybe 30-50 lines of code' with direct SDK tool-calling, correctly assessing low complexity.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'probably not' to LangChain, recommends keeping the direct API/tiny custom loop under 'A middle ground' and 'Bottom line' sections, favoring simplicity.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete triggers under 'When a framework starts earning its keep' (multi-step agentic loops, complex tool routing, memory/state, RAG, multi-provider swapping, team standardization) and reiterates 'Keep it direct until you hit an actual pain point... then evaluate frameworks against that specific need.'",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009366000000000001
+}

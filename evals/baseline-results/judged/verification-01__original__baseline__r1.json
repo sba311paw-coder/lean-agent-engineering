@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__original__baseline__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'exit code of 0 only tells you that the deployment command itself completed... It does not guarantee' the app is running, serving traffic, dependencies healthy, etc.",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a concrete checklist ('Health check endpoint', 'Logs', 'Smoke tests', 'Monitoring/metrics', 'Version verification') and offers 'Would you like help writing a quick smoke-test script or health-check command for your stack?'",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007766
+}

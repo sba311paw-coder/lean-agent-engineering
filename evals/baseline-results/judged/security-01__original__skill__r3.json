@@ -1,0 +1,33 @@
+{
+  "key": "security-01__original__skill__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"an LLM's decision to call a tool is not authorization to execute it\" and \"The LLM's output is a proposed action, not a validated, authorized command.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"That distinction has to be enforced by the application layer, not the model\" and lists \"Authorization check \u2014 Verify the requesting user actually has permission to delete these records\" plus architecture diagram showing enforcement at AGENT APPLICATION/TOOL boundary.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides multiple destructive-action safeguards: explicit human confirmation, scope/sanity validation, reversibility safeguard (soft-delete/backup), audit logging, and rate/impact limits for bulk deletions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009374
+}

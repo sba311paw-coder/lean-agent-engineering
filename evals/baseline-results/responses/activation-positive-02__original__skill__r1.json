@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__original__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent sometimes calls the correct tool, but sometimes skips the tool and answers from its own knowledge. Help me investigate the problem. Do not immediately suggest adding another framework or tool. First identify the likely failure boundary and what evidence I should collect.",
+  "response": "# Investigating: Agent inconsistently skips tool calls\n\nThis is a classic **LLM decision boundary** problem \u2014 the failure is likely happening at the point where the LLM decides *whether* to call a tool, not in the tool itself (since it works \"sometimes\"). Let's trace the architecture before touching anything.\n\n## Where the failure boundary likely is\n\n```\nUSER \u2192 AGENT APPLICATION \u2192 LLM (decision point) \u2192 TOOL\n```\n\nThe bug is almost certainly at the **LLM decision point**, not the tool execution. If the tool itself were broken, it would fail consistently or error out \u2014 instead it's being *bypassed*. That means the model is deciding \"I don't need the tool for this\" when it should decide otherwise.\n\nThree sub-boundaries to distinguish:\n\n1. **Prompt/instruction boundary** \u2014 system prompt doesn't clearly force tool use for the relevant cases.\n2. **Tool-description boundary** \u2014 the tool's description/schema doesn't clearly cover the query pattern, so the model judges it's own knowledge is \"close enough.\"\n3. **Input-variability boundary** \u2014 the *phrasing* of user queries varies enough that some phrasings don't trigger the model's tool-use pattern-matching, even though semantically they should.\n\n## Evidence to collect before changing anything\n\nFor each failure case, capture and compare against a success case:\n\n1. **Exact user input text** (success vs. failure) \u2014 look for phrasing differences (e.g., direct question vs. indirect, presence of specific keywords the tool description matches on).\n2. **Full system prompt / tool definitions sent to the model** for both cases \u2014 confirm nothing is being truncated or conditionally omitted.\n3. **The model's raw response** including any reasoning/thinking content, not just the final answer \u2014 see if it explicitly considered and rejected the tool, or never considered it.\n4. **Conversation history length/content** at time of failure \u2014 tool skipping often correlates with longer context where earlier turns \"anchor\" the model toward answering directly.\n5. **Tool choice/config setting** \u2014 check if `tool_choice` is set to `auto` (model decides) vs. `required`/forced in some paths but not others. A per-request config difference would explain inconsistency directly.\n6. **Whether temperature/sampling settings differ** across the paths that succeed vs. fail \u2014 nondeterminism alone can produce this pattern.\n7. **Confidence/framing in the query** \u2014 does the model skip the tool specifically when it \"thinks\" it already knows the answer (e.g., common facts) vs. when the query is clearly novel/specific?\n\n## What to check first (cheapest, highest signal)\n\n- Pull 5\u201310 failing transcripts and 5\u201310 succeeding transcripts side by side.\n- Diff the **tool description** against both sets of queries \u2014 does it explicitly state *when* to use the tool, or only *what* it does? Vague \"what it does\" descriptions without \"use this when...\" guidance are a very common root cause.\n- Check if `tool_choice` is inconsistently `auto` vs forced somewhere in the app logic.\n\n## What not to do yet\n\nDon't add a validator agent, a routing layer, or a second framework. This is very likely fixable by:\n- Tightening the tool description with explicit trigger conditions, and/or\n- Adjusting the system prompt to state the policy (e.g., \"Always use tool X for Y-type questions, even if you believe you know the answer\"), and/or\n- Enforcing `tool_choice` where the task is high-stakes rather than leaving it to model discretion.\n\nOnce you gather the transcript evidence above, share a few paired examples (failing + succeeding) and I can help pinpoint whether it's a description gap, prompt gap, or config inconsistency.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1214,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 497,
+      "webSearchRequests": 0,
+      "costUSD": 0.014581,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 497,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1214,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 497,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1214,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 497,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 497
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.014581,
+  "duration_ms": 16463
+}

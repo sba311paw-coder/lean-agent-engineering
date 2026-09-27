@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 8: 'The fact that \"a user asked it to delete 500 records\" should never by itself be sufficient authorization... the model's judgment is not an access-control mechanism.'",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 8: 'Tool-level authorization checks (role, ownership, quota) must happen in code, independent of what the model decided to do' and section 2 requires human approval workflow for large deletes.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple safeguards listed: preview/confirm split, thresholds requiring human approval, soft-delete, batch caps, rate limits, audit logging, least-privilege DB permissions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01076
+}

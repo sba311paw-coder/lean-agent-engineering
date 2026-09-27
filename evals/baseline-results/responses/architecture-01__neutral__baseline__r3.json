@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks probably won't fix this \u2014 wrong tool selection is usually a design/prompt problem, not a framework limitation. Before jumping ship, it's worth diagnosing *why* it's picking the wrong tool. Common causes:\n\n1. **Tool descriptions are ambiguous or overlapping** \u2014 the model can't tell tools apart.\n2. **Too many tools available at once** \u2014 beyond ~10-15, selection accuracy drops significantly regardless of framework.\n3. **Missing/weak examples** in tool descriptions (few-shot examples of when to use a tool help a lot).\n4. **No intermediate reasoning step** before tool selection (forcing a \"think step\" or plan before acting reduces misfires).\n5. **Weak system prompt guidance** on tool-selection priority/order.\n6. **Underlying model** struggling with the task \u2014 sometimes a stronger model matters more than the framework.\n\nThat said, if you do want to compare frameworks, here's roughly how they differ on this specific issue:\n\n| Framework | Tool-selection approach | Notes |\n|---|---|---|\n| **LangChain / LangGraph** | ReAct-style, flexible tool binding | Powerful but easy to misconfigure; explicit control over routing via graphs helps a lot |\n| **LlamaIndex** | Similar ReAct/agent patterns, strong routing/query-engine abstractions | Good if your \"tools\" overlap with data retrieval |\n| **Anthropic's Claude Agent SDK / tool use** | Native structured tool calling, model trained specifically for it | Often better raw tool-call accuracy since it's tightly coupled to model training |\n| **OpenAI function calling / Assistants API** | Similar native structured calling | Comparable accuracy to Claude's, depends on model |\n| **CrewAI / AutoGen** | Multi-agent role-based delegation | Can reduce wrong-tool issues by giving each sub-agent fewer tools (division of labor) |\n| **Semantic Kernel** | Planner-based orchestration | More explicit planning step can reduce impulsive tool picks |\n\n**My actual recommendation:** try these fixes first, in order of effort:\n1. Reduce the number of tools exposed at once (group/filter by context).\n2. Rewrite tool descriptions with clearer boundaries + 1-2 examples each.\n3. Add a \"reasoning before action\" step (explicit plan/critique before calling a tool).\n4. If tools are logically separable, split into specialized sub-agents (this is where CrewAI/multi-agent patterns genuinely help).\n\nIf none of that helps and you're on a framework with weak/loose tool-calling support (e.g., custom regex-parsed tool calls rather than native structured calling), *then* switching to something with native structured tool use (Claude's tool use, OpenAI function calling, or LangGraph with strict schemas) would be a reasonable move.\n\nWant to share which framework/model you're currently using and how the tools are described? I can give more targeted advice.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 518,
+      "outputTokens": 993,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010966,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 518,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 993,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 518,
+        "output_tokens": 993,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010966,
+  "duration_ms": 12601
+}

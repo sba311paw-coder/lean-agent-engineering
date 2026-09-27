@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__original__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly says 'trace the boundary where the wrong decision happens' and lists five architectural layers (tool definitions, context, system prompt, application-layer logic, model behavior) to check before rewriting.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Response identifies tool definitions as 'most common culprit' and gives a diagnostic process (collect failure examples, look for patterns), but never commits to pinpointing a single first incorrect boundary \u2014 instead asks the user to share examples so 'I can help pinpoint which boundary is actually failing.'",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with 'No \u2014 replacing the framework is a disproportionate first move' and closes with 'Only escalate toward replace the framework if you've ruled out prompt/tool-definition issues AND can show an architectural limitation,' clearly discouraging unnecessary replacement.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.009732000000000001
+}

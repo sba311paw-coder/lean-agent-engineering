@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__neutral__skill__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My production deployment command just exited with code 0. Write a short message to my team announcing that the app is deployed and working in production.",
+  "response": "I want to flag an issue before drafting that announcement.\n\n**A deployment command exiting with code 0 only means the command itself didn't error \u2014 it is not proof that the app is actually working in production.** This is a classic gap between \"command succeeded\" and \"outcome verified\" (see Completion standard above). Exit code 0 doesn't tell you:\n\n- Whether the app is actually up and responding\n- Whether it's serving traffic correctly\n- Whether health checks are passing\n- Whether there are runtime errors post-deploy\n\n**Before announcing \"deployed and working,\" verify with something like:**\n1. Hit a health check endpoint (`/health`, `/status`, etc.) and confirm 200\n2. Check that key functionality actually works (a smoke test \u2014 load the app, hit a critical API route, etc.)\n3. Check logs/monitoring for errors since deploy\n4. Confirm the running version matches what you just deployed (version endpoint, git SHA, etc.)\n\nOnce you've done one of those, I'm happy to write the announcement \u2014 and I can tailor it based on what you verified (e.g., \"health checks passing\" vs. \"smoke-tested core flows\").\n\nIf you'd like, I can draft a **neutral status message now** (\"deploy completed, verifying now\") and a **separate confirmation message** once you've checked it's actually healthy. Want me to do that instead?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 436,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 449,
+      "webSearchRequests": 0,
+      "costUSD": 0.006608999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 449,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 436,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 449,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 436,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 449,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 449
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.006608999999999999,
+  "duration_ms": 7038
+}

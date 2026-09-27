@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__skill__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "For a small personal agent that answers questions and calls two existing Python functions, keep it minimal. Here's the lean architecture:\n\n## Architecture\n\n```\nUSER (you)\n  |\n  v\nAGENT APPLICATION (a plain Python script/loop)\n  |\n  v\nLLM (API call, e.g. Anthropic/OpenAI SDK)\n  |  decides: answer directly, OR request tool call\n  v\nAGENT APPLICATION (dispatches to the right function)\n  |\n  v\nYOUR TWO EXISTING PYTHON FUNCTIONS\n  |  return result\n  v\nAGENT APPLICATION -> LLM -> FINAL RESPONSE -> YOU\n```\n\n## What you actually need\n\n1. **LLM SDK** \u2014 whichever provider's official Python client (Anthropic, OpenAI, etc.). That's your only real external dependency.\n2. **Tool/function-calling schema** \u2014 most SDKs support native \"tool use.\" Describe your two functions with a name, description, and JSON-schema parameters. No separate framework needed for this.\n3. **A dispatch dict in plain Python**:\n   ```python\n   TOOLS = {\"func_a\": func_a, \"func_b\": func_b}\n   ```\n   When the LLM returns a tool call, look up the function by name, call it with the provided args, and feed the result back to the LLM in the next message.\n4. **A simple loop**: send message \u2192 check if response is text or tool_use \u2192 if tool_use, call function, append result, loop again \u2192 if text, print and stop.\n\n## What you don't need\n\n- **No agent framework** (LangChain, CrewAI, AutoGen, etc.) \u2014 for two tools and a single-turn/multi-turn loop, a framework adds abstraction and dependency weight without solving a problem you have.\n- **No MCP server** \u2014 MCP is for exposing tools across processes/clients. If the functions live in the same codebase as the agent, just call them directly in-process.\n- **No vector DB / RAG** \u2014 not mentioned as a need; don't add it speculatively.\n- **No orchestration layer** \u2014 a single LLM decision loop is sufficient at this scale.\n\n## A few practical notes\n\n- **Validate tool arguments** before calling your functions \u2014 the LLM's output is a decision, not authorization. Even for personal use, basic type/range checks prevent a malformed call from crashing or misbehaving.\n- **If either existing function has side effects that are hard to reverse** (writes files, sends something, modifies state), add a print/confirm step before executing \u2014 cheap insurance for a personal tool.\n- **Keep the whole thing in one file** to start. Split into modules only if it actually grows past ~150-200 lines or you add more tools.\n\nThis gives you a working, debuggable agent in well under 100 lines, using only the LLM provider's SDK as a dependency. If you later find you need multi-agent coordination, persistent memory across sessions, or many more tools, that's the point to reconsider \u2014 not before.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 965,
+      "cacheReadInputTokens": 2701,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0101942,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2701,
+    "output_tokens": 965,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 965,
+        "cache_read_input_tokens": 2701,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0101942,
+  "duration_ms": 12151
+}

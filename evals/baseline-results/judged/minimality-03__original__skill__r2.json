@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__original__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames 'What capability are you actually missing?' and provides concrete questions like 'What exact gap exists today?' distinguishing real gaps from 'I saw it recommended.'",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Suggests extending existing logging first: 'extend what you have first (e.g., add request IDs, structured JSON logging, a simple latency histogram) before reaching for a framework.'",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists costs explicitly: 'New dependency, possibly a network egress to a third-party backend (cost, latency, another credential to manage), a new API to learn, more surface area to maintain and secure.'",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009112
+}

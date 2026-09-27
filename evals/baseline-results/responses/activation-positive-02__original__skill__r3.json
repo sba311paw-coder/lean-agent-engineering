@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__original__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent sometimes calls the correct tool, but sometimes skips the tool and answers from its own knowledge. Help me investigate the problem. Do not immediately suggest adding another framework or tool. First identify the likely failure boundary and what evidence I should collect.",
+  "response": "# Investigating: Agent inconsistently skips tool calls\n\nThis is a classic non-deterministic tool-calling failure. Before touching any code or adding a framework, let's find the actual boundary where the decision goes wrong.\n\n## Where the failure boundary likely is\n\nUsing the architecture model, the divergence happens at exactly one of these points:\n\n```\nUSER \u2192 AGENT APPLICATION \u2192 LLM (decision) \u2192 AGENT APPLICATION \u2192 TOOL\n```\n\nThe three candidate boundaries:\n\n1. **USER \u2192 LLM (prompt/context boundary)** \u2014 The LLM never had a clear enough signal that a tool was required. This is the most common root cause.\n2. **LLM decision boundary** \u2014 The model saw the right context but chose not to call the tool (borderline phrasing, ambiguous instructions, competing \"answer directly\" precedent in examples).\n3. **AGENT APPLICATION boundary** \u2014 The app conditionally withholds the tool definition, has a routing/classifier step that gates tool availability, or truncates/filters the tool list based on some state.\n\nNotice: **it is rarely \"the model is unreliable\" as a root cause** \u2014 that's a symptom, not a diagnosis. Something upstream is inconsistent (context, tool description, conversation state) or something downstream is inconsistently gating tool availability.\n\n## Evidence to collect first\n\nBefore hypothesizing further, gather these from actual failing vs. succeeding runs:\n\n1. **Full request payload sent to the LLM** for both a success case and a failure case \u2014 specifically:\n   - Was the tool included in the `tools`/`functions` list in both cases?\n   - Was the tool schema/description identical?\n   - Any system prompt differences (e.g., prior turns adding conflicting instructions)?\n\n2. **The exact user input** in both cases, side by side. Look for:\n   - Phrasing differences that make intent ambiguous (\"what's the weather\" vs \"check the weather\").\n   - Whether the failing case is a follow-up turn (conversation history may be crowding out the instruction, or a prior tool result cached in context gives the model enough to \"already know\" the answer).\n\n3. **Conversation history length/position** \u2014 does skipping correlate with longer context, later turns, or a specific prior tool call already having happened?\n\n4. **Model's raw output** for the failure case \u2014 did it emit a tool call attempt that got rejected/malformed and silently fell back to text? (Check the agent application's handling of malformed tool calls \u2014 this is a common hidden bug: app fails to parse a tool call, swallows the error, and treats it as a text response.)\n\n5. **Tool description wording** \u2014 vague or overlapping tool descriptions can make the model \"confident\" it can answer without invoking it.\n\n6. **Temperature/sampling settings** \u2014 if nonzero, some fraction of nondeterminism is expected and log-based correlation still applies (look for patterns, not just presence).\n\n## How to correlate\n\nOnce you have 5\u201310 paired examples (tool called vs. skipped), check for a pattern in:\n- Turn number in conversation\n- Presence/absence of specific keywords\n- Length of accumulated context\n- Whether tool call parsing errors appear in logs but are swallowed by the app\n\n## What I'd need from you to go further\n\n- A few example transcripts (success + failure) showing the system prompt, tool schema, and user message.\n- Confirmation of whether this is single-turn or multi-turn.\n- Whether the app has any conditional logic that decides which tools to expose per turn.\n\nOnce we see where the divergence actually happens, the fix is usually small \u2014 tightening a tool description, fixing an error-swallowing bug in the app, or adjusting a system instruction \u2014 not a new framework or orchestration layer.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1202,
+      "cacheReadInputTokens": 2742,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0125724,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2742,
+    "output_tokens": 1202,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1202,
+        "cache_read_input_tokens": 2742,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0125724,
+  "duration_ms": 17205
+}

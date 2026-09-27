@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__original__baseline__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 2 and 5 explicitly instruct to get the raw error/exception and reproduce minimally with logged raw request/response, distinguishing failure modes.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Diff the actual change' with git diff command and specific areas to check; Section 3 checks for dependency/lockfile changes.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Section 5 'Reproduce minimally' touches on tracing whether break is at API boundary vs app handling, but there's no explicit step-by-step tracing of data/control flow through the pipeline (e.g., request construction -> API call -> parsing -> execution).",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "The response jumps straight to a checklist of things to check/fix (diff, validate schema, reproduce minimally) but never explicitly frames forming a testable hypothesis before attempting fixes; it ends with an offer to pinpoint cause if given more info, not a hypothesis step.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.625,
+  "case_pass": false,
+  "judge_cost_usd": 0.009914000000000001
+}

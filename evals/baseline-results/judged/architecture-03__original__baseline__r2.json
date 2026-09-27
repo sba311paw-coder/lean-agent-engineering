@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__original__baseline__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response references 'one LLM' generically (via call_llm/Anthropic/OpenAI) and 'two existing functions' (your_function_1, your_function_2), and one app structure, but never names a specific LLM or shows the actual existing functions\u2014kept as placeholders.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Clear separation: tools.py/dispatch handles execution, call_llm handles LLM decision-making, main.py orchestrates the loop between them.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The run_agent while-loop explicitly shows: call LLM -> check stop_reason == 'tool_use' -> dispatch -> append tool_result_message -> loop again until final text returned.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "'When to add complexity later' section ties FastAPI/SQLite/registry additions to concrete triggers like concurrency or persistence needs, explicitly avoiding premature infrastructure.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011136
+}

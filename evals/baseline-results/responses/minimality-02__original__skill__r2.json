@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__original__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I have a small Python agent that needs to call two functions and return the results to the user. The current implementation works with the model API directly. Should I replace it with LangChain because I am building an AI agent?",
+  "response": "Short answer: no, not for this. Adding LangChain here is very likely unnecessary complexity.\n\n## Capability-gap check\n\nWhat does your agent actually need?\n\n1. Call function A\n2. Call function B\n3. Return results to the user\n\nThat's it. Ask the framework question in order:\n\n1. **What exact capability is missing?** \u2014 Probably nothing. You already have working code calling the model API directly.\n2. **Does an existing skill/library provide it?** \u2014 The model API's native tool-calling (function calling) already handles \"model decides to call a function, you execute it, you return the result.\" That's the whole use case.\n3. **Can the application solve it directly?** \u2014 Yes: a loop that (a) sends the prompt + tool schemas, (b) executes whichever tool(s) the model requests, (c) sends results back, (d) returns final answer. This is ~30-80 lines of plain Python.\n4. **Simpler local solution?** \u2014 Already covered above.\n5. **What does LangChain add, and at what cost?** \u2014 It adds abstraction layers (chains, agents, callbacks, its own tool-calling wrapper) on top of what the raw API already does. Costs: extra dependency, extra failure surface, version churn, harder debugging (you now have to trace through LangChain's abstractions *and* the model boundary when something breaks), and a steeper mental model for two function calls.\n6. **What evidence justifies adding it?** \u2014 For 2 functions and a return-to-user flow, there isn't any yet.\n\n## When LangChain (or similar) would actually pay for itself\n\n- You need many chained/branching steps with reusable prebuilt components (retrievers, memory, many model providers to swap between).\n- You need agent orchestration patterns (multi-step planning, tool routing across a large tool inventory) that would otherwise be substantial custom code.\n- Your team already standardizes on it across many projects, so consistency has value.\n\nNone of that is implied by \"two functions, return results.\"\n\n## Recommendation\n\nKeep the direct API implementation. If you want it cleaner without a framework:\n\n- Use the model's native structured tool-calling to get function name + arguments.\n- Have your application code validate arguments and execute the actual functions (enforce authorization/permissions here, not in the LLM call).\n- Feed tool results back to the model only if you need it to compose a final natural-language answer; if you just need raw results returned, skip the round-trip entirely and return them directly.\n\nThis keeps the LLM, your application, and the tools cleanly separated (per the agent architecture: LLM decides, app executes and enforces, tool performs the action, app returns result) \u2014 without inheriting a framework's abstractions for a problem that doesn't need them.\n\nIf your agent grows into something with many tools, multi-turn planning, or shared infra across projects, revisit \u2014 that's a real gap-driven decision, not a preemptive one.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 916,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 470,
+      "webSearchRequests": 0,
+      "costUSD": 0.011493,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 470,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 916,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 470,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 916,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 470,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 470
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011493,
+  "duration_ms": 12520
+}

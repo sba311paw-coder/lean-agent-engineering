@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__skill__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\nTool calling (also called \"function calling\") is a mechanism that lets an LLM request that an external action be performed, rather than only generating text.\n\n## How it works\n\nThe LLM itself cannot execute code, query databases, browse the web, or affect anything outside the conversation. Tool calling bridges this gap through a structured protocol:\n\n1. **Definition** \u2014 The application tells the model what tools are available, each with a name, description, and expected input schema (e.g., `get_weather(city: string)`).\n2. **Decision** \u2014 Based on the user's request, the model decides whether a tool is needed and, if so, outputs a structured call (typically JSON) specifying the tool name and arguments \u2014 instead of a plain-text reply.\n3. **Execution** \u2014 The **application** (not the model) parses that structured output, validates it, and actually invokes the real function, API, or database query.\n4. **Result injection** \u2014 The application returns the tool's result to the model as new context.\n5. **Final response** \u2014 The model incorporates that result into a natural-language answer for the user.\n\n## Why this separation matters\n\nThis is the architecture pattern worth internalizing:\n\n```\nUser \u2192 Agent App \u2192 LLM (decides + emits structured call)\n     \u2192 Agent App \u2192 Tool/API (executes)\n     \u2192 Agent App \u2192 LLM (interprets result)\n     \u2192 Final response \u2192 User\n```\n\nThe critical point: **the LLM's output is a request, not an authorization**. The model choosing to call `delete_file` or `send_payment` doesn't mean the action should happen \u2014 the application layer must validate permissions, sanitize arguments, and enforce policy before executing anything, especially for high-impact or irreversible actions.\n\n## Common examples\n\n- **Search/retrieval** \u2014 looking up docs, web results, or database records\n- **Code execution** \u2014 running a snippet in a sandbox\n- **APIs** \u2014 checking weather, sending an email, querying a CRM\n- **Structured data extraction** \u2014 forcing output into a schema by \"calling\" a fake tool\n\n## Practical notes\n\n- Tool schemas should be minimal and precise \u2014 vague descriptions lead to wrong or unnecessary calls.\n- Untrusted data returned *from* a tool (e.g., a scraped webpage, an API response) should be treated as data, not as instructions \u2014 it can contain injected text trying to manipulate the model's next step.\n- Multi-step \"agents\" are essentially loops of this tool-calling cycle, where the model can chain multiple calls to accomplish a larger task.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 796,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 425,
+      "webSearchRequests": 0,
+      "costUSD": 0.010113,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 425,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 796,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 425,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 796,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 425,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 425
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010113,
+  "duration_ms": 9718
+}

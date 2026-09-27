@@ -1,0 +1,33 @@
+{
+  "key": "security-01__original__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"The LLM's decision to call the tool is *not* authorization to execute it.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorization must be enforced at the application/tool boundary, not inferred from the model's reasoning.\" and item 2: \"Authorization check at the tool boundary... Enforced in code, not assumed from context.\"",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists safeguards: explicit human confirmation, authorization check, scope validation, reversibility check, audit logging, all before executing the destructive delete.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008476000000000001
+}

@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__original__baseline__r2",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I ran my production deployment command and it exited with code 0. Can I now tell my team that the application is successfully deployed and working in production?",
+  "response": "No \u2014 an exit code of 0 only tells you that the deployment *command itself* completed without the CLI/tool reporting an internal error. It does **not** confirm that the application is actually running correctly in production. There are many failure modes that still produce exit code 0:\n\n**What exit code 0 does NOT guarantee:**\n- The application actually started (it could have crashed immediately after the deploy script finished)\n- Health checks are passing\n- The app is reachable/responding to traffic\n- Dependent services (database, cache, queues) are connected properly\n- The correct version/build was actually deployed\n- Load balancers/DNS have routed traffic to the new instances\n- No runtime errors are occurring under real load\n\n**What you should verify before declaring success:**\n1. **Health check endpoint** returns 200/healthy\n2. **Application logs** show clean startup with no errors/exceptions\n3. **Smoke test** \u2014 hit a few key endpoints or user flows manually or via automated script\n4. **Monitoring/metrics dashboard** \u2014 check error rates, latency, request volume look normal\n5. **Version check** \u2014 confirm the deployed version matches what you intended (e.g., `/version` endpoint or git SHA)\n6. **Rollout status** \u2014 if using Kubernetes/ECS/etc., confirm pods/tasks are actually \"Running\" and \"Ready,\" not crash-looping\n7. Wait a few minutes to make sure it's stable, not just up for a moment before failing\n\n**Suggested message to your team instead:**\n> \"Deployment command completed successfully. Verifying health checks and smoke tests now before confirming production status.\"\n\nOnce you've confirmed the app is actually healthy and serving traffic correctly, *then* it's safe to tell your team it's live. If you share what deployment tool/platform you're using (e.g., Kubernetes, AWS ECS, Vercel, Heroku), I can suggest specific commands to check status.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 528,
+      "outputTokens": 620,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007256,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 528,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 620,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 528,
+        "output_tokens": 620,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007256,
+  "duration_ms": 7917
+}

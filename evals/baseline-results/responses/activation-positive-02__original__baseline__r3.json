@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__original__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent sometimes calls the correct tool, but sometimes skips the tool and answers from its own knowledge. Help me investigate the problem. Do not immediately suggest adding another framework or tool. First identify the likely failure boundary and what evidence I should collect.",
+  "response": "# Investigating Inconsistent Tool Calling\n\nThis is a classic nondeterministic tool-use failure. Before touching frameworks or adding guardrails, you want to narrow down *where* in the pipeline the decision to skip the tool is happening. Let's build a mental model of the failure boundary first.\n\n## The Decision Boundary\n\nEvery agent turn goes through roughly this pipeline:\n\n```\nUser input \u2192 Prompt assembly (system + tools schema + history) \u2192 Model inference \u2192 Decision: tool_call vs text \u2192 (if tool) execution \u2192 response\n```\n\nThe \"skip the tool\" failure happens at the **Decision** step, but the *cause* usually originates earlier. So the boundary you're investigating is: **what was different about the prompt/context on the runs that failed vs. the runs that succeeded.**\n\n## Most Likely Culprits (in rough order of likelihood)\n\n1. **Ambiguous tool-triggering conditions in the system/tool description** \u2014 the model has to infer *when* to call the tool from natural language. If the query is phrased slightly differently, it may judge \"I already know this\" and skip it.\n2. **Context/history pollution** \u2014 if a prior turn already contains an answer (even a wrong or stale one) in the conversation history, the model may pattern-match to \"this was already answered\" and respond from memory instead of re-invoking the tool.\n3. **Confidence miscalibration** \u2014 the model has strong parametric knowledge about the topic (e.g., common facts, popular libraries) and treats the tool as optional-confirmation rather than mandatory.\n4. **Tool schema / description quality** \u2014 vague descriptions (\"get info about X\") give the model latitude to decide it isn't needed.\n5. **System prompt doesn't state a hard policy** \u2014 e.g., no explicit \"ALWAYS use tool X before answering Y-type questions, never answer from memory.\"\n6. **Sampling/temperature nondeterminism** \u2014 same prompt, different sampled trajectory. This is the \"irreducible\" cause you should rule out *last*, not first, since it's often blamed prematurely.\n\n## Evidence to Collect\n\nBefore changing anything, gather a small dataset (10\u201320 examples) of paired failures/successes:\n\n| Field | Why it matters |\n|---|---|\n| Exact user input (verbatim) | Detect phrasing patterns that correlate with skipping |\n| Full system prompt sent that turn | Confirm policy wording is actually present and not truncated |\n| Full tool schema/description sent that turn | Check if description is ambiguous or buried among many tools |\n| Full conversation history up to that turn | Check for prior answers/context that could cause pattern-matching skip |\n| Whether it was turn 1 or a later turn | Multi-turn context pollution is a common trigger |\n| Model's raw output (not just final answer) \u2014 including any reasoning/thinking trace if available | See *why* it chose not to call the tool |\n| Temperature / sampling settings | Rule in/out stochastic variance |\n| Number and order of tools available in that call | Tool-crowding can bury the right one |\n\n## Concrete Steps\n\n1. **Log everything at the boundary.** Capture the exact final assembled prompt (system + tools + messages) sent to the model for both success and failure cases \u2014 not your app-level intent, the literal payload.\n2. **Diff a matched pair.** Find one failure and one success with near-identical user intent. Diff the prompts. Often you'll find the history or phrasing differs in a small but decisive way.\n3. **Check if failures cluster on turn number.** If skips only happen turn 2+, it's a context/history issue, not a tool-description issue.\n4. **Check if failures cluster on phrasing.** If skips happen when the user phrases something as a statement vs. a question, or omits a keyword, it's a decision-ambiguity issue.\n5. **Re-run failed cases at temperature 0 (if adjustable).** If skip is still non-reproducible even at temp 0 with identical input, sampling/decoding variance is a real factor. If it reproduces deterministically, it's prompt/context, not randomness.\n\n## What I'd hold off on\n\nDon't yet: add a second framework, add a forced tool-call mode, add a validator/critic agent, or hardcode keyword triggers. Those are patches on top of an undiagnosed root cause and will make the next debugging pass harder.\n\n---\n\nOnce you collect a handful of paired examples (exact prompt + output for a skip vs. a success), share them here \u2014 I can help you diff them and pinpoint whether it's a phrasing, history, or schema-ambiguity issue.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 572,
+      "outputTokens": 1498,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.016124,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 572,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1498,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 572,
+        "output_tokens": 1498,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.016124,
+  "duration_ms": 19856
+}

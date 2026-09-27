@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames the question as a capability-gap test: 'What exact capability is missing? Is it that you can't see the data (you can, via logs/tests), or that you can't aggregate/query/visualize it across many runs?'",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends reusing existing tools before adding a framework: 'Python's logging module already supports structured logging... you may already have most of this' and suggests small scripts/pandas instead of a new system.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States adding a large framework is 'a big jump in complexity, dependencies, often network calls to a third-party service, and sometimes credentials' and reserves heavier tools like OpenTelemetry or SaaS platforms for when genuinely needed.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009466
+}

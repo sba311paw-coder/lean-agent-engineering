@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "My recommendation: **don't migrate to LangChain for this.** Let me explain why, per the capability-gap check.\n\n## Capability-gap test\n\n1. **What capability is actually missing?** You have a working agent that calls the model, calls two functions based on the result, and returns output. That's it. Nothing in your description (two tools, direct model calls) indicates a missing capability \u2014 it indicates a working system.\n\n2. **Does the existing system already provide what you need?** Yes. A loop that calls the model API and dispatches to two functions based on structured output/tool-calls *is* an agent. Frameworks don't make something \"more of an agent\" \u2014 the architecture does.\n\n3. **Can the application solve it directly?** Yes, it already does.\n\n4. **What would LangChain actually add here?**\n   - Abstraction layers over the model API you already call directly.\n   - Chain/agent executor objects, prompt templates, output parsers \u2014 for a system with two tools.\n   - A dependency surface (version churn, breaking changes across LangChain releases, transitive deps) with real maintenance cost.\n\n5. **What new cost/risk does it introduce?**\n   - New dependency to pin, patch, and understand.\n   - Debugging gets harder \u2014 you now trace through LangChain's abstractions to find the actual API call, instead of reading your own code.\n   - Migration risk: chance of subtly changing tool-calling behavior, retry logic, or error handling during the port.\n\n6. **What evidence justifies adding it?** None stated. \"I'm building an AI agent\" is not evidence of a functional gap \u2014 it's a label. The skill's activation logic applies here directly: framework/orchestration layers are step 6\u20137 in the \"simplify first\" ordering, used only when steps 1\u20135 (existing code, small local change, stdlib, existing tool call pattern) can't do the job.\n\n## When LangChain *would* be justified\n\nIf you have a concrete, current pain point such as:\n- You need many interchangeable tools/agents with dynamic routing across several models.\n- You need built-in memory/retrieval chains you don't want to hand-roll.\n- You need multi-step planning with conditional branching that's getting hard to maintain as raw code.\n- Team standardization across many agents already using LangChain.\n\nNone of these seem to apply to \"calls two functions and returns results.\"\n\n## What I'd actually do\n\nKeep the direct API implementation. If you want it to look more like a \"proper agent,\" the smallest improvements are:\n- Use the model provider's native structured tool-calling (most APIs already support this) instead of ad hoc parsing.\n- Add a thin dispatch layer: `{tool_name: function}` mapping with validation.\n- Add a verification step (check tool output before returning) and basic error handling/retries.\n\nThat gets you a robust two-tool agent without new dependencies, new abstractions, or new failure surfaces.\n\nIf you want, tell me what specific pain point is pushing you toward LangChain (e.g., you're about to add 10 more tools, need memory, need multi-agent orchestration) \u2014 that would change the calculus, and I can help you evaluate whether LangChain, a lighter library, or just more of your own code is the right fit.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1020,
+      "cacheReadInputTokens": 2720,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010748,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2720,
+    "output_tokens": 1020,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1020,
+        "cache_read_input_tokens": 2720,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010748,
+  "duration_ms": 14343
+}

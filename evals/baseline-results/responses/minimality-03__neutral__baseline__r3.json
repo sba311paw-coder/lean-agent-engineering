@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "For a Python agent with tool-call failures and latency you want to track, **OpenTelemetry (OTel)** is the framework I'd reach for first. It's the de facto standard, not tied to one vendor, and Python support is mature (`opentelemetry-sdk`, `opentelemetry-exporter-*`).\n\n**Why it fits your case:**\n- Each tool call becomes a **span** \u2014 you get duration (latency) and status (success/failure) automatically, plus you can attach custom attributes (tool name, args, error type).\n- Nested spans give you a full trace of an agent run: LLM call \u2192 tool call \u2192 sub-tool call, so failures show up in context, not just as isolated log lines.\n- Exporters let you send data anywhere (Jaeger, Grafana Tempo, Prometheus, Datadog, Honeycomb, etc.) without rewriting instrumentation later.\n- Your existing logging/tests aren't wasted \u2014 you just wrap tool-call functions in spans and record exceptions/latency into them.\n\n**Minimal pattern:**\n```python\nfrom opentelemetry import trace\ntracer = trace.get_tracer(\"my-agent\")\n\ndef call_tool(name, **kwargs):\n    with tracer.start_as_current_span(f\"tool.{name}\") as span:\n        span.set_attribute(\"tool.args\", str(kwargs))\n        try:\n            result = tools[name](**kwargs)\n            span.set_status(trace.StatusCode.OK)\n            return result\n        except Exception as e:\n            span.record_exception(e)\n            span.set_status(trace.StatusCode.ERROR, str(e))\n            raise\n```\n\n**If this is specifically an LLM/agent framework** (not just generic Python), consider a layer built on top of OTel that's LLM-aware:\n- **Arize Phoenix** or **Traceloop OpenLLMetry** \u2014 open source, use OTel under the hood, add semantic conventions for prompts, tokens, tool calls.\n- **Langfuse** \u2014 open source, great for tool-call traces, latency, and cost, easy self-host.\n- **LangSmith** \u2014 best if you're already using LangChain/LangGraph.\n\n**Rule of thumb:** start with raw OpenTelemetry if you want a vendor-neutral foundation and full control; pick Langfuse/Phoenix instead if you want LLM-specific dashboards (prompts, tokens, tool-call trees) out of the box with less setup.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 523,
+      "outputTokens": 1825,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.019296,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1024,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 523,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1825,
+    "output_tokens_details": {
+      "thinking_tokens": 1024
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 523,
+        "output_tokens": 1825,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.019296,
+  "duration_ms": 19263
+}

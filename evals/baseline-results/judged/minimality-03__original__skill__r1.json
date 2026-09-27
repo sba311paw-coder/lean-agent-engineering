@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__original__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly asks 'What capability is actually missing?' and lists concrete capabilities (tracing, dashboards, cost tracking, alerting) to check against current setup.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 2 and the ladder ('Smallest adequate solution') explicitly favor reusing/extending existing logging (structured logging, self-generated trace/span IDs) before adopting a new framework.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 3 explicitly lists 'new dependency surface, often a hosted/SaaS component..., configuration and maintenance burden, and sometimes vendor lock-in' as costs of adding it now.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009328
+}

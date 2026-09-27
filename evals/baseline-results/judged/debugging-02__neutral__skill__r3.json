@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response opens with 'Before jumping to swap the embedding model' and only lists embedding options conditionally at the end under 'If embeddings genuinely are the gap'.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly breaks down pipeline into Retrieval failure, Chunking, Embedding quality, Ranking/top-k, Prompt/context assembly, and Generation hallucination, tracing each stage.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides a 'Quick diagnostic before changing anything' asking to manually check top-k results for 5-10 failing queries, and ends by asking user to clarify what 'wrong answers' looks like to gather evidence before recommending a fix.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009176
+}

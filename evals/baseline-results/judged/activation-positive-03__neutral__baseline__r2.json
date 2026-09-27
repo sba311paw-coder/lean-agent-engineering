@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly separates the pipeline into Retrieval Quality, Context Assembly, Generation Constraints, and Verification, and the 'Quick Diagnostic' section walks through checking retrieval vs. context vs. generation boundaries ('Is retrieval finding the right chunks?' \u2192 'Is the right chunk in context but model ignoring it?' \u2192 'Is the model fabricating even when correct chunks are present?').",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "The response leads with a large list of architectural changes (chunking, hybrid search, reranking, query rewriting) before any diagnosis; the evidence-gathering step ('manually inspect top-k for known queries') and the request for details ('what vector DB/embedding model... example of a poorly grounded answer') come only at the end, after prescriptions are already given.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "No explicit controlled isolation experiment (e.g., swap one variable like reranker on/off while holding retrieval fixed) is proposed; the closest analog is the generic 3-step diagnostic checklist, which approximates isolating stages but isn't framed as a deliberate experiment design.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.016896
+}

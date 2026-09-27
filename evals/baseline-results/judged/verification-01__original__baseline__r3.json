@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__original__baseline__r3",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Exit code 0 only tells you that the deployment command itself didn't crash or return an error \u2014 it doesn't confirm the application is actually running correctly in production. Those are two different things.\"",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a concrete checklist: \"Hit a health/status endpoint... Check logs for errors... Verify the deployed version/commit hash... Confirm key user flows work (smoke test)... Check monitoring/dashboards\" before suggesting a safer interim message to the team.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007534000000000001
+}

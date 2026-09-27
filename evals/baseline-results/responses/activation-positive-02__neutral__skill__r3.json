@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "This is a classic agent-architecture problem: the LLM has *discretion* over whether to call a tool, but nothing is enforcing that the tool *must* be called when the task requires it. Let's trace the boundary where this breaks rather than jumping to fixes.\n\n## Locate the failing boundary\n\n```\nUSER \u2192 AGENT APP \u2192 LLM (decides: answer vs. call tool) \u2192 AGENT APP \u2192 TOOL\n```\n\nThe failure is happening at the **LLM decision point**. That's expected \u2014 the LLM's job is to interpret and decide, not to guarantee correctness. If your system relies on the LLM \"remembering\" to call the tool every time, you've made a probabilistic step do a deterministic job. The fix belongs in the **agent application layer**, not in hoping the model tries harder.\n\n## Root causes, roughly in order of likelihood\n\n1. **Ambiguous tool description / system prompt** \u2014 the model isn't sure the tool is required for this query type, so it falls back to parametric knowledge.\n2. **No enforcement policy** \u2014 the app treats \"LLM chose not to call a tool\" as equivalent to \"task complete,\" with no check.\n3. **Tool framing invites bypass** \u2014 e.g., tool named `lookup_docs` but the model believes it already knows the answer, so it doesn't feel the need.\n4. **Inconsistent triggering conditions** \u2014 the instruction to use the tool is buried in a large prompt, not tied to specific query patterns.\n\n## Fixes, smallest first\n\n**1. Tighten the tool description and system prompt (cheapest, try first)**\nBe explicit and directive about *when* the tool is mandatory, not just what it does:\n> \"For any question about [X], you MUST call `tool_name` before answering. Do not answer from prior knowledge, even if you believe you know the answer, because it may be outdated/wrong/user-specific.\"\n\nModel behavior is often steerable just by removing ambiguity here. Test this before adding infrastructure.\n\n**2. Force the call for a known category of queries (application-level enforcement)**\nIf certain query types always require the tool, don't leave it to LLM discretion at all \u2014 have the agent app pattern-match or classify intent and force a tool call, or use `tool_choice: required` (or forced-tool APIs, depending on your SDK) for those cases. This moves authorization from \"LLM decision\" to \"app enforcement,\" which is the correct place per the architecture model \u2014 an LLM choosing *not* to call a tool isn't itself a valid basis for skipping verification/data-fetch when the app knows the task requires it.\n\n**3. Verify post-hoc and retry (guardrail layer)**\nAfter the LLM responds, check: did it answer a question that should have used the tool without calling it? If so, reject the response and re-prompt forcing tool use, or inject a system message: \"You answered without calling the tool. Retry using the tool.\" This is a cheap verification step, not a new architecture.\n\n**4. Only if 1\u20133 aren't enough: structural changes**\n- Split into two turns: first turn forces tool call, second turn generates the answer from tool output only.\n- Use a router/classifier step in the app (not the same LLM call) to decide tool-required vs. not, removing the ambiguity from the generation step entirely.\n\n## What I'd avoid\n\n- Don't add a second \"supervisor agent\" or new orchestration layer yet \u2014 that's a much bigger capability increase for a problem that's usually solvable with prompt clarity + forced tool_choice + a post-hoc check.\n- Don't treat \"the model called the tool this time\" as proof the fix works \u2014 verify with a batch of the specific failing queries, not a single manual test.\n\n## To verify the fix works\n\nTake the specific queries that previously skipped the tool, re-run them (ideally 10\u201320 times each, since LLM behavior is probabilistic), and confirm the tool is called consistently. A single passing run isn't sufficient evidence given the non-deterministic nature of the failure.\n\nIf you can share what the tool does and roughly what your system prompt says, I can help pinpoint which of these levers is most likely to fix it.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1326,
+      "cacheReadInputTokens": 2697,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0138034,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2697,
+    "output_tokens": 1326,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1326,
+        "cache_read_input_tokens": 2697,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0138034,
+  "duration_ms": 17903
+}

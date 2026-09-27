@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__original__baseline__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I am building an agent that reads documents and retrieves information from a vector database. The answers are sometimes poorly grounded. Before changing the retrieval system, help me determine whether the problem is retrieval, context construction, or final answer generation. What evidence should I collect first?",
+  "response": "# Diagnosing Poor Grounding: Retrieval vs. Context Construction vs. Generation\n\nBefore touching the retrieval system, you want to isolate *where in the pipeline* the failure originates. A poorly grounded answer can result from any of these stages, and they require completely different fixes. Here's how to systematically collect evidence.\n\n## The Core Diagnostic Principle\n\nFor each failing query, you need to answer three sequential questions:\n1. **Did retrieval fetch the right chunks?** (Retrieval problem)\n2. **If yes, was the right information actually usable in the assembled context?** (Context construction problem)\n3. **If yes, did the model use it correctly?** (Generation problem)\n\nYou need to check these *in order* for a sample of failures, because a downstream fix (e.g., prompt tweaking) can't fix an upstream problem (e.g., missing chunks).\n\n## Step 1: Build a Failure Sample with Ground Truth\n\n- Collect 20-30 cases where grounding failed (hallucination, unsupported claim, contradicts source).\n- For each, manually identify: what is the *correct* supporting passage in the corpus, and where does it live (which doc, which section)?\n- This gives you an \"oracle\" answer set to compare retrieved/used content against.\n\n## Step 2: Isolate Retrieval \u2014 \"Was the right chunk fetched at all?\"\n\nFor each failure case:\n- Log the **raw retrieved chunks** (with scores) for the query, independent of what the LLM did with them.\n- Check: is the oracle passage present anywhere in the top-K? \n  - **Not present at all** \u2192 retrieval problem (recall failure \u2014 bad embeddings, bad chunking boundaries, query-doc mismatch, missing metadata filters).\n  - **Present but ranked low / crowded out** \u2192 retrieval *ranking* problem, not a total miss.\n  - **Present in top-K** \u2192 retrieval likely fine for this case; move to Step 3.\n\nUseful metrics here: recall@K, MRR, or just manual \"yes/no is the answer chunk in top-K\" \u2014 this alone often resolves 50% of ambiguity cheaply.\n\n## Step 3: Isolate Context Construction \u2014 \"Was it actually usable once assembled?\"\n\nIf the right chunk *was* retrieved, check what happened between retrieval and the prompt sent to the LLM:\n- **Truncation**: was the chunk cut off by context window limits, especially if it's near the end of a long concatenated context?\n- **Chunking damage**: was the relevant sentence split across chunk boundaries, losing context (e.g., an antecedent, a table header, a qualifying clause)?\n- **Ordering/position**: was the correct chunk buried in the middle of a long context (\"lost in the middle\" effect) while less relevant chunks got prime position?\n- **Deduplication/compression**: if you're doing any re-ranking, compression, or summarization before the final prompt, check if that step dropped or distorted the needed content.\n- **Formatting**: did metadata, chunk separators, or citations get mangled so the model can't tell what's authoritative?\n\nLog the **exact final prompt string** sent to the LLM for these cases \u2014 not just \"the chunks we intended to send.\" This is the single most under-inspected artifact in most RAG debugging.\n\n## Step 4: Isolate Generation \u2014 \"Did the model use what it was given?\"\n\nIf the correct passage was retrieved AND survived intact into the final prompt, but the answer is still wrong:\n- Check if the model **ignored** the context and used parametric knowledge instead (classic hallucination-despite-evidence).\n- Check if the model **misread** the context (misattribution, conflating two similar chunks, wrong entity binding).\n- Check if the model **over-synthesized** \u2014 combining pieces of context in a way that isn't actually supported.\n- Try re-running the exact same prompt with a stronger/different model to see if generation quality is model-limited vs. prompt-limited.\n- Check your system prompt: does it explicitly instruct \"only answer from context, cite sources, say 'unsupported' if not present\"? Weak grounding instructions are a common cheap culprit.\n\n## Step 5: Tabulate and Look for Patterns\n\nBuild a simple table per failure case:\n\n| Query | Oracle passage found in top-K? | Survived into final prompt intact? | Model used it correctly? | Failure stage |\n|---|---|---|---|---|\n\nOnce you tally this across your sample, you'll typically see one stage dominating. Common patterns:\n- **Mostly retrieval failures** \u2192 invest in chunking strategy, embedding model, hybrid search/reranking.\n- **Mostly context construction failures** \u2192 fix chunk boundaries, ordering, truncation handling, \"lost in the middle\" mitigation.\n- **Mostly generation failures** \u2192 fix prompting/grounding instructions, add citation requirements, consider a smaller/cheaper model swap test, or add a post-hoc verification/critique step.\n\n## A Fast Triage Shortcut\n\nIf you want a lower-effort first pass before full manual labeling: take 5-10 failures and just **paste the oracle passage directly into the prompt yourself** (bypassing retrieval entirely), then see if the model answers correctly.\n- If it now answers correctly \u2192 the problem is upstream (retrieval or context construction).\n- If it still fails \u2192 the problem is generation, and no amount of retrieval tuning will fix it.\n\nThis one test alone often gives you 80% of the diagnostic signal for 5% of the effort, and is worth doing before building out the full instrumentation above.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 572,
+      "outputTokens": 1826,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.019403999999999998,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 572,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1826,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 572,
+        "output_tokens": 1826,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.019403999999999998,
+  "duration_ms": 22751
+}

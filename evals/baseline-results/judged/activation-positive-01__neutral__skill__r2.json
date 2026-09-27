@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response draws the loop diagram 'LLM -> tool call -> AGENT APP -> TOOL (weather API) -> result -> LLM -> final response' and walks through each boundary explicitly.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates concerns: 'If the result is present and correct in that final request but the response still ignores it \u2014 it's a prompt/model issue... If the result is missing or malformed in that request \u2014 it's an agent application bug.'",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists five distinct failure boundaries: result not passed back, malformed/empty result, tool_call_id mismatch, system prompt discouraging tool use, and agent stopping before second LLM call.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "'Let's trace the architecture rather than guessing at fixes' and provides a numbered 'Fastest way to isolate it' logging/diagnostic section before the 'Fix' section, plus asks for the agent loop code to pinpoint the exact issue.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010887999999999998
+}

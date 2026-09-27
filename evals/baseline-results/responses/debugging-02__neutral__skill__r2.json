@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models is often *not* the right fix \u2014 it's a common jump-to-solution move that adds cost/migration work without addressing the actual failure. Since I can't see your setup, let's find the actual failing boundary first.\n\n**\"Wrong answers\" from a RAG pipeline usually comes from one of these stages \u2014 figure out which one is broken before touching the embedding model:**\n\n1. **Retrieval failure** \u2014 right chunks aren't being retrieved at all.\n   - Check: log the top-k retrieved chunks for a failing query. Are the relevant docs even in that list?\n   - If relevant chunks *are* retrieved but ranked low \u2192 could be embedding quality, but also often a chunking/query mismatch issue.\n   - If relevant chunks are *never* retrieved \u2192 check indexing (did the doc get embedded/stored at all?), chunk size/overlap, and metadata filters.\n\n2. **Chunking problem** \u2014 very common cause of \"looks like retrieval issue, isn't.\"\n   - Chunks too large \u2192 dilutes relevant signal.\n   - Chunks too small \u2192 loses context, answer fragments split across chunks.\n\n3. **Query/embedding mismatch** \u2014 e.g. using a model not well-suited to your domain (code, legal, multilingual, etc.), or short queries vs. long documents (asymmetric retrieval needs a model trained for that, like a proper bi-encoder with query/passage prefixes \u2014 e.g. `e5`, `bge` models require `\"query: \"` / `\"passage: \"` prefixes to work correctly. If those prefixes are missing, that alone tanks quality and looks exactly like \"wrong embedding model.\")\n\n4. **Generation failure, not retrieval** \u2014 the right chunks were retrieved, but the LLM ignored them, hallucinated, or the prompt/context assembly is broken (e.g. chunks truncated, wrong order, no citation grounding instruction).\n\n5. **Similarity metric mismatch** \u2014 using cosine similarity with a model trained for dot product (or vice versa), or normalizing embeddings inconsistently between index-time and query-time.\n\n**Before swapping models, cheap diagnostic:**\n- Pick 3-5 known failure cases.\n- For each, manually check: (a) was the correct chunk in the vector store at all, (b) was it retrieved in top-k, (c) if retrieved, did the LLM use it correctly.\n- This alone usually tells you whether the bug is in indexing, retrieval, or generation \u2014 three completely different fixes.\n\n**If you do confirm it's genuinely an embedding quality issue** (relevant chunks consistently rank poorly despite correct chunking/prefixes), then model choice depends on your domain, language, and latency/cost budget \u2014 happy to give a recommendation, but I'd need specifics: what's the current model, is this English/multilingual/code/legal domain, and what evidence (e.g. eval scores, retrieval hit-rate) suggests the embeddings themselves are the problem?\n\nWant to walk through the diagnostic on one failing query together?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 990,
+      "cacheReadInputTokens": 2684,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0104408,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2684,
+    "output_tokens": 990,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 990,
+        "cache_read_input_tokens": 2684,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0104408,
+  "duration_ms": 13966
+}

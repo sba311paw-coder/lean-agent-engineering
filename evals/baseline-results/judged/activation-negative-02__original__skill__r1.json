@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-02__original__skill__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response provides a structured, clear educational explanation of tool calling, covering definition, mechanism steps, architecture, examples, and practical notes.",
+      "criterion": "Give a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "No debugging workflow, code execution, or tool invocation occurs; response is purely explanatory text.",
+      "criterion": "Do not automatically initiate a debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00736
+}

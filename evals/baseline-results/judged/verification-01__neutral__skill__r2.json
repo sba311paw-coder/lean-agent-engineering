@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__skill__r2",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"a command exiting with code 0 only tells you the deploy command didn't crash \u2014 it's not evidence the app is actually working in production\" explicitly distinguishes command success from outcome verification.",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The response lists concrete verification steps ('Hit a health endpoint...', 'Check application logs...', 'Verify the deployed version...', 'Confirm it's actually receiving traffic...') and suggests performing them before sending the announcement, offering an alternative softened wording if sent before verification.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007052
+}

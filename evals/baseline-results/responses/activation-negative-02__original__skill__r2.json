@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__skill__r2",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called function calling) is a mechanism that lets an LLM request that a specific action be executed by external code, rather than just generating text.\n\n## How it works\n\n1. **Definition**: The developer describes available tools to the model \u2014 name, purpose, and expected input schema (usually JSON schema), e.g., `get_weather(location: string)`.\n2. **Decision**: Given a user prompt, the model decides whether a tool is needed and, if so, which one and with what arguments. It outputs this as structured data (e.g., a JSON object) instead of free-form text.\n3. **Execution**: The *application* (not the model) parses that structured request, validates it, and actually calls the real function, API, or database.\n4. **Result injection**: The tool's output is passed back into the conversation context.\n5. **Final response**: The model reads the result and produces a natural-language answer for the user.\n\n## Key architectural point\n\nThe model only *decides* to call a tool \u2014 it never executes anything itself. The agent application is responsible for:\n- Validating the tool call (correct arguments, allowed tool, permissions)\n- Executing it safely\n- Enforcing authorization boundaries (a model's decision to call a tool is not itself authorization to do so)\n- Returning results back to the model\n\nThis separation matters especially for high-impact tools (payments, deletions, sending messages, credential changes) \u2014 those should have explicit checks or human approval at the application layer, not rely on the model \"deciding correctly.\"\n\n## Why it's useful\n\n- Lets LLMs access real-time or external data (weather, databases, search)\n- Enables taking real actions (sending emails, creating calendar events, running code)\n- Reduces hallucination by grounding answers in actual computed/retrieved results\n- Forms the foundation of \"agents\" \u2014 models that can chain multiple tool calls together to complete multi-step tasks\n\n## Simple example flow\n\n```\nUser: \"What's the weather in Paris?\"\nModel \u2192 tool_call: get_weather(location=\"Paris\")\nApp \u2192 executes real API call \u2192 {\"temp\": 18, \"condition\": \"cloudy\"}\nModel \u2192 \"It's currently 18\u00b0C and cloudy in Paris.\"\n```",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 702,
+      "cacheReadInputTokens": 2670,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007558,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2670,
+    "output_tokens": 702,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 702,
+        "cache_read_input_tokens": 2670,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007558,
+  "duration_ms": 8482
+}

@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__original__baseline__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates the pipeline into three stages (Step 2 Retrieval, Step 3 Context Construction, Step 4 Generation) with distinct diagnostic questions and boundary markers ('If yes...') tracing where each stage ends and the next begins.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before touching the retrieval system...isolate where in the pipeline the failure originates' and Step 1 focuses entirely on building an evidence-based failure sample with ground truth before any architecture change is proposed.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The 'Fast Triage Shortcut' explicitly isolates generation by 'paste the oracle passage directly into the prompt yourself (bypassing retrieval entirely)' to test if the model succeeds, which is a clear isolation experiment separating generation from retrieval/context effects.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013869999999999999
+}

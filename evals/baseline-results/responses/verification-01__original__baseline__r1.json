@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__original__baseline__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I ran my production deployment command and it exited with code 0. Can I now tell my team that the application is successfully deployed and working in production?",
+  "response": "No \u2014 an exit code of 0 only tells you that the deployment *command itself* completed without the shell/tool reporting an error. It does **not** guarantee that:\n\n1. **The application is actually running** \u2014 the process could have started and then crashed seconds later, or the deployment script might exit 0 even if a downstream step (e.g., container failing health checks) fails silently.\n2. **It's serving traffic correctly** \u2014 exit 0 says nothing about whether the app responds to requests, returns correct responses, or handles load.\n3. **Dependencies are healthy** \u2014 databases, caches, external APIs, DNS, load balancers, etc. could all be misconfigured or unreachable even if the deploy command succeeded.\n4. **No errors are occurring at runtime** \u2014 application logs could be full of exceptions even though the process is technically \"up.\"\n5. **Traffic is actually being routed to the new version** \u2014 in blue/green or rolling deployments, exit 0 might just mean \"the new version was pushed,\" not \"traffic has cut over successfully.\"\n\n## What to check before declaring success\n\n- **Health check endpoint** \u2014 hit `/health` or equivalent and confirm a 200 response.\n- **Logs** \u2014 check application and infrastructure logs for errors/warnings post-deploy.\n- **Smoke tests** \u2014 run a small set of critical-path tests against production (login, key API calls, etc.).\n- **Monitoring/metrics** \u2014 check dashboards (error rates, latency, CPU/memory) for anomalies.\n- **Version verification** \u2014 confirm the deployed version/commit hash matches what you intended to ship.\n- **Rollback readiness** \u2014 make sure you have a fast rollback path in case something surfaces in the next few minutes/hours.\n\n## Suggested message to your team\n\nInstead of \"it's deployed and working,\" something like:\n\n> \"Deployment command completed successfully (exit 0). Verifying health checks and running smoke tests now \u2014 will confirm once I've validated it's serving correctly in production.\"\n\nOnce you've actually verified behavior (not just the exit code), *then* you can confidently say it's working. Would you like help writing a quick smoke-test script or health-check command for your stack?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 528,
+      "outputTokens": 692,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007976,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 528,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 692,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 528,
+        "output_tokens": 692,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007976,
+  "duration_ms": 9131
+}

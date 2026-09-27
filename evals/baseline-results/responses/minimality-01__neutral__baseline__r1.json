@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Here's a practical way to wrap your existing email function as an MCP tool, plus some things worth doing before you let an agent send emails autonomously.\n\n## 1. Quick sanity check: do you need MCP at all?\n\nIf your agent is a single Python app that you fully control, you could just register `send_email` as a plain function-calling tool in your LLM client (no MCP needed) \u2014 simpler, no extra process/protocol overhead. MCP is worth it if:\n\n- Multiple different agents/clients (Claude Desktop, other apps, teammates) need this tool\n- You want the email capability to run as an isolated process/service\n- You want to reuse it across projects without copy-pasting code\n\nIf either of those apply, MCP is a good call. Here's how to set it up.\n\n## 2. Build the MCP server with FastMCP\n\n```bash\npip install mcp\n```\n\n```python\n# email_mcp_server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom your_app.email_utils import send_email  # your existing function\n\nmcp = FastMCP(\"email-server\")\n\n@mcp.tool()\ndef send_email_tool(to: str, subject: str, body: str, cc: str = \"\") -> str:\n    \"\"\"\n    Send an email on behalf of the user.\n\n    Args:\n        to: Recipient email address(es), comma-separated.\n        subject: Email subject line.\n        body: Plain-text or HTML body of the email.\n        cc: Optional comma-separated CC addresses.\n\n    Returns:\n        A confirmation message or error string.\n    \"\"\"\n    try:\n        send_email(to=to, subject=subject, body=body, cc=cc)\n        return f\"Email sent to {to} with subject '{subject}'.\"\n    except Exception as e:\n        return f\"Failed to send email: {e}\"\n\nif __name__ == \"__main__\":\n    mcp.run()\n```\n\nKey points:\n- The docstring **is** the tool description the LLM sees \u2014 be precise about what each field means and expected formats.\n- Return a string result (success/failure), not raise unhandled exceptions, so the agent can react sensibly.\n- Keep credentials (SMTP/API keys) in environment variables, not in this file.\n\n## 3. Add guardrails before wiring it to an autonomous agent\n\nSince this lets an LLM trigger real-world side effects, consider:\n\n- **Validation**: check `to` looks like a valid email, reject empty subject/body, cap recipient count.\n- **Allow/deny lists**: restrict which domains or addresses can be emailed, especially early on.\n- **Dry-run mode**: an env flag that logs the email instead of sending it, for testing the agent's behavior.\n- **Confirmation step**: if this is used in an interactive agent, consider requiring a human-in-the-loop confirmation before actually sending, at least initially.\n- **Logging**: log every send attempt (to, subject, timestamp) for auditability.\n- **Rate limiting**: prevent runaway loops from spamming.\n\n## 4. Test it standalone\n\n```bash\nmcp dev email_mcp_server.py\n```\n\nThis opens the MCP Inspector so you can call `send_email_tool` manually and confirm it behaves before your agent touches it.\n\n## 5. Register it with your agent\n\nIf you're using Claude Desktop or another MCP-compatible client, add it to the config:\n\n```json\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"/path/to/email_mcp_server.py\"]\n    }\n  }\n}\n```\n\nIf you're building your own agent loop in Python, use the MCP client SDK to connect to this server over stdio and expose `send_email_tool` alongside your other tools.\n\n---\n\nOne small note: since your app likely sends from your own account, you might want a default `from`/`reply-to` of your address (sba311paw@gmail.com) baked into `send_email` rather than exposing it as an agent-controllable parameter \u2014 that way the LLM can't be tricked into spoofing a different sender.\n\nWant me to sketch the guardrail/validation logic in more detail, or show the client-side code for connecting your agent to this server?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 551,
+      "outputTokens": 2246,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.023562,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 916,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 551,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2246,
+    "output_tokens_details": {
+      "thinking_tokens": 916
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 551,
+        "output_tokens": 2246,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.023562,
+  "duration_ms": 24270
+}

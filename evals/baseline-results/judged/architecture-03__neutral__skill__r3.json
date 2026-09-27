@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__skill__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response names 'Python Agent App' as 'plain Python' script and LLM generically as 'anthropic Python package / whichever model', but never concretely names one specific LLM (e.g., Claude Sonnet). It also doesn't name or define the two existing functions concretely, only refers to them abstractly as 'your two existing functions', asking the user to specify them at the end.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Architecture diagram and text clearly separate LLM ('decision / structured tool call') from AGENT APPLICATION which 'validates + dispatches' and executes functions.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Diagram and steps show: send message+tools to LLM -> tool call -> validate/invoke function -> send tool result back to LLM -> final answer returned to user.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicit 'Things to skip (for now)' section rejects MCP, frameworks, RAG, multi-agent orchestration unless a concrete need arises, and 'State' section says no DB unless persistence is actually needed.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011439999999999999
+}

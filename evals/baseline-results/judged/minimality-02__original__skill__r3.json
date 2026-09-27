@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__original__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly walks through 'What capability is actually needed?', 'Does your existing setup already provide it?', and 'Can the application solve it directly?' concluding the task is just two function calls and result formatting.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommendation: 'Keep the direct API implementation. Use the model provider's native function/tool-calling feature' rather than adopting LangChain.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 'When LangChain (or similar) would earn its place' lists concrete triggers: multi-step planning across many tools, built-in memory/retrieval chains, multiple LLM providers behind one interface, complex agent loops, or team-wide standardization.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00901
+}

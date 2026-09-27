@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__original__skill__r3",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"exit code of 0 only tells you that the deployment command completed without throwing an error... not evidence that the application is actually running correctly... confusing 'command succeeded' with 'outcome verified.'\"",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a checklist to perform before claiming success: 'Process/service status', 'Health endpoint', 'Smoke test', 'Logs', 'Monitoring/metrics', 'Version confirmation', plus suggests a holding message to the team until verification is done.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007712
+}

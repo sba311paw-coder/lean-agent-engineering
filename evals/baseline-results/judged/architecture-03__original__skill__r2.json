@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__original__skill__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Diagram and text specify a single 'plain Python script/loop' as the Agent App, 'Claude API call with tool definitions' as the one LLM, and 'YOUR TWO PYTHON FUNCTIONS' as the two existing functions.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Point 5: 'Application, not the LLM, executes the function. The LLM only *decides* which tool and with what arguments... Your script validates the arguments and actually invokes the function.'",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Diagram traces full loop: LLM tool-call request \u2192 Agent validates/dispatches \u2192 functions execute \u2192 result \u2192 Agent feeds result back to LLM \u2192 LLM gives final natural-language answer \u2192 returned to user.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "'When to add more' section ties each addition to a concrete trigger: 'Add a retry/error-handling layer... if failures are silent or ambiguous' and 'Only consider a framework or MCP if you outgrow single-process, single-user use.'",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.015954
+}

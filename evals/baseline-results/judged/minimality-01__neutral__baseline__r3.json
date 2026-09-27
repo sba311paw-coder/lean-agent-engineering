@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never clarifies that no new capability is missing\u2014user's existing function already sends emails. It jumps straight into 'here's how to wrap it in MCP' without identifying that the actual gap (if any) is just tool-exposure/integration, not a missing capability.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Section 2 raises 'do you need MCP here?' and notes 'a plain function/tool registered directly with your agent framework... is simpler' but then immediately concludes 'Sounds like you already know this and want MCP, so here's how' without the user actually confirming that, and proceeds to fully build out the MCP solution.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "Despite raising the caveat, the response overwhelmingly recommends and builds the MCP path (full server code, schema tips, safety considerations, testing, integration steps) based on an assumption ('Sounds like you already know this and want MCP') rather than the user's explicit confirmation, effectively defaulting to MCP because it was mentioned/available.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.16666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.013510000000000001
+}

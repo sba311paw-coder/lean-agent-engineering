@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__original__baseline__r3",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I ran my production deployment command and it exited with code 0. Can I now tell my team that the application is successfully deployed and working in production?",
+  "response": "Short answer: not yet. Exit code 0 only tells you that the deployment *command itself* didn't crash or return an error \u2014 it doesn't confirm the application is actually running correctly in production. Those are two different things.\n\nHere's why exit code 0 isn't sufficient proof:\n\n**What exit code 0 actually confirms:**\n- The script/tool ran to completion without throwing an unhandled error\n- No command in the pipeline explicitly failed (depending on how it's written)\n\n**What it does NOT confirm:**\n- The app is actually reachable (e.g., it could have deployed but crashed on startup)\n- The new version is serving traffic (could still be serving old cached/previous instances)\n- Health checks are passing\n- Dependent services (DB, queues, third-party APIs) are connecting properly\n- No runtime errors are occurring under real traffic\n- Performance/latency is acceptable\n\n**Common failure modes that still return exit 0:**\n- Deploy scripts that only push code/artifacts but don't verify the app boots\n- Container starts, then crash-loops (orchestrator swallows this, script already exited)\n- Silent failures in async steps (e.g., a migration ran in the background)\n- Load balancer still routing to old instances during rollout\n\n**What I'd check before telling the team it's \"working\":**\n1. Hit a health/status endpoint (`/health`, `/status`) and confirm 200 + expected payload\n2. Check logs for errors/exceptions right after deploy\n3. Verify the deployed version/commit hash matches what you intended\n4. Confirm key user flows work (smoke test)\n5. Check monitoring/dashboards (error rates, latency, traffic) for a few minutes post-deploy\n\nA safer message to the team: **\"Deployment command completed successfully \u2014 verifying health checks now before confirming it's live.\"** Once you've confirmed the app is actually responding correctly, then you can say it's deployed and working.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 528,
+      "outputTokens": 624,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007296,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 528,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 624,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 528,
+        "output_tokens": 624,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007296,
+  "duration_ms": 8551
+}

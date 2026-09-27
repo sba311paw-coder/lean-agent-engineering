@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__baseline__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "Here's a practical migration path, plus a quick gut-check on whether it's worth it.\n\n## Quick gut-check first\n\nIf your agent really is just \"call model \u2192 maybe call one of two functions \u2192 return result,\" LangChain (or LangGraph, which LangChain now recommends for agents) adds real overhead: more dependencies, more abstraction to debug, version churn. It pays off when you'll soon need things like multiple tools, memory, streaming, retries, multi-step planning, or LangSmith tracing. If that's the plan, migrating now is reasonable \u2014 just don't expect less code for the same functionality today.\n\n## Step 1: Inventory what you have\n\nWrite down (literally, on paper is fine):\n- How you define the two \"functions\" today (JSON schema for tool/function calling? just Python `if` branches after a text response?)\n- How you call the model (raw `openai`/`anthropic` SDK, streaming or not)\n- How you parse the response and decide which function to call\n- How you feed the function result back to the model (single-turn, or another round-trip?)\n\nThis determines whether you're doing real \"function calling\" (structured, model decides) or just orchestrating calls yourself. LangChain's value is mostly in the former.\n\n## Step 2: Map concepts\n\n| Your current code | LangChain equivalent |\n|---|---|\n| Model API client (openai.chat.completions, anthropic.messages) | `ChatOpenAI`, `ChatAnthropic`, etc. |\n| Your two Python functions | `@tool`-decorated functions |\n| Manual JSON schema for function calling | Auto-generated from type hints/docstring via `@tool` |\n| Your parse-response-and-dispatch loop | `.bind_tools()` + agent executor (or LangGraph loop) |\n| Prompt string | `ChatPromptTemplate` (optional \u2014 plain strings still work) |\n\n## Step 3: Convert your functions to tools\n\n```python\nfrom langchain_core.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get current weather for a city.\"\"\"\n    ...\n    return result\n\n@tool\ndef search_db(query: str) -> str:\n    \"\"\"Search the internal database.\"\"\"\n    ...\n    return result\n\ntools = [get_weather, search_db]\n```\n\n## Step 4: Wire up the model\n\n```python\nfrom langchain_anthropic import ChatAnthropic  # or langchain_openai\n\nmodel = ChatAnthropic(model=\"claude-sonnet-5\")\nmodel_with_tools = model.bind_tools(tools)\n```\n\n## Step 5: Choose your execution loop\n\nLangChain's older `AgentExecutor`/`create_tool_calling_agent` still works, but the currently recommended approach for anything agentic is **LangGraph's prebuilt ReAct agent** \u2014 it's the direction LangChain itself is pushing, and it's simpler for exactly your \"call a function, get result, return\" pattern:\n\n```python\nfrom langgraph.prebuilt import create_react_agent\n\nagent = create_react_agent(model, tools)\n\nresult = agent.invoke({\"messages\": [(\"user\", \"What's the weather in Tokyo?\")]})\nprint(result[\"messages\"][-1].content)\n```\n\nThat's it \u2014 no need to hand-roll the \"did the model ask for a tool? call it, feed result back\" loop; the graph does that for you.\n\nIf you want something more minimal and don't want the LangGraph dependency:\n\n```python\nfrom langchain.agents import AgentExecutor, create_tool_calling_agent\nfrom langchain_core.prompts import ChatPromptTemplate\n\nprompt = ChatPromptTemplate.from_messages([\n    (\"system\", \"You are a helpful assistant.\"),\n    (\"human\", \"{input}\"),\n    (\"placeholder\", \"{agent_scratchpad}\"),\n])\n\nagent = create_tool_calling_agent(model, tools, prompt)\nexecutor = AgentExecutor(agent=agent, tools=tools)\nresult = executor.invoke({\"input\": \"What's the weather in Tokyo?\"})\n```\n\n## Step 6: Watch for these gotchas\n\n- **Token/cost accounting** differs from raw SDK calls \u2014 check `result[\"usage\"]` equivalents if you were tracking cost.\n- **Streaming** works differently (`.stream()` / `astream_events`) if your current code streams tokens.\n- **Error handling**: LangChain will retry/parse tool-call JSON for you, but silent failures can be harder to see than your own `try/except` around the raw API call \u2014 turn on LangSmith tracing (or at least verbose logging) while you migrate to make sure behavior matches.\n- **Determinism**: if your current code has hardcoded branching logic (not real model-driven tool selection), don't force it into an agent loop \u2014 a plain `.bind_tools()` call + manual dispatch (skip the executor entirely) may be a truer 1:1 migration.\n\n## Step 7: Verify parity\n\nRun both versions side by side on the same 10-20 test prompts and diff the outputs before cutting over. Small behavioral differences (e.g., how the model phrases the final answer after a tool call) are common even with equivalent tools/prompts.\n\nIf you share the actual code (or paste it here), I can give you an exact line-by-line conversion instead of the general template above.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 550,
+      "outputTokens": 2384,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.02494,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 675,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 550,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2384,
+    "output_tokens_details": {
+      "thinking_tokens": 675
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 550,
+        "output_tokens": 2384,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.02494,
+  "duration_ms": 26957
+}

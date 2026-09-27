@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response identifies 'Likely root causes' section and explicitly says 'Before jumping to fixes, let's locate exactly where the boundary is failing,' tracing causes like optional tool design, ambiguous descriptions, no enforcement, context drift, and tool_choice setting.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Ends with 'What I'd check first' section asking for tool_choice setting, whether failure correlates with phrasing, and whether skipping is actually wrong every time, before recommending architecture changes, and explicitly asks user to share evidence before proceeding.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Fixes proposed (tool_choice settings, tightening tool descriptions, app-level verification checks) are lightweight and use existing SDK features rather than introducing new frameworks; no mention of adopting agent frameworks or heavy tooling.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011216
+}

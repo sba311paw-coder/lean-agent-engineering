@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__original__baseline__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I am building a small Python AI agent for my own use. It needs to answer questions, call two existing Python functions when necessary, and return the results to me. I do not need multiple agents, distributed services, or production scale yet. What architecture should I start with?",
+  "response": "# Simple Architecture for a Single-User Agent with Function Calling\n\nFor your use case, keep it minimal. You don't need LangChain, agent frameworks, or orchestration layers \u2014 just a clean loop with function calling. Here's the recommended structure:\n\n## Core Components\n\n```\nyour_agent/\n\u251c\u2500\u2500 main.py          # Entry point, runs the loop\n\u251c\u2500\u2500 tools.py         # Your two existing functions + their schemas\n\u251c\u2500\u2500 agent.py         # The core call-LLM \u2192 check-for-tool-call \u2192 execute \u2192 respond loop\n\u2514\u2500\u2500 config.py        # API keys, model name, etc.\n```\n\n## The Pattern: Single-Loop Tool Calling\n\n1. **User sends a question** \u2192 goes into a messages list.\n2. **Call the LLM** (via Anthropic/OpenAI SDK) with the messages + tool definitions (JSON schemas describing your two functions).\n3. **Check the response**:\n   - If it's a normal text answer \u2192 return it to the user, done.\n   - If it's a tool-call request \u2192 run the corresponding Python function locally, append the result to the messages list, and call the LLM again.\n4. **Loop until you get a final text answer** (usually just 1-2 round trips).\n\nThis is often called the **\"agentic loop\"** or **\"ReAct-style loop\"**, but you don't need any framework to implement it \u2014 it's ~50-80 lines of code.\n\n## Example Skeleton\n\n```python\n# tools.py\ndef get_weather(city: str) -> str:\n    ...\n\ndef search_notes(query: str) -> str:\n    ...\n\nTOOLS = [\n    {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a city\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"city\": {\"type\": \"string\"}},\n            \"required\": [\"city\"]\n        }\n    },\n    {\n        \"name\": \"search_notes\",\n        \"description\": \"Search your personal notes\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"query\": {\"type\": \"string\"}},\n            \"required\": [\"query\"]\n        }\n    }\n]\n\nFUNCTION_MAP = {\n    \"get_weather\": get_weather,\n    \"search_notes\": search_notes,\n}\n```\n\n```python\n# agent.py\nimport anthropic\nfrom tools import TOOLS, FUNCTION_MAP\n\nclient = anthropic.Anthropic()\n\ndef run_agent(user_input: str) -> str:\n    messages = [{\"role\": \"user\", \"content\": user_input}]\n\n    while True:\n        response = client.messages.create(\n            model=\"claude-sonnet-5-20260101\",  # example\n            max_tokens=1024,\n            tools=TOOLS,\n            messages=messages,\n        )\n\n        if response.stop_reason != \"tool_use\":\n            # Final text answer\n            return \"\".join(\n                block.text for block in response.content if block.type == \"text\"\n            )\n\n        # Handle tool call(s)\n        messages.append({\"role\": \"assistant\", \"content\": response.content})\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                func = FUNCTION_MAP[block.name]\n                result = func(**block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": str(result),\n                })\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n```\n\n```python\n# main.py\nfrom agent import run_agent\n\nif __name__ == \"__main__\":\n    while True:\n        q = input(\"You: \")\n        if q.lower() in (\"quit\", \"exit\"):\n            break\n        print(\"Agent:\", run_agent(q))\n```\n\n## Why This Is Enough\n\n- **No framework overhead**: You control exactly what happens, easy to debug.\n- **No persistence needed yet**: Keep `messages` in memory per session unless you want conversation history across runs (then just pickle/json-dump it to a file).\n- **No multi-agent orchestration**: One model, one loop, two tools \u2014 that's it.\n- **Easy to extend later**: If you eventually need more tools, memory, or scheduling, you can bolt those on without a rewrite (e.g., add a `tools.py` entry, or swap the in-memory list for a SQLite-backed history).\n\n## When to Add Complexity\n\nOnly reach for something heavier (LangGraph, CrewAI, a proper task queue, etc.) if you find yourself needing:\n- Multiple agents coordinating with each other\n- Long-running background tasks / async job queues\n- Complex branching logic beyond \"call tool, get result, respond\"\n\nFor now, the ~80-line loop above is genuinely the right scope \u2014 it's the same core pattern those frameworks wrap in extra abstraction.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 563,
+      "outputTokens": 1520,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.016326,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 563,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1520,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 563,
+        "output_tokens": 1520,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.016326,
+  "duration_ms": 15393
+}

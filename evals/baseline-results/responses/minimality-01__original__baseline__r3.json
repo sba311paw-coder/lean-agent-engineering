@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__original__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I have a Python application with an existing function that can send email successfully. I want my AI agent to send an email when appropriate. Should I add an MCP server for email, or can I use what I already have? Help me decide based on the minimum reliable architecture.",
+  "response": "# Short answer: You almost certainly don't need an MCP server for this.\n\nMCP earns its complexity when you need to **distribute** a tool across processes, languages, or multiple clients (e.g., Claude Desktop, multiple agents, a hosted service). If your email function already lives in the same Python process as your agent, wrapping it in an MCP server just adds a serialization boundary, a subprocess/socket, and a protocol handshake \u2014 with no real benefit.\n\n## Minimum reliable architecture\n\nJust expose your existing function as a **local tool/function call** to the agent directly:\n\n```python\ndef send_email(to: str, subject: str, body: str) -> str:\n    \"\"\"Send an email. Use only when the user explicitly requests it or\n    confirms sending.\"\"\"\n    # your existing, already-working implementation\n    ...\n    return \"sent\"\n```\n\nRegister it with whatever tool-calling mechanism your agent framework uses (function calling schema, `@tool` decorator, etc.). That's it. Same process, same error handling, same logging, no new failure modes.\n\n## When MCP *would* make sense here\n\nReach for an MCP server only if one of these is true:\n\n- **Multiple clients need it** \u2014 e.g., Claude Desktop, a CLI agent, and a web service all need to send email, and you want one implementation instead of copy-pasting the function.\n- **Process/language isolation is required** \u2014 e.g., the email logic must run in a different runtime, container, or with different credentials/permissions than the agent process.\n- **You want it swappable/discoverable** \u2014 e.g., users can plug in \"any MCP email server\" without touching agent code.\n- **Sandboxing** \u2014 you don't trust the agent process itself and want the tool execution boundary enforced by a separate process.\n\nNone of these sound like your situation from what you described.\n\n## Reliability-focused recommendations regardless of the wrapper\n\n1. **Confirm before sending** \u2014 require explicit user intent/confirmation in the agent's system prompt or a human-in-the-loop step before calling `send_email`, especially since this is an irreversible external side effect.\n2. **Validate inputs** in the function itself (valid recipient, non-empty subject/body) rather than trusting the model's output blindly.\n3. **Return structured success/failure** from the tool so the agent can react (retry, report failure) instead of assuming success.\n4. **Log every send** (to, subject, timestamp, triggering context) for audit/debugging.\n5. **Rate-limit or cap** sends per session to avoid a runaway loop spamming emails.\n\nIf later you need this callable from multiple independent tools/agents or across languages, *then* extract it into an MCP server \u2014 but that's a refactor to do when the need is real, not preemptively.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 562,
+      "outputTokens": 877,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009894,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 562,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 877,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 562,
+        "output_tokens": 877,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009894,
+  "duration_ms": 11913
+}

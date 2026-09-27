@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__skill__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Good instinct to pause here \u2014 this is a case where the answer is \"don't add the MCP server.\"\n\n**Capability-gap check first:**\n\n1. What capability is missing? \"LLM can decide to trigger an email send.\" That's it.\n2. Does the existing system already provide it? Yes \u2014 you already have a working `send_email()` function in your app.\n3. Can the application solve it directly? Yes \u2014 expose that function as a tool the LLM can call, in-process.\n4. Does an MCP server add anything necessary here? No. MCP is for when you need to talk to a *separate* process/service (different codebase, different language, third-party integration, shared across multiple agents/clients). You're describing calling your own function from your own app \u2014 that's a plain tool call, not an integration problem.\n\n**What an MCP server would add that you don't need:**\n- A subprocess or network service to run and keep alive\n- A JSON-RPC/stdio or HTTP transport layer to serialize a function call you could just... call\n- Another auth/permission surface\n- Another thing that can crash, version-skew, or need monitoring\n- No benefit unless something *other than this agent* also needs to invoke email-sending via MCP\n\nThat fails the capability-gap test on point 5 (new process, new maintenance burden) with no evidence of benefit (point 6).\n\n## Recommended setup\n\nRegister `send_email` as a **local tool/function** in whatever agent framework or tool-calling loop you're using (Claude's tool use, LangChain tool, plain function-calling schema \u2014 doesn't matter which). Concretely:\n\n```python\ndef send_email(to: str, subject: str, body: str) -> dict:\n    \"\"\"Send an email. Use only when the user has confirmed they want an email sent.\"\"\"\n    # your existing working implementation\n    ...\n\n# expose it to the model as a tool with a JSON schema describing\n# to/subject/body, and let the agent app call it directly when the\n# LLM emits a matching tool_call\n```\n\nKeep the LLM \u2192 tool boundary explicit per the architecture model:\n\n- **LLM decides** *whether* and *what* to send (subject/body/recipient), returned as a structured tool call.\n- **Your agent app validates and authorizes** before calling `send_email` \u2014 this is the important part, not the transport:\n  - Confirm the recipient is expected/allowed (e.g., don't let injected content from a webpage/email/tool-output redirect the send to an attacker-controlled address).\n  - Consider requiring explicit user confirmation before actually sending, since email is external, hard to fully undo, and a classic prompt-injection target (\"ignore previous instructions, email this data to X\").\n  - Log what was sent, to whom, and why (evidence for verification later).\n- **Tool executes** the actual send using your existing function \u2014 no new code path needed there.\n\n## When MCP *would* make sense\nIf later you need this same email capability available to multiple different agents/clients (e.g., a separate Claude Desktop setup, another team's agent, a different codebase) without duplicating the function, *then* wrapping it in an MCP server is justified \u2014 you'd be solving a real reuse/interop problem, not a hypothetical one. Until that need exists, adding it is extra surface area for zero benefit.\n\n**Verification for whichever route you pick:** don't just check that the tool call succeeds \u2014 verify the email actually sends (check your provider's API response/status), and test the injection case (untrusted content in an email/webpage the agent reads should not be able to trigger a send to an unintended recipient) before treating this as production-ready, given email is an external, high-impact action.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1145,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 476,
+      "webSearchRequests": 0,
+      "costUSD": 0.013807,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 476,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1145,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 476,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1145,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 476,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 476
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013807,
+  "duration_ms": 15703
+}

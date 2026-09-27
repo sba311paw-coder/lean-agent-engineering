@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__original__baseline__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly lists what MCP would provide (cross-process boundaries, reuse across clients, third-party discovery, isolation) and states 'You have none of these triggers,' correctly identifying no missing capability exists.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'You likely don't need an MCP server. Just expose your existing function as a tool' and provides code wrapping 'your_existing_send_email_function' directly.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'Adding MCP here means' a list of costs/downsides and concludes 'Skip MCP until you have an actual multi-consumer or process-isolation requirement,' explicitly rejecting MCP-by-default reasoning.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009734
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames a 'capability-gap test' asking what exact capability is missing (storage/querying, aggregation, tracing, alerting) rather than assuming a framework is needed.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Suggests reusing existing tools: 'Structured logging (structlog or stdlib logging with JSON formatter) + grep/jq', 'time.perf_counter() + logging', and 'a simple correlation ID (run_id) threaded through your logs' before recommending any new framework.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly lists costs: 'New dependency surface, possibly a SaaS account/API key..., network calls out..., a learning curve, and ongoing maintenance' and notes this is 'often disproportionate to the problem' for a single agent.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009654
+}

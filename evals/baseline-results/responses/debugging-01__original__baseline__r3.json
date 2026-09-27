@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__original__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration worked yesterday, but after a recent code change it started failing. I want to fix it quickly. What should I do first?",
+  "response": "Since something worked yesterday and broke after a code change, the fastest path is to isolate *what changed* before diving into the tool-calling logic itself. Here's the order I'd go in:\n\n### 1. Confirm it's actually the code change, not an external factor\n- Check if the model/provider SDK version, API endpoint, or tool-calling schema changed upstream (some providers tweak function-calling formats).\n- Check if any env vars, API keys, or config files changed (even unintentionally, e.g. `.env` overwritten).\n\n### 2. Diff against the last known-good state\n- `git diff` (or your VCS equivalent) between yesterday's working commit and now \u2014 even a one-line change to tool schemas, message formatting, or serialization can break tool calls.\n- Pay special attention to:\n  - Tool/function **schema definitions** (JSON schema typos, renamed params, changed `required` fields)\n  - The **system prompt or instructions** telling the model when/how to call tools\n  - Any **wrapper/parsing code** that extracts tool calls from the model response (e.g., expecting `tool_calls[0].function.arguments` but format changed)\n  - Serialization of tool results being sent back to the model\n\n### 3. Reproduce with a minimal, isolated test\n- Strip it down to the smallest possible call: one tool, one simple prompt, log the raw request and raw response.\n- Compare the **raw API request/response payload** to what it looked like before (if you have logs/traces from yesterday).\n\n### 4. Check the actual error surface\n- Is it: (a) the model not calling the tool at all, (b) malformed tool call arguments, (c) your code failing to parse/execute the call, or (d) the tool result not being fed back correctly?\n- The fix path is very different for each, so nailing down *where* in the pipeline it breaks matters more than guessing.\n\nIf you can share the specific error message/stack trace or the diff of what changed, I can help narrow it down much faster \u2014 right now I don't have visibility into your repo or logs (this session has no file access), so pointing me at the actual failure (error output, or the relevant snippet) will let me give concrete fixes instead of general debugging steps.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 533,
+      "outputTokens": 761,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008676,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 54,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 533,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 761,
+    "output_tokens_details": {
+      "thinking_tokens": 54
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 533,
+        "output_tokens": 761,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008676,
+  "duration_ms": 10446
+}

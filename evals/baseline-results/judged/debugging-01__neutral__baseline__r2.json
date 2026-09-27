@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "Response explicitly states it cannot inspect the bug and never asks for or attempts to reproduce the actual failure; reproduction is only mentioned as a suggested future step ('Isolate with a minimal repro'), not performed.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section '1. Check the diff first' instructs running `git diff HEAD~1 HEAD` and lists specific things to look for in the change (schema defs, config, SDK version bumps, serialization).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Mentions logging raw request/response and model output, and tracing async/callback wiring, but doesn't walk through an actual data/control flow trace for this specific case\u2014stays at a generic suggestion level.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "Response jumps straight to a list of likely causes and fixes/checks; it never explicitly forms or states a single testable hypothesis before proposing fixes, instead offering a broad enumeration of possibilities.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.375,
+  "case_pass": false,
+  "judge_cost_usd": 0.010686
+}

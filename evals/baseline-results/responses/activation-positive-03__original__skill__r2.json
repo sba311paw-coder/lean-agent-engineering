@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__original__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I am building an agent that reads documents and retrieves information from a vector database. The answers are sometimes poorly grounded. Before changing the retrieval system, help me determine whether the problem is retrieval, context construction, or final answer generation. What evidence should I collect first?",
+  "response": "# Diagnosing \"poorly grounded\" answers in a RAG agent\n\nThis is a classic case where \"the answers are wrong\" gets prematurely diagnosed as \"the retrieval system is bad.\" Before touching retrieval, trace the pipeline and find the first boundary where things go wrong:\n\n```\nQUERY \u2192 RETRIEVAL \u2192 CONTEXT CONSTRUCTION \u2192 LLM GENERATION \u2192 ANSWER\n```\n\nGrounding failures can originate at any of these three stages, and each has a distinct signature and fix. Collect evidence in this order, because each step is cheap and rules out an entire category of hypotheses.\n\n## Step 1: Isolate retrieval quality (cheapest to check first)\n\nFor a sample of failing queries (10\u201320 real ones, not synthetic), log and inspect:\n\n- **The raw retrieved chunks** (text + similarity/rerank scores) \u2014 before any prompt assembly.\n- Ask, for each query: *does at least one retrieved chunk actually contain the answer?*\n\nThis gives you a binary split:\n\n- **If the answer is NOT present in any retrieved chunk** \u2192 retrieval problem (or the answer isn't in your corpus at all \u2014 check that first, it's common and not fixable by tuning).\n- **If the answer IS present in retrieved chunks** \u2192 retrieval is fine for that query; the bug is downstream. Move to Step 2.\n\nQuick things to check within retrieval itself, since \"retrieval\" is not monolithic:\n- Embedding relevance (is the right chunk in the top-k at all, even ranked low?)\n- Chunking (is the answer split across chunk boundaries, so no single chunk is sufficient?)\n- Top-k size (is the right chunk retrieved at rank 15 but you only take top 5?)\n\n## Step 2: Isolate context construction\n\nIf retrieval surfaced the right content but the answer is still wrong, inspect **the exact final prompt sent to the LLM** \u2014 not what you assume was sent.\n\nCheck for:\n- **Truncation** \u2014 did the context window get cut off before the relevant chunk?\n- **Ordering/lost-in-the-middle** \u2014 is the relevant chunk buried in the middle of a long context, where LLMs attend less?\n- **Formatting stripped meaning** \u2014 did chunking remove headers, tables, or surrounding context needed to interpret the fact correctly (e.g., a number without its unit or date)?\n- **Conflicting chunks** \u2014 did you include multiple chunks with contradictory or stale info, and the model picked the wrong one?\n- **Instruction/prompt template issues** \u2014 does the system prompt actually instruct the model to answer *only* from context and say when it doesn't know?\n\nIf the correct chunk is in the final assembled prompt, in a usable position, with clear formatting, and the answer is still wrong \u2192 move to Step 3.\n\n## Step 3: Isolate generation behavior\n\nIf the ground-truth content was present and well-formed in the prompt, and the model still produced an ungrounded answer, the issue is generation-side:\n\n- The model is **ignoring provided context** and answering from parametric memory.\n- The model is **conflating** multiple chunks incorrectly.\n- The model is **hallucinating specifics** (numbers, names) not present in context, often when context is thin or ambiguous.\n- No **explicit grounding instruction** or refusal-when-insufficient behavior is enforced.\n\nThis is the layer to fix with prompt changes (e.g., \"answer only using the provided context; if insufficient, say so\"), citation-forcing (ask the model to quote the source span), or a lower-temperature/more constrained generation setting \u2014 not retrieval tuning.\n\n## Minimum evidence set to collect before changing anything\n\nFor ~15\u201320 failing examples, capture a table with these columns:\n\n| Query | Retrieved chunks (raw) | Answer present in any chunk? | Final assembled prompt | Answer present in final prompt? | Model output | Grounded? |\n\nThis single artifact will make the failure mode visible \u2014 you'll likely see it cluster (e.g., 80% of failures have the answer missing from top-k \u2192 retrieval; or 80% have it present but the model still hallucinates \u2192 generation).\n\n## Why this order matters\n\nRetrieval fixes (reranking, chunking, embedding model swaps) are expensive to iterate on and easy to mis-tune if the actual failure is a truncated context window or a model ignoring its context. Tracing the boundary first prevents you from \"fixing\" retrieval and still having the same failure rate because the real bug was three stages downstream \u2014 a common and expensive mistake.\n\nOne thing worth flagging: if you find failures split across more than one stage, fix them in pipeline order (retrieval \u2192 context \u2192 generation), since fixing generation behavior on top of bad retrieval will just mask the retrieval problem intermittently.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1567,
+      "cacheReadInputTokens": 2742,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0162224,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2742,
+    "output_tokens": 1567,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1567,
+        "cache_read_input_tokens": 2742,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0162224,
+  "duration_ms": 20199
+}

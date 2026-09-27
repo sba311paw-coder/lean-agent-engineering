@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__baseline__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "# Debugging: Tool Returns Correct Data But Final Answer Ignores It\n\nThis is a common issue with LLM agent/tool-calling pipelines. Since you're seeing correct data in the logs but a generic final response, the problem is almost always in how the tool result gets fed back into the model for the final generation step. Here's a systematic checklist:\n\n## 1. Check the message/role structure\nThe tool result needs to be added back into the conversation with the correct role before the final LLM call. Common mistakes:\n- Tool result appended as a `user` message instead of a `tool`/`function` role message\n- Missing the `tool_call_id` (or equivalent) linking the result to the original tool call \u2014 some APIs silently drop or ignore unlinked tool messages\n- Tool result added to logs/state but never actually appended to the messages array sent to the model\n\n**Fix:** Print the *exact* payload sent to the LLM on the final call (not just your internal logs) and verify the tool output is literally in there.\n\n## 2. Verify the final call actually includes tool results\nSome frameworks require a second explicit call after tool execution. If you're using an agent loop, check that:\n- The loop doesn't short-circuit and generate a response *before* the tool result is appended\n- You're not accidentally using a cached/stale message history for the final generation\n\n## 3. Check for truncation\nIf context is long, the tool result might be getting truncated or evicted:\n- Look for a max-token or history-trimming step that could be cutting the tool message\n- Check if the tool result is buried too far back in context relative to a small context window\n\n## 4. Check parsing/formatting of the tool output\nIf the tool returns something like a nested JSON object, the model may not \"see\" the relevant field clearly:\n- Try returning a simple, flat, human-readable string (e.g., `\"Temperature in Paris: 22\u00b0C\"`) instead of raw JSON\n- Malformed JSON in the tool result can cause some SDKs to silently fail to parse it, resulting in an empty/ignored tool message\n\n## 5. Check your system prompt / instructions\nSometimes the model has been instructed (explicitly or via few-shot examples) to answer conversationally without referencing tools, causing it to ignore available data. Make sure your prompt explicitly says: *\"Use the tool result to answer the user's question directly.\"*\n\n## 6. Confirm tool call/response pairing\nIf multiple tools are called in parallel, mismatched IDs between call and response is a frequent cause of the model \"not seeing\" a particular result.\n\n---\n\n**To help narrow this down further, it'd help to know:**\n- What framework/SDK are you using (LangChain, OpenAI SDK, Claude Agent SDK, custom loop, etc.)?\n- Are you making a manual two-step call (tool call \u2192 tool result \u2192 final call), or using an agentic loop/framework that handles this automatically?\n- Can you share the actual message array/payload sent for the final generation step (redact anything sensitive)?\n\nWith that, I can point to the specific line/step likely causing this.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 535,
+      "outputTokens": 981,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.01088,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 535,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 981,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 535,
+        "output_tokens": 981,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.01088,
+  "duration_ms": 12926
+}

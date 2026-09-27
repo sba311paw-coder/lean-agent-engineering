@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames the issue as the 'AGENT APPLICATION \u2192 TOOL \u2192 AGENT APPLICATION \u2192 LLM' return leg and lists causes like tool_result not appended, wrong tool_use_id, etc.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'Check the exact message array sent to the LLM on the final call \u2014 not the logs, the actual payload' and suggests printing the serialized tool_result block before sending.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Advises reproducing with a minimal test by manually constructing a message array before concluding, and asks for the code around message appending/LLM call rather than suggesting tool changes; the 'Fix' section only addresses message handling, not the tool itself.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009828
+}

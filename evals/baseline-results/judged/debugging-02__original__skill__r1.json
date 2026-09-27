@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__original__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"No \u2014 swapping the embedding model is a big, disruptive change... Don't replace the embedding model as a first move.\"",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a diagram tracing RETRIEVAL -> CONTEXT ASSEMBLY -> LLM GENERATION, and diagnostic steps checking retrieved chunks, prompt sent to LLM, and generation behavior.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "\"Reproduce a few failing queries and log what actually happened at each stage... Pull actual retrieval logs for a handful of failing cases\"",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009862
+}

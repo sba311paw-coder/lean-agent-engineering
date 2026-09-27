@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__baseline__r2",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "# Retrieval Augmented Generation (RAG)\n\nRAG is a technique that combines a large language model (LLM) with an external knowledge retrieval system to produce more accurate, up-to-date, and grounded responses.\n\n## How it works\n\n1. **Query** \u2014 A user asks a question or gives a prompt.\n2. **Retrieve** \u2014 Instead of relying solely on what the model learned during training, the system searches an external knowledge source (e.g., a vector database, document store, or search index) for relevant information related to the query. This typically uses semantic search via embeddings.\n3. **Augment** \u2014 The retrieved documents/passages are inserted into the prompt as additional context.\n4. **Generate** \u2014 The LLM generates a response using both the original query and the retrieved context.\n\n## Why it's useful\n\n- **Reduces hallucinations** \u2014 The model can ground its answers in real, retrieved facts rather than relying purely on memorized (and possibly outdated or incorrect) information.\n- **Up-to-date knowledge** \u2014 You can update the underlying knowledge base without retraining the model, so it can answer questions about recent events or proprietary data.\n- **Domain-specific accuracy** \u2014 Useful for enterprise/internal knowledge bases (e.g., company docs, legal texts, codebases) that weren't part of the model's training data.\n- **Source attribution** \u2014 Since responses are based on specific retrieved documents, it's often easier to cite sources.\n- **Cost-effective** \u2014 Cheaper than fine-tuning a model every time new information needs to be incorporated.\n\n## Typical architecture components\n\n- **Embedding model** \u2014 converts text into vector representations.\n- **Vector database** (e.g., Pinecone, Weaviate, Chroma, FAISS) \u2014 stores and indexes document embeddings for fast similarity search.\n- **Retriever** \u2014 finds the most relevant chunks of text for a given query.\n- **LLM** \u2014 generates the final answer using the retrieved context plus the query.\n\n## Common use cases\n\n- Chatbots answering questions from internal documentation\n- Customer support systems referencing product manuals\n- Research assistants pulling from academic papers\n- Code assistants referencing a specific codebase\n\nIn short, RAG lets you \"look things up\" before answering, rather than relying entirely on what's baked into the model's weights.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 504,
+      "outputTokens": 743,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008438,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 504,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 743,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 504,
+        "output_tokens": 743,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008438,
+  "duration_ms": 8417
+}

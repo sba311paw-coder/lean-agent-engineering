@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__original__skill__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides a full reference flow diagram from USER through AGENT APPLICATION, LLM, TOOL/API, back to AGENT APPLICATION, LLM, and FINAL RESPONSE.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates 'LLM (decides to call weather tool...)' from 'AGENT APPLICATION (parses tool_call, invokes tool)' and later distinguishes 'control-flow bug in the agent loop itself, not a model or tool issue.'",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists three candidate failing boundaries: tool result capture, agent-to-LLM round-trip, and message formatting boundary, with checks for each.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "States 'let's trace the architecture rather than guess at a fix' and ends with a request for logs/code before giving 'the actual fix', explicitly deferring fix proposal until investigation.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011172
+}

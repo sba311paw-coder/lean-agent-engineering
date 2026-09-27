@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__baseline__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called \"function calling\") is a capability that lets an AI model interact with external systems, code, or data sources instead of relying only on its built-in knowledge and text generation.\n\n## How It Works\n\n1. **Definition**: Developers describe available tools to the model \u2014 each with a name, description, and expected input parameters (often in a schema like JSON).\n2. **Decision**: When given a task, the model decides whether it needs a tool to complete it, and if so, which one.\n3. **Call**: The model outputs a structured request specifying the tool name and arguments (rather than just plain text).\n4. **Execution**: The surrounding application (not the model itself) actually runs the tool \u2014 e.g., calling an API, querying a database, or running code.\n5. **Response**: The result is returned to the model, which incorporates it into its next response to the user.\n\n## Example\n\nA user asks: *\"What's the weather in Tokyo right now?\"*\n\n- The model recognizes it can't know real-time weather.\n- It calls a `get_weather` tool with `{\"location\": \"Tokyo\"}`.\n- The application executes the actual API call.\n- The result (e.g., \"22\u00b0C, cloudy\") is passed back to the model.\n- The model responds: *\"It's currently 22\u00b0C and cloudy in Tokyo.\"*\n\n## Common Use Cases\n\n- **Data retrieval**: Searching the web, querying databases, fetching documents\n- **Computation**: Running calculations, executing code\n- **Actions**: Sending emails, creating calendar events, updating records\n- **Multi-step workflows**: Chaining several tool calls together to accomplish complex tasks (sometimes called \"agentic\" behavior)\n\n## Why It Matters\n\nTool calling extends an AI model beyond static, pre-trained knowledge \u2014 giving it access to **real-time information**, **precise computation**, and the ability to **take actions** in the real world, rather than just generating text based on patterns it learned during training.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 500,
+      "outputTokens": 635,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007350000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 500,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 635,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 500,
+        "output_tokens": 635,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007350000000000001,
+  "duration_ms": 7603
+}

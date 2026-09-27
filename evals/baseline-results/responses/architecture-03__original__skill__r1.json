@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__original__skill__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I am building a small Python AI agent for my own use. It needs to answer questions, call two existing Python functions when necessary, and return the results to me. I do not need multiple agents, distributed services, or production scale yet. What architecture should I start with?",
+  "response": "# Minimal architecture for your use case\n\nFor a single-user agent with two tools and no scale requirements, you don't need a framework, orchestration layer, or multi-agent setup. Here's the smallest reliable structure:\n\n```\nUSER\n |\n v\nAGENT APPLICATION (single Python script/module)\n |-- builds prompt + conversation history\n |-- defines tool schemas for your 2 functions\n v\nLLM (via API call)\n |\n | decision: answer directly, OR structured tool call\n v\nAGENT APPLICATION\n |-- validates tool call arguments\n |-- executes the matching Python function\n |-- captures result (or error)\n v\nLLM (result fed back in)\n |\n v\nFINAL RESPONSE -> USER\n```\n\n## Concretely, that means:\n\n1. **One Python file/module.** No separate services, no message queues, no agent framework (LangChain/CrewAI/etc. would be pure overhead here).\n2. **A single loop**: send messages to the LLM API, check if it returned a tool call, execute the corresponding function if so, feed the result back, repeat until you get a final text answer.\n3. **Tool definitions**: just JSON schemas describing your two functions' name/args/description, passed to the API's native tool-calling parameter (OpenAI, Anthropic, etc. all support this directly \u2014 no extra library needed).\n4. **A dispatch dict**: `{\"tool_name\": actual_function}` \u2014 the application looks up and calls the real function; the LLM never executes code directly.\n5. **In-memory conversation list** (a Python list of messages) \u2014 no database needed unless you want persistence across runs.\n\n## Why this is sufficient\n\n- The LLM only *decides* which tool to call \u2014 your application code is what actually authorizes and executes it (important even for personal tools, in case of bad/ambiguous LLM output).\n- Two tools don't warrant a routing/orchestration layer \u2014 a simple `if`/dict dispatch is more reliable and easier to debug than a framework abstraction.\n- No persistence, retries, or scaling infrastructure needed for personal, single-session use.\n\n## When to add more\n\nOnly grow this if you hit an actual gap:\n- **Need conversation persistence across restarts** \u2192 add a simple file/SQLite save of the message list.\n- **Tools can fail/hang** \u2192 add basic try/except and timeouts around the function calls (worth doing even now, cheaply).\n- **More than a handful of tools** \u2192 consider organizing schemas/dispatch in a small registry, still no framework needed.\n- **Untrusted input reaches your tools** (e.g., web content, user-supplied file content) \u2192 validate/sanitize before passing to your functions, since that content should be treated as data, not instructions.\n\nStart with the loop + dispatch dict. Add complexity only when a specific, real limitation shows up.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 928,
+      "cacheReadInputTokens": 2733,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0098306,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2733,
+    "output_tokens": 928,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 928,
+        "cache_read_input_tokens": 2733,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0098306,
+  "duration_ms": 13517
+}

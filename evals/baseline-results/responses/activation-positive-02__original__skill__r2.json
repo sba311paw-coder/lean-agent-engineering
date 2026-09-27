@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__original__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent sometimes calls the correct tool, but sometimes skips the tool and answers from its own knowledge. Help me investigate the problem. Do not immediately suggest adding another framework or tool. First identify the likely failure boundary and what evidence I should collect.",
+  "response": "# Investigating: Agent Sometimes Skips Tool Calls\n\nThis is a classic **LLM decision boundary** issue \u2014 the model is choosing not to call a tool, rather than the tool failing. Before adding routing frameworks, structured-output enforcers, or \"tool-forcing\" wrappers, let's find the actual failure boundary with evidence.\n\n## Where this fits in the architecture\n\n```\nUSER \u2192 AGENT APPLICATION \u2192 LLM (decides: call tool or answer directly) \u2192 ...\n```\n\nThe failure is happening at the **LLM decision point**, but the *cause* could originate in several places upstream of that decision:\n\n1. **Prompt/instruction layer** \u2014 tool description or system prompt ambiguity\n2. **Input framing** \u2014 how the user's query happens to be phrased triggers different model behavior\n3. **Context window** \u2014 tool definitions get pushed out or diluted by long context\n4. **Application layer** \u2014 inconsistent tool availability/registration per request\n5. **Model layer** \u2014 genuine reasoning inconsistency (least likely to be sole cause, most commonly blamed first)\n\n## Evidence to collect before hypothesizing\n\nPull **10\u201320 paired examples**: same or similar intent, one where the tool was called, one where it wasn't. For each, capture:\n\n- **Exact user input** (verbatim)\n- **Full system prompt** sent that turn\n- **Full tool schema/definitions** sent that turn (names, descriptions, parameter docs)\n- **Whether tool_choice was `auto`, `required`, or a specific tool**\n- **Conversation history length** at that point (turn count, token count)\n- **The model's raw output** \u2014 did it emit a tool_call block, or plain text? (Not just the final rendered answer)\n- **Model ID/version** used per call (if you're on multiple versions or providers)\n\n## What to compare across the pairs\n\n- **Phrasing pattern**: Does skipping correlate with indirect/ambiguous phrasing (\"what's the weather like\") vs. direct (\"get the weather\")?\n- **Context length**: Does skipping happen more often later in long conversations (tool schema attention dilution)?\n- **Confidence framing**: Is the skipped case one where the model \"thinks it knows\" (e.g., stable facts) vs. cases requiring live/dynamic data?\n- **Tool description quality**: Is there any ambiguity about *when* the tool applies vs. when general knowledge suffices?\n- **tool_choice setting**: Are all failing cases using `auto` while none use `required`?\n\n## One testable hypothesis to start with\n\nThe most common root cause for this exact symptom: **the tool description doesn't clearly state it must be used whenever its domain applies**, so the model treats it as optional/supplementary rather than authoritative \u2014 and defaults to its own knowledge when it judges itself \"confident enough.\" Long context or multi-turn dilution is the second most common cause.\n\n## Before proposing a fix\n\nDon't add a second agent, a router, or a validation framework yet. Once you share a few paired examples (input, tool schema, raw model output), we can pinpoint whether this is a **prompt/schema problem** (cheap fix) or something structural (context truncation, application-layer inconsistency) that needs a different remedy.\n\nCan you share 2\u20133 concrete transcripts \u2014 one where the tool was called correctly and one where it was skipped, including the tool definitions and raw model output for that turn?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1112,
+      "cacheReadInputTokens": 2742,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0116724,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2742,
+    "output_tokens": 1112,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1112,
+        "cache_read_input_tokens": 2742,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0116724,
+  "duration_ms": 14425
+}

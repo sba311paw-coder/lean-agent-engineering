@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-01__original__skill__r3",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "What is an LLM?",
+  "response": "**LLM** stands for **Large Language Model** \u2014 a type of AI model trained on massive amounts of text data to understand and generate human-like language.\n\nKey points:\n\n- **How it works**: An LLM is typically a neural network (usually based on the \"transformer\" architecture) trained to predict the next word/token in a sequence, given the preceding context. Through this training on huge text corpora, it learns grammar, facts, reasoning patterns, and various styles of writing.\n\n- **What it can do**: Answer questions, write and explain code, summarize text, translate languages, hold conversations, draft documents, and generally process/generate natural language for a wide range of tasks.\n\n- **Examples**: Models like GPT-4, Claude, Gemini, and Llama are all LLMs.\n\n- **Important caveats**:\n  - LLMs don't \"know\" facts in a database sense \u2014 they generate plausible-sounding text based on patterns learned during training, which means they can be confidently wrong (\"hallucinate\").\n  - They have a training data cutoff, so they lack knowledge of events after that point (unless given external tools/context).\n  - They don't inherently have goals, memory across separate conversations, or true understanding \u2014 they're statistical pattern-matchers, albeit very sophisticated ones.\n\n- **In agentic systems**: LLMs are often paired with tools (search, code execution, APIs) so they can take actions in the world, not just generate text \u2014 this is the basis of \"AI agents.\"\n\nThis was a general knowledge question rather than an engineering task, so no build/debug workflow was needed \u2014 just a direct explanation.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 506,
+      "cacheReadInputTokens": 2664,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0055968,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2664,
+    "output_tokens": 506,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 506,
+        "cache_read_input_tokens": 2664,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0055968,
+  "duration_ms": 6942
+}

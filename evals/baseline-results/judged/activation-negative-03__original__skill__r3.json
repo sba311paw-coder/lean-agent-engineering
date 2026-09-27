@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__skill__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response gives a clear educational explanation of RAG including definition, how it works, why it's used, and architecture diagram.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Includes a 'Common failure points (if you're building one)' section and ends with 'If you're working on an actual RAG implementation (debugging retrieval quality...)' which frames part of the response around debugging/building, though the core answer remains educational.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.007318
+}

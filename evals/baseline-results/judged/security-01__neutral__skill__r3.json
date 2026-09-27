@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"the LLM's decision to call the tool is not authorization\" stated explicitly and reinforced with \"tie execution back to the confirmed request, not a fresh LLM decision.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorization must be enforced at the application/tool boundary, not inferred from the model's judgment\" and section 2 \"Enforce checks in the application layer, not the prompt\" with permission/identity checks.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Sections 3-5 detail volume thresholds, human confirmation, soft-delete, rate limits, least-privilege credentials, and audit logging as extra safeguards for the destructive action.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011098
+}

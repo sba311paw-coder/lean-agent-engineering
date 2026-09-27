@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "# Debugging tool-calling failure after a recent code change\n\nSince this broke right after a code change, treat it as a regression \u2014 don't guess, trace it. Here's the fast, systematic path:\n\n## 1. Check recent changes first\nSince you know it worked before and broke after a specific change, diff that change against the working version before anything else. Look specifically for changes to:\n- Tool/function schema definitions (names, parameter types, required fields)\n- The system prompt or tool descriptions\n- SDK/library version bumps (tool-calling formats change between versions)\n- Serialization of tool results back to the model\n- Any request/response parsing logic\n\n## 2. Locate the failing boundary\nUsing the agent architecture model, tool-calling has three distinct hops \u2014 figure out which one is actually broken:\n\n```\nLLM decision \u2192 AGENT APPLICATION \u2192 TOOL/API\n                     \u2191\n              (result handling)\n                     \u2193\nLLM \u2192 FINAL RESPONSE\n```\n\nCheck each in order:\n1. **Is the LLM emitting a tool call at all?** Log the raw model response. If no tool call appears, the issue is upstream (prompt, tool schema, or model config) \u2014 not the tool execution.\n2. **Is the agent application parsing/dispatching it correctly?** Log the parsed tool name + arguments before dispatch. A schema mismatch (e.g., renamed parameter, changed type) will often show valid-looking calls that fail to match your dispatcher.\n3. **Is the tool itself executing and returning a result?** Log the raw tool output.\n4. **Is the result being fed back to the LLM in the expected format?** A broken result \u2192 LLM handoff often looks identical to a \"tool calling stopped working\" symptom.\n\n## 3. Compare against a known-good case\nIf you have an older working request/response pair (logs, tests), diff it against a current failing one at each of the four checkpoints above. This usually pinpoints the exact boundary in under a few minutes.\n\n## 4. Common root causes after code changes\n- Tool schema no longer matches what the model was told (name/param drift)\n- A wrapper/middleware change altered how tool results are serialized\n- Model or SDK version upgrade changed the tool-call response format (e.g., field renamed)\n- A validation/permission check was added that now silently rejects the call\n- System prompt edit removed or altered tool-use instructions\n\n## 5. Fix at the root, then verify\nOnce you find the exact broken boundary, fix only that piece \u2014 don't touch surrounding logic. Then verify with the lowest sufficient level:\n- Unit test the tool schema/dispatcher in isolation\n- Integration test: one full round-trip (LLM call \u2192 tool execution \u2192 result \u2192 final response)\n- Confirm with a real end-to-end run matching the original failure scenario\n\n---\n\nIf you can share the actual error/log output (or the diff of the recent change), I can help pinpoint which boundary is failing rather than working through all four generically.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 953,
+      "cacheReadInputTokens": 2688,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0100716,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2688,
+    "output_tokens": 953,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 953,
+        "cache_read_input_tokens": 2688,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0100716,
+  "duration_ms": 12844
+}

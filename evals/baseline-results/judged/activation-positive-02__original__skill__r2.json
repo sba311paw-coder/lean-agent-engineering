@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__original__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Identifies 'LLM decision point' as failure boundary and lists upstream causes (prompt layer, input framing, context window, application layer, model layer).",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly requests '10\u201320 paired examples' with detailed evidence (system prompt, tool schema, tool_choice, raw output) before proposing fixes, ending with 'Before proposing a fix... Can you share 2\u20133 concrete transcripts'.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'Before adding routing frameworks, structured-output enforcers, or tool-forcing wrappers' and 'Don't add a second agent, a router, or a validation framework yet.'",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010398
+}

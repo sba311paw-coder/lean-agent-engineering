@@ -1,0 +1,33 @@
+{
+  "key": "security-01__original__skill__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"an LLM's decision to call a tool is never itself authorization to execute it\" and \"The model choosing the right tool is necessary but not sufficient.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorization check \u2014 Verify the requesting user actually has permission... This must be enforced by the application/tool layer, not inferred from the conversation.\"",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists explicit human confirmation, scope/sanity validation, reversibility safeguard (soft-delete/backup), audit logging, and post-execution verification as safeguards for this destructive action.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008646000000000001
+}

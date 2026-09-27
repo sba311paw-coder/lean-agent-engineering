@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly traces the architecture diagram and states 'The bug is almost certainly at the \"feed result back to LLM\" boundary, not in the tool itself,' identifying the Agent App to LLM handoff as the focus.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends: 'Add one temporary log point: print the exact payload sent to the LLM in the follow-up call (not the tool's raw output, but the full message array as constructed)' \u2014 directly checking the actual messages sent to the second LLM call.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'the failure is happening after the tool call' and never suggests modifying the tool itself; instead ends by asking to see 'the code path where you call the tool and construct the follow-up LLM request' before suggesting any fix.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010494
+}

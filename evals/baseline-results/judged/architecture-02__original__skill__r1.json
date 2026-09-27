@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__original__skill__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section '1. Agent app \u2192 LLM boundary (most likely culprit)' explicitly directs investigation to the handoff between agent app and LLM, listing causes like tool result not appended, wrong tool_call_id, etc.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'How to check: Log the actual payload sent to the LLM API on the follow-up call \u2014 not just the tool output, but the full message array including the tool-result message.' and the suggested next step to print the exact list of messages before the final LLM invocation.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Final line: 'Start there before touching the LLM prompt or model choice.' and opening states 'the failure is not in the tool' \u2014 explicitly avoiding tool changes before tracing the boundary.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009732
+}

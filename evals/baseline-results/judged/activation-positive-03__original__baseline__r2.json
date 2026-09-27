@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__original__baseline__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Steps 2-4 explicitly separate retrieval ('Inspect Retrieval Quality in Isolation'), context construction ('Inspect What Actually Reached the Prompt'), and generation ('Isolate Generation Given Known-Good Context'), with distinct checks and 'evidence pointing to X failure' for each stage.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before touching your retrieval system, you want to isolate where in the pipeline grounding breaks down' and structures the entire response around collecting evidence (failure sample, logs, quantification table) prior to any architecture change.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 4 describes an isolation experiment: 'Take cases where the correct info was present in the final prompt... Try re-running the exact same prompt manually... Test with a stricter instruction... does grounding improve?' \u2014 isolating generation from context/retrieval variables.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012905999999999999
+}

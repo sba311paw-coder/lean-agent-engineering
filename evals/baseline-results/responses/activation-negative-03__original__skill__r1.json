@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__skill__r1",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "# Retrieval Augmented Generation (RAG)\n\nRAG is a technique for improving LLM outputs by combining a retrieval step with a generation step, rather than relying solely on the model's parametric (trained-in) knowledge.\n\n## How it works\n\n1. **Query** \u2013 User submits a question/prompt.\n2. **Retrieve** \u2013 The system searches an external knowledge source (usually a vector database of embedded documents, but can also be keyword search, SQL, APIs, etc.) for content relevant to the query.\n3. **Augment** \u2013 The retrieved passages are inserted into the LLM's context window alongside the original query.\n4. **Generate** \u2013 The LLM produces a response grounded in that retrieved content, rather than (or in addition to) what it memorized during training.\n\n## Why it's used\n\n- **Freshness** \u2013 Provides access to information created after the model's training cutoff.\n- **Grounding / reduced hallucination** \u2013 The model answers based on real, citable source material rather than guessing.\n- **Private/proprietary data** \u2013 Lets an LLM answer questions about internal documents, codebases, or knowledge bases without retraining the model.\n- **Traceability** \u2013 Responses can cite which document/passage they came from, aiding verification.\n- **Cost efficiency** \u2013 Cheaper than fine-tuning a model on every new piece of data.\n\n## Typical components\n\n- **Embedding model** \u2013 Converts text (documents and queries) into vectors.\n- **Vector store** \u2013 Holds document embeddings and supports similarity search (e.g., pgvector, FAISS, Pinecone, Chroma).\n- **Retriever** \u2013 Fetches top-k relevant chunks for a query (semantic, keyword/BM25, or hybrid).\n- **Prompt assembly** \u2013 Formats retrieved chunks + query into the LLM's context.\n- **LLM** \u2013 Generates the final answer using retrieved context.\n\n## Common failure points to watch for (if you're building one)\n\n- **Chunking** \u2013 Too large/small chunks hurt retrieval precision.\n- **Retrieval quality** \u2013 Irrelevant or missing chunks lead to wrong/incomplete answers regardless of how good the LLM is.\n- **Context overflow** \u2013 Too many retrieved chunks can crowd out the actual query or exceed context limits.\n- **Stale index** \u2013 Knowledge base not updated as source documents change.\n- **No grounding check** \u2013 Model may still hallucinate beyond what was retrieved if not explicitly instructed to stick to provided context.\n\nIf you're evaluating or debugging a RAG system, the first place to look when answers are wrong is usually the **retrieval step** (is the right content even being fetched?) before assuming the generation/LLM step is at fault.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 878,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 429,
+      "webSearchRequests": 0,
+      "costUSD": 0.010949,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 429,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 878,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 429,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 878,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 429,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 429
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010949,
+  "duration_ms": 10305
+}

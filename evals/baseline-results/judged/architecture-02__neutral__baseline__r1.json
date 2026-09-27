@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Discusses the handoff explicitly: 'Tool result isn't being passed back into the conversation history' and 'Wrong role/format for the tool response' with provider-specific formats.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Quick way to isolate it: 'Dump the exact JSON payload sent to the model on the final call... print the raw messages array right before that API request.'",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The response does not suggest changing the tool itself, but it also doesn't explicitly instruct the user to trace/verify the boundary before making any changes\u2014instead it lists 6 possible fixes (including system prompt changes) before mentioning the diagnostic dump step at the end.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.009482
+}

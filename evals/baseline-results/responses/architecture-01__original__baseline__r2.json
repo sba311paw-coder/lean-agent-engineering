@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__original__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. I am thinking about replacing the entire agent framework with a different framework. Is that the right first step?",
+  "response": "Short answer: probably not. Swapping the whole framework is a big, expensive move that often doesn't even fix the problem \u2014 wrong tool selection is usually a *design/prompt/context* issue, not a *framework* issue. Most frameworks (LangChain, LangGraph, CrewAI, OpenAI/Anthropic tool-use APIs, etc.) all boil down to the same underlying mechanism: the model picks a tool based on descriptions + context + conversation history. If that's misconfigured, the new framework will likely have the same failure mode dressed up differently.\n\nBefore considering a rewrite, it's worth diagnosing *why* it's picking the wrong tool. Common root causes, roughly in order of how often they're the actual culprit:\n\n1. **Ambiguous or overlapping tool descriptions** \u2014 if two tools sound similar, the model guesses wrong. Tightening names/descriptions (what it does, when to use it, when *not* to) often fixes this immediately.\n2. **Too many tools exposed at once** \u2014 if the agent has access to 15+ tools for a given task, selection accuracy drops sharply. Scoping down to only relevant tools per step helps a lot.\n3. **Missing or weak examples** \u2014 few-shot examples of correct tool selection in the system prompt can dramatically improve accuracy.\n4. **Poor parameter/schema design** \u2014 unclear input schemas make the model less confident, leading to wrong picks.\n5. **No fallback/verification step** \u2014 some setups let the agent just fire a tool without a \"does this tool match the intent\" check; adding a lightweight self-verification or router step fixes a lot of misfires.\n6. **Context window pollution** \u2014 irrelevant history confusing tool choice.\n7. **Underlying model capability** \u2014 sometimes it really is a model reasoning limitation, but that's fixed by changing models, not frameworks.\n\nA more efficient first step:\n- Log a handful of failure cases (what task, what tools were available, what it picked vs. should've picked).\n- Categorize whether it's a description/ambiguity problem, a too-many-tools problem, or a genuine reasoning failure.\n- Try fixes in place (rename tools, trim available set, add examples, add a routing/verification layer) and measure.\n\nOnly if you find the *framework itself* structurally prevents good tool selection (e.g., it doesn't let you scope tools per step, doesn't support good descriptions, no way to add few-shot guidance) would switching frameworks be justified \u2014 and even then, it's a big lift for a fix that's usually cheaper elsewhere.\n\nIf you want, tell me which framework you're using and roughly how many tools/what kind of mis-selections you're seeing (e.g., picks search when it should calculate, or picks tool A vs B when both are valid) \u2014 I can help pinpoint likely causes before you commit to a migration.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 536,
+      "outputTokens": 926,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010332,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 536,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 926,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 536,
+        "output_tokens": 926,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010332,
+  "duration_ms": 13213
+}

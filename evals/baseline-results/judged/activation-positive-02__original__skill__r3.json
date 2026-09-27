@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__original__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly lays out the pipeline USER \u2192 AGENT APPLICATION \u2192 LLM \u2192 AGENT APPLICATION \u2192 TOOL and identifies three candidate boundaries (prompt/context, LLM decision, agent application gating) where divergence likely occurs.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response has a dedicated 'Evidence to collect first' section listing six specific data points (payloads, user input, conversation history, raw model output, tool descriptions, sampling settings) to gather before making any architectural changes, and closes by saying 'Once we see where the divergence actually happens, the fix is usually small... not a new framework.'",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'Before touching any code or adding a framework...' and concludes fixes are 'tightening a tool description, fixing an error-swallowing bug... not a new framework or orchestration layer,' explicitly avoiding recommending new tools/frameworks.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011578
+}

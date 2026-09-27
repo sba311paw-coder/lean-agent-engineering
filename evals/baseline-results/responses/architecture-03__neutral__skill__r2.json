@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__skill__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "For a small personal-use agent with just two tool functions, you don't need a framework. Here's the minimal architecture:\n\n## Architecture\n\n```\nUSER\n |\n v\nYOUR SCRIPT (agent application)\n |  - builds messages/history\n |  - sends to LLM\n v\nLLM (via API, e.g. Anthropic/OpenAI SDK)\n |  - decides: answer directly, or call tool_a/tool_b\n v\nYOUR SCRIPT\n |  - if tool call requested: validate args, call the actual Python function\n |  - feed result back to LLM\n v\nLLM\n |\n v\nFINAL RESPONSE -> USER\n```\n\nKey point: the LLM's tool-call request is a *suggestion*, not authorization. Your script is what actually invokes the function \u2014 it should validate arguments before calling.\n\n## What you need\n\n1. **LLM API client** \u2014 official SDK for whichever provider you use (Anthropic, OpenAI, etc.). This alone gives you tool-calling / function-calling support natively \u2014 no agent framework required.\n2. **Tool schema** \u2014 a plain dict/JSON schema describing your two functions (name, description, parameters) so the model knows when to call them.\n3. **A dispatch dict or if/elif** mapping tool name \u2192 your actual Python function.\n4. **A loop**: send message \u2192 check response for tool_use \u2192 call function \u2192 send result back \u2192 repeat until model gives a final text answer.\n5. **Basic input validation** on whatever arguments the two functions accept, especially if either function does anything irreversible (file writes, network calls, deletions). Even for personal use, validate types/ranges before executing.\n\n## What you don't need\n\n- LangChain, CrewAI, AutoGPT, or any orchestration framework \u2014 massive overkill for 2 tools and single-agent, single-user use.\n- A vector DB / RAG unless your two functions or your Q&A actually require retrieval over documents.\n- MCP server \u2014 only worth it if you want the tools reusable across multiple different agent clients (e.g., Claude Desktop *and* your script). For a single custom script calling your own functions directly, direct function calls are simpler and more reliable than wrapping them in MCP.\n- Multi-agent setup \u2014 you have one agent doing one job.\n\n## Rough shape (~50-80 lines)\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ntools = [\n    {\"name\": \"tool_a\", \"description\": \"...\", \"input_schema\": {...}},\n    {\"name\": \"tool_b\", \"description\": \"...\", \"input_schema\": {...}},\n]\n\ndef dispatch(name, args):\n    if name == \"tool_a\":\n        return tool_a_func(**args)\n    if name == \"tool_b\":\n        return tool_b_func(**args)\n    raise ValueError(f\"unknown tool: {name}\")\n\ndef run(user_input):\n    messages = [{\"role\": \"user\", \"content\": user_input}]\n    while True:\n        resp = client.messages.create(\n            model=\"claude-...\", max_tokens=1024,\n            tools=tools, messages=messages,\n        )\n        if resp.stop_reason != \"tool_use\":\n            return resp.content[0].text\n        messages.append({\"role\": \"assistant\", \"content\": resp.content})\n        tool_results = []\n        for block in resp.content:\n            if block.type == \"tool_use\":\n                result = dispatch(block.name, block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": str(result),\n                })\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n```\n\n## Verification before you call it done\n\n- Run it with a query that should trigger tool_a, one for tool_b, and one that needs no tool \u2014 confirm correct routing.\n- Confirm error handling: what happens if a function raises or returns unexpected data (should surface as tool error, not crash the loop).\n- If either function touches files/network/state, test with intentionally bad or edge-case arguments.\n\nIf you tell me what the two functions do, I can help you write the exact tool schemas and validation.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1327,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 456,
+      "webSearchRequests": 0,
+      "costUSD": 0.015547000000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 456,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1327,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 456,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1327,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 456,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 456
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.015547000000000002,
+  "duration_ms": 15727
+}

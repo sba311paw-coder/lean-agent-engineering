@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__original__baseline__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response defines a single Python agent app structure (main.py/agent.py/tools.py), uses one LLM (Anthropic client), and shows two example functions (get_weather, search_notes) wired via FUNCTION_MAP.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The 'Core Components' and pattern description explicitly separate the LLM call (decision to use a tool) from execution: 'If it's a tool-call request \u2192 run the corresponding Python function locally' is distinct from the LLM's response.stop_reason check.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The run_agent function shows the full loop: call LLM, check stop_reason, execute tool_use blocks, append tool_result to messages, and loop again until a text response is returned.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "'When to Add Complexity' section explicitly ties added infrastructure (LangGraph, CrewAI, task queues) to concrete triggers like multi-agent coordination, async jobs, or complex branching, rather than adding them upfront.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013332
+}

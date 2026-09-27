@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists general categories where tool selection breaks (tool descriptions, too many tools, schemas, etc.) but doesn't trace the user's specific agent architecture (no questions asked about how the agent is built before giving the list); it asks clarifying questions only at the end, after already presenting a generic breakdown.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It ranks likely causes ('#1 cause' being ambiguous tool descriptions) but doesn't pinpoint the first incorrect boundary in the user's actual system\u2014instead it asks the user for examples to identify it, deferring rather than identifying it directly.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "'Switching frameworks is unlikely to fix this' and 'which in most cases it won't, since the underlying tool-selection mechanism is nearly identical across frameworks' explicitly argues against unnecessary framework replacement.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009136
+}

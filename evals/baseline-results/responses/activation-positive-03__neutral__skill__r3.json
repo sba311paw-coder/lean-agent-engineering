@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving Grounding in RAG Systems\n\nThis is a classic RAG grounding problem. Rather than jumping to a fix, let's trace where the failure is actually occurring \u2014 poor grounding can originate at several distinct boundaries, and the fix differs depending on which one is broken.\n\n## First, localize the failure\n\nUsing the agent architecture model, a RAG pipeline has multiple boundaries where grounding can break:\n\n```\nQUERY \u2192 RETRIEVAL (vector DB) \u2192 CONTEXT ASSEMBLY \u2192 LLM \u2192 ANSWER\n```\n\nBefore changing anything, check with a handful of real failing examples:\n\n1. **Retrieval failure** \u2014 Are the right chunks even being retrieved? (Print/log the top-k chunks for a failing query and read them yourself.)\n2. **Chunking failure** \u2014 Are the relevant chunks retrieved but missing context (cut off mid-sentence, missing surrounding paragraph, no section/document title)?\n3. **Assembly failure** \u2014 Is the context passed to the LLM formatted ambiguously (no clear separation between sources, no citation markers)?\n4. **Generation failure** \u2014 Is the correct context present, but the LLM ignoring it and using prior/parametric knowledge instead?\n\nDon't skip this step \u2014 the fix for \"bad chunks\" is totally different from \"model ignoring good chunks,\" and guessing wastes effort.\n\n## Likely root causes and targeted fixes\n\n**If retrieval is the problem:**\n- Check embedding model quality/fit for your domain (generic embeddings often underperform on technical/specialized text)\n- Add hybrid search (BM25 + vector) \u2014 pure semantic search often misses exact terms, IDs, names\n- Add a reranker (cross-encoder) after initial retrieval to improve precision of top-k\n- Tune chunk size/overlap \u2014 too small loses context, too large dilutes relevance\n- Check if `k` is too low (missing relevant chunks) or too high (drowning signal in noise)\n\n**If chunking/context is the problem:**\n- Preserve document structure (headers, section boundaries) in chunks\n- Add metadata (source, section, date) to each chunk so the model can attribute claims\n- Avoid mid-sentence/mid-table splits\n\n**If generation is the problem (most common root cause):**\n- Add an explicit instruction: *\"Answer only using the provided context. If the answer isn't in the context, say you don't know.\"*\n- Require inline citations (e.g., `[source: doc_id]`) \u2014 this measurably reduces hallucination because it forces the model to point to evidence\n- Lower temperature for factual QA tasks\n- Consider a lightweight post-hoc verification step: after generation, check that key claims in the answer are actually supported by the retrieved chunks (this can be a simple string/entailment check, not necessarily another LLM call)\n\n## Simplify-first guidance\n\nBefore adding new infrastructure (reranker service, new vector DB, agent orchestration layer), try the cheapest fixes first:\n\n1. Tighten the system prompt (grounding instruction + citation requirement) \u2014 free, immediate\n2. Improve chunking strategy \u2014 no new dependencies\n3. Increase/decrease `k` and inspect results \u2014 no new dependencies\n4. Only then consider a reranker or hybrid search \u2014 adds a component, justify it with retrieval-quality evidence first\n5. Only add an agentic \"verify-then-answer\" loop if a single well-grounded prompt genuinely can't solve it \u2014 this adds latency, cost, and complexity\n\n## Verification\n\nWhatever you change, verify with evidence, not vibes:\n- Build a small eval set (10\u201330 real queries with known correct answers/sources)\n- Measure: retrieval precision@k, whether the answer's claims are traceable to retrieved chunks, and whether \"I don't know\" is produced when context is insufficient\n- Re-run after each change to confirm improvement rather than assuming it worked\n\n**One clarifying question:** when you say \"poorly grounded,\" do you mean the model is hallucinating despite correct chunks being retrieved, or the retrieved chunks themselves are irrelevant/incomplete? That will tell us which end of the pipeline to focus on first.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1373,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 454,
+      "webSearchRequests": 0,
+      "costUSD": 0.015999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 454,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1373,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 454,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1373,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 454,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 454
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.015999,
+  "duration_ms": 16123
+}

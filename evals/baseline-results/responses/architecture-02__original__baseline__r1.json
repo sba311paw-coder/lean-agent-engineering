@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__original__baseline__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My weather tool executes successfully and returns the correct temperature. I can see the result in the Agent App logs, but the final LLM response ignores the temperature and gives a generic answer. Where should I investigate first?",
+  "response": "# Where to Investigate First\n\nSince the tool executes correctly and returns the right temperature, but the LLM's final answer ignores it, the issue is almost certainly in **how the tool result gets fed back into the conversation before the final generation step**. Here's the priority order:\n\n## 1. Tool result \u2192 message history wiring (most likely culprit)\nCheck how the tool output is being inserted back into the conversation that goes to the LLM for the final response:\n- Is the tool result actually being appended as a `tool` role message (or equivalent) in the message array sent for the *final* completion call?\n- Is there a **second LLM call** happening after the tool executes? Some agent frameworks require you to explicitly re-invoke the model with the updated message history after a tool call \u2014 if you're not doing that, the model is generating a response based only on the *original* messages (without ever seeing the tool output).\n- Double-check the `tool_call_id` (or equivalent) matches between the assistant's tool-call message and the tool-result message. A mismatch often causes providers to silently drop/ignore the result.\n\n## 2. Log the exact payload sent to the final LLM call\nDon't just trust the Agent App logs showing the tool executed \u2014 add a log of the **literal request body** sent to the model for the response-generation step. Confirm:\n- The tool result is present in that specific request\n- It's formatted correctly for your provider (e.g., OpenAI's `tool` role + `tool_call_id`, Anthropic's `tool_result` content block)\n- It wasn't truncated, summarized away, or dropped by a context-window trimming step\n\n## 3. Check for context truncation / summarization logic\nIf your agent has any middleware that trims history to fit context length, verify it isn't dropping the tool result message specifically (this is a common bug \u2014 trimmers sometimes preserve the assistant's tool-call but drop the paired result).\n\n## 4. Check the system prompt / instructions\nLess likely given your symptoms, but worth a quick check: does the system prompt tell the model *when* and *how* to use tool results? Some models will \"answer from general knowledge\" if the prompt doesn't clearly instruct them to prioritize tool outputs.\n\n## 5. Parsing/formatting of the tool result content itself\nConfirm the temperature value isn't buried in a large JSON blob, wrapped in metadata, or formatted in a way that visually \"looks right in logs\" but is structured oddly (e.g., nested under unexpected keys) \u2014 sometimes models under-attend to poorly formatted tool payloads.\n\n---\n\n**Fastest debugging step:** Log the raw request payload for the final completion call and inspect it directly \u2014 90% of the time this bug is \"the tool result never actually made it into that request\" rather than a model reasoning issue.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 553,
+      "outputTokens": 891,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010015999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 553,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 891,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 553,
+        "output_tokens": 891,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010015999999999999,
+  "duration_ms": 12005
+}

@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__original__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response lists common root causes (tool descriptions, too many tools, examples, schema, verification step, context pollution) and suggests logging failure cases, but doesn't explicitly walk through tracing the agent's actual architecture/pipeline (e.g., how tool selection flows through prompt->model->execution). It's more a diagnostic checklist than an architecture trace.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "The response gives a general list of possible causes ranked by frequency, but never identifies a specific 'first incorrect boundary' in the user's own agent \u2014 it defers this to the user via 'tell me which framework you're using... I can help pinpoint likely causes,' rather than pinpointing the boundary itself.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "'Short answer: probably not... Only if you find the framework itself structurally prevents good tool selection... would switching frameworks be justified \u2014 and even then, it's a big lift for a fix that's usually cheaper elsewhere.'",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.010456
+}

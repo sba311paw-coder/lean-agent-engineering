@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__original__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames investigation as the boundary between 'tool result' and 'second LLM call' and details checks like tool_call_id matching and result formatting at that handoff.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'Log (or breakpoint) the exact payload of the second LLM API call \u2014 not your app's internal log of the tool result, but the literal request body sent to the model.'",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly says 'So the bug is not in the tool' and concludes with 'That's the first incorrect boundary to rule in or out before touching prompts, models, or tool code.'",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009228
+}

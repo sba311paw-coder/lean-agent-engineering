@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__original__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Not yet \u2014 replacing the embedding model is an expensive, high-effort change... should be the last thing tried, not the first.\"",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides pipeline diagram covering query processing, embedding, retrieval, reranking, context assembly, generation, and explicitly separates retrieval vs generation failure diagnosis with steps for each.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "\"Pull 5\u201310 failing queries... Build a small eval set (10\u201320 query/expected-doc pairs) and measure retrieval precision/recall before changing anything.\"",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010216
+}

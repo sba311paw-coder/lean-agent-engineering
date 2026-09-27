@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Before jumping to \"swap the embedding model,\" it's worth diagnosing *where* in the RAG pipeline things are actually failing \u2014 bad embeddings are only one of several possible causes, and often not the most likely one.\n\n**Root-cause first:** wrong answers from a RAG agent can come from any of these stages:\n\n1. **Retrieval failure** \u2014 the right chunks aren't being retrieved at all\n2. **Chunking problems** \u2014 content is split in a way that destroys context (e.g., splitting mid-table, mid-paragraph, losing headers)\n3. **Embedding quality** \u2014 the model doesn't capture semantic similarity well for your domain\n4. **Ranking/top-k issues** \u2014 right chunks retrieved but ranked too low / k too small\n5. **Prompt/context assembly** \u2014 chunks retrieved correctly but the LLM ignores or misuses them\n6. **Generation hallucination** \u2014 LLM contradicts retrieved context\n\nSwitching embedding models only helps with #3. If the problem is actually #1, #2, #4, or #5, a new model won't fix it and you'll have spent effort + migration cost (re-embedding your whole corpus) for nothing.\n\n**Quick diagnostic before changing anything:**\n- Take 5-10 failing queries. For each, manually check: *did the correct chunk even appear in the top-k retrieved results?*\n  - If **no** \u2192 retrieval/chunking/embedding problem \u2014 keep investigating.\n  - If **yes** \u2192 the retriever is fine; the problem is in prompting or generation, and changing embeddings won't help at all.\n\nIf it does turn out to be retrieval quality, some things to check before model choice:\n- Chunk size/overlap (often the actual culprit)\n- Whether you're using cosine similarity correctly and consistently\n- Whether metadata filtering is over/under-restricting results\n- top-k value\n\n**If embeddings genuinely are the gap**, current solid options (Sept 2026, general guidance \u2014 check current benchmarks like MTEB for your specific language/domain):\n- `text-embedding-3-large` (OpenAI) \u2014 strong general-purpose baseline\n- `voyage-3` / `voyage-3-large` (Voyage AI) \u2014 often outperforms on retrieval-specific benchmarks\n- Open-source: `bge-large` or `gte-large` variants if you need self-hosting\n\nCan you tell me more about what \"wrong answers\" looks like \u2014 is it fabricating facts, retrieving irrelevant chunks, contradicting the source docs, or missing info that's clearly in the corpus? That will narrow down whether embeddings are actually the fix.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 853,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 439,
+      "webSearchRequests": 0,
+      "costUSD": 0.010739,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 439,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 853,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 439,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 853,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 439,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 439
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010739,
+  "duration_ms": 11475
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__original__baseline__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly evaluates the task's complexity: 'Two functions + return results is a textbook case for just write the loop yourself' and lists conditions like 'two known functions/tools', 'no multi-step planning, memory, retries, or complex chains'.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'probably not' to LangChain, recommends sticking with direct implementation, provides a minimal hand-rolled loop example, and states 'keep it simple, keep it direct.'",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicit 'When to reconsider' section: 'if you anticipate growing into many tools, multi-agent orchestration, RAG pipelines, or need to swap model providers frequently \u2014 then LangChain... starts pulling its weight.'",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00923
+}

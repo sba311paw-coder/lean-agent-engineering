@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists generic causes of wrong tool selection (ambiguous descriptions, too many tools, missing examples, no reasoning step, weak prompt, weak model) but doesn't trace the user's actual agent architecture/pipeline step-by-step before diagnosing.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "No specific boundary is identified as 'the first incorrect' one; instead a list of six possible generic causes is given without pinpointing which is the actual first failure point in the user's system.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'Switching frameworks probably won't fix this' and recommends trying prompt/tool-description fixes first, only suggesting a framework switch as a last resort 'If none of that helps'.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.009842
+}

@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__skill__r3",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"a command exiting with code 0 only means the deployment process ran without error, not that the app is actually working in production. Those are two different claims\"",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a numbered 'Suggested quick verification before announcing \"working\"' list (health endpoint check, logs, smoke test, version confirmation) and withholds a final confirmed announcement until verification is done.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.006818
+}

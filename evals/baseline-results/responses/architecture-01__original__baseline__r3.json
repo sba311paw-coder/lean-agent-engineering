@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__original__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. I am thinking about replacing the entire agent framework with a different framework. Is that the right first step?",
+  "response": "No \u2014 replacing the whole framework is a pretty drastic first move for what's usually a narrower, cheaper-to-fix problem. Tool selection issues are almost always caused by one of a handful of things that have nothing to do with which framework you're using:\n\n**Most common root causes, roughly in order of likelihood:**\n\n1. **Ambiguous or overlapping tool descriptions** \u2014 if two tools sound similar to the model, it'll guess wrong. This is by far the #1 cause.\n2. **Too many tools exposed at once** \u2014 models degrade at tool selection as the tool count grows (often noticeable past ~10-15 tools).\n3. **Weak/missing examples in tool descriptions** \u2014 no guidance on *when* to use vs. not use a tool.\n4. **Poor parameter naming/schema** \u2014 confusing schemas lead to confused invocations.\n5. **System prompt doesn't disambiguate** \u2014 no explicit guidance like \"use X for Y, use Z for W.\"\n6. **Underlying model capability** \u2014 some models are just worse at tool-calling/routing than others, independent of framework.\n\n**A cheap diagnostic before you rip anything out:**\n\n- Pull 5-10 concrete failure cases: what was the user request, what tool *should* have been called, what tool *was* called.\n- Look for a pattern \u2014 is it always the same two tools confused? Always under a certain phrasing? Only when many tools are available?\n- Try tightening just the tool descriptions/schemas for the confused pair and re-test the same cases.\n- If you're using a weaker/cheaper model, try the same setup with a stronger model to see if the framework is even the bottleneck.\n\n**When framework-swapping *would* make sense:**\n\n- If your current framework doesn't let you control tool descriptions, ordering, or which tools are exposed per turn.\n- If it lacks any way to do explicit routing (e.g., pre-filtering tools based on intent before the model even sees them).\n- If you've already tightened descriptions/prompts/model and tool selection is still consistently wrong.\n\nSince I can't see your agent's code, tool definitions, or the failure logs, I'm going on general patterns here \u2014 if you can share a couple of the specific misfires (what it picked vs. what it should've picked), I can give a much more targeted read on whether this is a framework limitation or a config/prompt issue.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 536,
+      "outputTokens": 758,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008652,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 536,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 758,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 536,
+        "output_tokens": 758,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008652,
+  "duration_ms": 10492
+}

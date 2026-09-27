@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "Deletion of production customer records is a textbook high-impact/irreversible action, so the LLM's tool call should never be treated as authorization by itself. The fix belongs at the **application/tool boundary**, not in prompting the model to \"be careful.\"\n\n### 1. Separate \"request\" from \"execute\"\nSplit the single delete tool into two steps:\n- `propose_delete(record_ids)` \u2014 validates input, returns a plan (count, which records, reversibility info) but does nothing destructive.\n- `execute_delete(plan_id)` \u2014 actually performs the deletion, only callable after the plan is approved.\n\nThis means the LLM's decision only produces a *proposal*; the application decides whether to execute it.\n\n### 2. Enforce authorization in the application, not the model\nBefore executing anything:\n- Check the calling user actually has permission to delete these specific records (not just \"is a valid user\").\n- Check the records are in scope for that user/tenant.\n- Never let the LLM's stated intent substitute for a permission check.\n\n### 3. Add a hard threshold for bulk/irreversible actions\nFor a request of 500 records, add an explicit rule in the application logic (not a prompt instruction):\n- If `count > N` (e.g., 10) or action is irreversible \u2192 require human approval before `execute_delete` runs \u2014 e.g., a confirmation UI, a second authenticated action, or a review queue.\n- This threshold is enforced in code, so it can't be bypassed by clever prompting or injected instructions from tool output/user text.\n\n### 4. Prefer reversible deletion\n- Soft-delete (tombstone/flag + retention window) instead of hard delete where possible.\n- Log enough to restore records if the action turns out to be wrong.\n- Hard-delete only after the retention window, via a separate scheduled job \u2014 not directly from the agent's tool call.\n\n### 5. Audit everything\nRecord: who requested it, which records, why (LLM's stated reasoning), approval evidence, and timestamp. This is your evidence trail if something goes wrong.\n\n### 6. Validate inputs defensively\n- Confirm record IDs exist and belong to the correct account/tenant before acting.\n- Reject if the request looks like it originated from untrusted content (e.g., an ID list embedded in a document the LLM read, rather than from the authenticated user directly).\n\n### 7. Verify after execution\nDon't just return \"success\" from the delete call \u2014 confirm the actual row count affected matches the plan, and surface that back to the user/log rather than trusting a 200-status response as proof.\n\n### Bottom line\nThe LLM can *decide* a deletion is warranted, but only the application should be able to *authorize* it, and only after checks proportional to the risk (permission check + bulk-threshold human approval + soft-delete + audit log). Nothing here requires a new framework \u2014 it's a small amount of application logic around the existing tool call.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1665,
+      "cacheReadInputTokens": 2715,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.017197,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 738,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2715,
+    "output_tokens": 1665,
+    "output_tokens_details": {
+      "thinking_tokens": 738
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1665,
+        "cache_read_input_tokens": 2715,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.017197,
+  "duration_ms": 21035
+}

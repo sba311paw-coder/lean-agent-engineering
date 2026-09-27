@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response includes a diagram tracing 'LLM receives: task + tool list + descriptions -> LLM decision -> Agent app executes chosen tool', explicitly framing this as tracing the architecture.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'The bug is almost always in what the LLM receives (tool descriptions/context), not in the orchestration layer' \u2014 pinpointing the tool description/context boundary as the first incorrect boundary rather than the framework layer.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Switching frameworks probably won't fix this' and concludes with 'That will let me point to the exact fix instead of a framework swap,' explicitly discouraging unnecessary migration.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00936
+}

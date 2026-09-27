@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__original__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration worked yesterday, but after a recent code change it started failing. I want to fix it quickly. What should I do first?",
+  "response": "# Debugging a Recently Broken Tool-Calling Integration\n\nSince this worked yesterday and broke after a code change, the fastest path is to isolate *what changed* rather than debugging the whole system blind. Here's the order I'd recommend:\n\n## 1. Diff the recent change first\nBefore touching anything else, look at exactly what changed between \"working\" and \"broken\":\n- If it's tracked in git, run `git diff` or `git log -p` on the last commit(s)\n- If not tracked (like this environment, which isn't a git repo), manually compare against a backup, clipboard history, or your editor's undo history\n- Pay special attention to changes in: tool/function schema definitions, system prompts, the request payload construction, and any SDK/library version bumps\n\n## 2. Check the exact error, not just \"it's failing\"\nGet the raw response from the model/API, not just your app's wrapper error:\n- Is the model *not calling the tool at all*? (often a prompt/schema clarity issue)\n- Is it calling the tool but with malformed arguments? (schema mismatch)\n- Is the tool call happening but your code fails to parse/execute it? (integration bug)\n- Is the API itself rejecting the request? (check for a 400 error with schema validation details)\n\nThese three failure modes point to very different fixes.\n\n## 3. Common culprits after a \"recent code change\"\n- **Tool schema changed**: renamed/added/removed a parameter, changed a type, or broke JSON schema validity\n- **SDK/package version bump**: tool-calling APIs change fairly often (parameter names like `tools` vs `functions`, `tool_choice` format, etc.)\n- **System prompt edit**: accidentally removed instructions telling the model when/how to use tools\n- **Response parsing**: changed how you extract `tool_calls` from the response object\n- **Model/endpoint change**: switched model versions and the new one has different tool-calling behavior\n\n## 4. Quick isolation test\nRoll back just the tool-calling-related part of your change (schema, prompt, parsing logic) while keeping the rest, and test again. If it starts working, you've found the culprit \u2014 bisect from there.\n\n---\n\nIf you can share the actual error message/stack trace and the diff of what changed, I can help pinpoint the exact cause much faster.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 533,
+      "outputTokens": 744,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008506,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 533,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 744,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 533,
+        "output_tokens": 744,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008506,
+  "duration_ms": 9494
+}

@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__skill__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "# Debugging: Tool result not reaching the final answer\n\nThis is a classic case of tracing the architecture to find the **first incorrect boundary**, since the model is not necessarily the problem.\n\n## Map the flow\n\n```\nUSER -> AGENT APP -> LLM (decides to call weather tool)\n     -> AGENT APP -> TOOL (returns correct temp, confirmed in logs)\n     -> AGENT APP -> LLM (should synthesize final answer)\n     -> FINAL RESPONSE\n```\n\nThe tool boundary is confirmed working (logs prove it). So the break is somewhere **between the tool result and the LLM's final synthesis** \u2014 either the agent app isn't feeding the result back correctly, or the LLM is receiving it but not using it.\n\n## Most likely root causes, in order of probability\n\n1. **The tool result isn't actually being appended to the conversation sent to the LLM.**\n   Logs can show the tool executed correctly without proving the *result message* was added to the message array passed in the next LLM call. Check that the tool response is inserted with the correct role (e.g. `tool`/`function` role tied to the matching `tool_call_id`), not dropped, not sent to a different context, or overwritten by a stale message history.\n\n2. **ID/threading mismatch.** Many APIs require the tool result message to reference the exact `tool_call_id`/`tool_use_id` from the assistant's tool call. If that ID is wrong, missing, or duplicated, some SDKs silently ignore the result or the model treats the turn as unanswered and falls back to a generic reply.\n\n3. **Truncation or context window eviction.** If you're managing history manually, check whether the tool result gets cut off, summarized away, or placed after a system prompt that resets context, before the final LLM call.\n\n4. **A second, separate LLM call/agent generates the \"final answer\"** (e.g., a summarizer step, a different agent, or a cached/templated response path) that never receives the tool output at all \u2014 this is common in multi-agent or pipeline setups where one path is \"answer path\" and another is \"tool path\" and they aren't merged.\n\n5. **Prompt/instruction issue** \u2014 e.g., system prompt telling the model to \"always give a general weather disclaimer\" or a low-priority fallback template firing before the model finishes reasoning over the tool result.\n\n## Fastest way to isolate it\n\nAdd one diagnostic: **log the exact message array/payload sent to the LLM on the final call** (not just the tool's own log). Compare:\n\n- Does it contain the tool result?\n- Is it attached to the correct tool_call_id?\n- Is it positioned before the final assistant turn is generated?\n\nThis single check will tell you which side of the boundary is broken:\n\n- **Tool result missing from the payload** \u2192 bug is in the agent application (message assembly/history management).\n- **Tool result present in the payload but still ignored** \u2192 bug is in prompting/model behavior (e.g., conflicting system instructions, or the model genuinely not being cued to use it \u2014 try a minimal repro with just the tool result and a simple \"answer using this data\" instruction).\n\n## Fix based on finding\n\n- If missing from payload \u2192 fix the message-append logic that inserts tool output into history (verify role and ID pairing).\n- If present but ignored \u2192 tighten the system/final-turn prompt to explicitly instruct the model to base its answer on the returned tool data, and check for a competing instruction or fallback template overriding it.\n\nOnce fixed, verify with an integration test: call the tool, capture the payload sent to the LLM, and assert the final response text contains the tool's temperature value \u2014 don't rely on \"no error was thrown\" as proof.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1181,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 460,
+      "webSearchRequests": 0,
+      "costUSD": 0.014103,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 460,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1181,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 460,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1181,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 460,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 460
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.014103,
+  "duration_ms": 16114
+}

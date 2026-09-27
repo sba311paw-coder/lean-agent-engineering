@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "# RAG Giving Wrong Answers: Embedding Model May Not Be the Fix\n\nBefore recommending a specific embedding model swap, it's worth noting: **wrong answers in RAG are often *not* an embedding problem.** Switching models without diagnosing the actual failure point can waste time. Let me give you both a quick diagnostic approach and model recommendations.\n\n## First, diagnose where it's failing\n\nRAG failures typically come from one of these stages:\n\n1. **Retrieval failure** \u2014 wrong/irrelevant chunks are pulled from the vector store\n2. **Chunking failure** \u2014 right document, but chunks are too big/small/poorly split, losing context\n3. **Generation failure** \u2014 retrieval is fine, but the LLM ignores or misuses the context (hallucination, poor prompt)\n4. **Ranking failure** \u2014 right chunks are retrieved but ranked too low to make the top-k cutoff\n\n**Quick test:** Manually inspect what chunks are being retrieved for a few failing queries. If the retrieved chunks are irrelevant \u2192 likely embedding/retrieval issue. If retrieved chunks *contain* the right answer but the LLM still gets it wrong \u2192 it's a generation/prompting issue, not embeddings.\n\n## If it is a retrieval/embedding issue, here are solid options (as of 2026)\n\n| Model | Best for | Notes |\n|---|---|---|\n| **OpenAI `text-embedding-3-large`** | General purpose, strong baseline | Reliable, widely supported, good multilingual |\n| **Voyage AI `voyage-3-large` / `voyage-3`** | Domain-specific (legal, code, finance) | Often outperforms OpenAI on MTEB for specialized retrieval |\n| **Cohere `embed-v4`** | Multilingual + long context | Good for enterprise/multi-language corpora |\n| **BGE-M3 / `bge-large-en`** (open source) | Self-hosted, cost-sensitive | Strong performance, no API cost, supports hybrid dense+sparse |\n| **Nomic Embed / `nomic-embed-text-v2`** | Long context, open source | Good if you need >8k token chunks |\n| **Google `text-embedding-005` / Gemini embeddings** | If already in GCP/Vertex ecosystem | Competitive quality |\n\n## Other things to try before/alongside a model swap\n\n- **Hybrid search** (dense + BM25/sparse) \u2014 often fixes retrieval issues embeddings alone can't\n- **Reranking** \u2014 add a reranker (e.g., Cohere rerank, BGE reranker) after initial retrieval\n- **Chunk size/overlap tuning** \u2014 a common silent culprit\n- **Query rewriting** \u2014 especially if user queries are short/ambiguous\n\n## My suggestion\n\nIf you tell me:\n- What embedding model you're currently using\n- Whether the issue looks like retrieval (irrelevant chunks) or generation (right chunks, wrong answer)\n- Your domain (general text, code, legal, etc.) and scale\n\nI can narrow this down to a specific recommendation rather than a general list.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 514,
+      "outputTokens": 1033,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011358,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 514,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1033,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 514,
+        "output_tokens": 1033,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011358,
+  "duration_ms": 11802
+}

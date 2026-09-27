@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Tool Runs Fine but Agent Ignores the Result\n\nThis is a common pattern in agent frameworks. Here's a systematic checklist to find the cause, roughly ordered by likelihood:\n\n## 1. Tool result isn't being fed back into the conversation loop\nMost agent frameworks require you to explicitly append the tool's output as a new message (with `role: \"tool\"` or equivalent) and then **call the model again** with that message included. Common bugs:\n- You call the tool, get the result, but forget to append it to message history before the next LLM call.\n- You append it but to the wrong array/context (e.g., a separate log instead of the actual conversation state sent to the model).\n- You only do one round-trip and return the *first* model response (which just contains the tool call, not a synthesized answer).\n\n**Fix:** Make sure your loop is:\n```\n1. Send messages \u2192 model\n2. Model returns tool_call\n3. Execute tool\n4. Append tool result to messages\n5. Send messages (now including tool result) \u2192 model AGAIN\n6. Model returns final text response \u2190 this is what you should return to user\n```\nIf you're returning the output from step 2 instead of step 6, that's your bug.\n\n## 2. Tool result format doesn't match what the model expects\n- Wrong `tool_call_id` / `tool_use_id` linking the result to the original call \u2014 many APIs (OpenAI, Anthropic) silently ignore mismatched IDs or error out.\n- Returning the result as a plain string when the API expects a structured content block (e.g., Anthropic wants `{\"type\": \"tool_result\", \"tool_use_id\": ..., \"content\": ...}`).\n- Result content too large / gets truncated by a middleware step.\n\n**Fix:** Log the exact payload sent back to the model on the second call and verify structure matches the API spec exactly.\n\n## 3. System prompt or agent instructions cause the model to disregard tool output\nSometimes the model receives the result correctly but a system prompt says something like \"always respond concisely\" and the model treats the raw JSON as irrelevant, or it hallucinates instead of quoting the tool result because instructions weren't clear it should be used.\n\n**Fix:** Add an explicit instruction like: \"When you receive tool results, incorporate them directly into your answer to the user.\"\n\n## 4. Multi-tool-call race condition\nIf the agent can call multiple tools in one turn, some frameworks require *all* tool results to be returned before continuing. If your weather tool result is submitted alone but the model expected results for 2 tool calls, the turn may stall or get dropped.\n\n**Fix:** Confirm the number of tool_calls in the response matches the number of tool_results you submit.\n\n## 5. Response parsing bug\n- You might be correctly getting a final answer from the model, but your code that extracts \"the final text\" is grabbing the wrong message/block (e.g., grabbing the first content block instead of the last, or filtering out blocks incorrectly).\n\n**Fix:** Log the full raw response object at the end and inspect all content blocks/messages, not just the one you think you're extracting.\n\n---\n\n### Quick diagnostic step\nAdd logging at these 3 points and inspect them:\n1. Exact tool call the model requested\n2. Exact tool result payload you send back\n3. Full raw model response after that second call\n\nThat will usually pinpoint which of the above it is immediately.\n\nIf you can share which framework/SDK you're using (LangChain, OpenAI function calling, Anthropic tool use, a custom loop, etc.) and a snippet of your tool-calling loop, I can point to the exact line likely causing this.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 534,
+      "outputTokens": 1171,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.012778,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 534,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1171,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 534,
+        "output_tokens": 1171,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012778,
+  "duration_ms": 14780
+}

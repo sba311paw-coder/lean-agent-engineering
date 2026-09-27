@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Don't rely on the model to 'decide' to ask \u2014 enforce it in code so a prompt injection or model mistake can't skip it\" and \"the tool's job is to refuse unsafe operations regardless of what the model asks for.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 2 shows enforcement in code (`confirmed=False` check) and section 5 states \"The tool should check that the authenticated user actually has permission to delete those specific records\" \u2014 explicit tool-level authorization logic.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple dedicated safeguards: preview/confirm split, hard caps/rate limits, soft deletes, audit logging, idempotency/operation_id \u2014 all explicitly for destructive delete actions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010748
+}

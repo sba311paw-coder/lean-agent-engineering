@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__original__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 2 'Reproduce the failure minimally' instructs running the exact failing case and capturing raw request/response at the LLM boundary.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Check the actual diff first' explicitly tells to check git diff or change-tracking for what changed since yesterday.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 3 'Locate the failing boundary' traces the flow AGENT APP \u2192 LLM \u2192 decision \u2192 AGENT APP \u2192 TOOL with a table mapping symptoms to boundaries.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Section 4 'Form one hypothesis, test it' explicitly says to form one hypothesis and make the smallest fix before broader changes.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009462
+}

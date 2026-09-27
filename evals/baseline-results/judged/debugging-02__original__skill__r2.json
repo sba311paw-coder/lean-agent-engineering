@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__original__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Not yet... it should be the last thing you try, not the first. Root-cause it first.\"",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Diagnostic steps trace retrieval ('Log and inspect what was actually retrieved'), context assembly ('yes, ranked well \u2192 problem is downstream: context assembly'), and generation ('or the LLM ignoring/misusing context').",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step-by-step diagnostic list: 'Reproduce a few failing queries', 'Log and inspect what was actually retrieved', 'Check for stale index', 'Try... keyword/BM25 search as a sanity check' before concluding embedding model is the issue.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009882
+}

@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__baseline__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "# Observability for a Python Agent: Framework Options\n\nSince you already have logging and tests capturing tool-call failures and latency, you're really looking for something that adds **structured tracing, metrics aggregation, and visualization** on top of what you have \u2014 not a replacement. Here's how the major options compare:\n\n## Top picks for LLM/agent workloads\n\n**1. OpenTelemetry (OTel) \u2014 recommended starting point**\n- Vendor-neutral, industry-standard tracing/metrics/logs framework\n- Instrument your agent's tool calls as *spans* with attributes (tool name, latency, success/failure, error type)\n- Export to any backend (Jaeger, Grafana Tempo, Datadog, Honeycomb, etc.) \u2014 no lock-in\n- Growing ecosystem of **GenAI semantic conventions** for LLM calls specifically\n- Python SDK: `opentelemetry-sdk`, plus auto-instrumentation for common libraries\n\n**2. Langfuse (if agent = LLM-based)**\n- Purpose-built for LLM/agent observability: traces, tool calls, token usage, latency, cost, evals\n- Open-source, self-hostable or cloud\n- Very low integration friction with LangChain, OpenAI SDK, or custom agents via decorators\n- Great if you want prompt/response-level visibility, not just infra metrics\n\n**3. Arize Phoenix**\n- Open-source, strong for tracing agent tool-call chains, latency breakdowns, and failure analysis\n- Built on OpenTelemetry under the hood \u2014 plays nicely if you later want to add OTel elsewhere\n- Good local dev experience (run in-notebook or as a service)\n\n**4. Datadog APM / Honeycomb (if you want a heavier commercial platform)**\n- Both now have LLM/agent-specific observability modules\n- Overkill unless you already use one for other infra\n\n## Suggested path\n\nIf your agent involves LLM calls + tool calls (sounds like it does):\n1. Instrument with **OpenTelemetry** as the underlying tracing layer (future-proof, standard)\n2. Send traces to **Langfuse** or **Arize Phoenix** for LLM-specific visualization (tool failures, latency waterfalls, token/cost tracking)\n\nThis gives you standards-based instrumentation now, with the flexibility to swap/add backends later without re-instrumenting code.\n\n---\n\nWant me to sketch out example OTel span instrumentation for your tool-call wrapper, or a Langfuse integration snippet?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 523,
+      "outputTokens": 837,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009415999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 523,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 837,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 523,
+        "output_tokens": 837,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009415999999999999,
+  "duration_ms": 10855
+}

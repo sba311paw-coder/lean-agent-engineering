@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly assesses complexity: 'You have a working agent that calls the model, calls two functions... Nothing in your description indicates a missing capability' and walks through capability-gap test.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'Keep the direct API implementation' and suggests minimal improvements like a thin dispatch layer and native tool-calling instead of adopting LangChain.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete evidence under 'When LangChain would be justified': many interchangeable tools/dynamic routing, built-in memory/retrieval, multi-step planning with conditional branching, team standardization.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009832
+}

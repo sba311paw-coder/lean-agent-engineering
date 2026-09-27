@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__original__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Step 3 mentions 'Reproduce with a minimal, isolated test' and logging raw request/response, but this is not prioritized first and doesn't explicitly emphasize reading existing error logs/stack traces before other steps.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 2 explicitly says 'Diff against the last known-good state' using git diff, and lists specific areas to check (schema definitions, system prompt, wrapper code).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 4 'Check the actual error surface' explicitly traces control flow: model not calling tool, malformed args, parsing failure, or tool result not fed back correctly.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "The response implies forming hypotheses via 'nailing down where in the pipeline it breaks matters more than guessing' but never explicitly frames a testable hypothesis to verify before applying a fix.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.009476
+}

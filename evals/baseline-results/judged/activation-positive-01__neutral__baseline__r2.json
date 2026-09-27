@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response lays out the full loop: 'Send messages \u2192 model, Model returns tool_call, Execute tool, Append tool result to messages, Send messages... AGAIN, Model returns final text response' tracing the architecture step by step.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "The response distinguishes model output (tool_call, final text response) from execution steps (Execute tool, appending results, response parsing bug) implicitly in the numbered loop and sections 2/5, but never explicitly frames this as 'LLM decision' vs 'Agent App execution' as a conceptual distinction.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Enumerates distinct failure boundaries: loop/message history bug, tool result format/ID mismatch, system prompt influence, multi-tool-call race condition, and response parsing bug.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Ends with a 'Quick diagnostic step' asking to log tool call, tool result payload, and raw model response before concluding, and explicitly asks for framework/snippet 'to point to the exact line' rather than jumping to a single fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.01198
+}

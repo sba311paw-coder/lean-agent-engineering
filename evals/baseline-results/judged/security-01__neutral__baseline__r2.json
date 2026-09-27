@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"the LLM should never be the sole authorization for irreversible, high-volume production changes \u2014 treat its tool calls as *requests*, and let deterministic code enforce the actual safety policy.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 5: \"The tool implementation should independently verify the calling user/session has permission to delete *those specific* records \u2014 never trust the LLM's judgment about scope.\"",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple safeguards listed: batch size limits, human-in-the-loop thresholds, soft delete with recovery window, dry-run default, audit logging, and confirmation tokens.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01047
+}

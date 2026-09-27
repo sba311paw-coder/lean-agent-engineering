@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__skill__r2",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "**Retrieval Augmented Generation (RAG)** is a technique for improving LLM outputs by combining a language model with an external knowledge retrieval step, rather than relying solely on the model's built-in (parametric) knowledge.\n\n## How it works\n\n1. **Query** \u2013 A user submits a question or prompt.\n2. **Retrieve** \u2013 The system searches an external knowledge source (often a vector database of document embeddings, but could also be a search engine, SQL database, or API) for content relevant to the query.\n3. **Augment** \u2013 The retrieved content is inserted into the prompt as context.\n4. **Generate** \u2013 The LLM produces a response grounded in that retrieved context, rather than generating purely from its training data.\n\n## Why it's used\n\n- **Reduces hallucination** by grounding answers in real, verifiable source material.\n- **Keeps knowledge current** without retraining the model \u2014 you update the retrieval corpus instead.\n- **Enables domain/private data access** \u2014 the model can answer questions about internal docs, codebases, or proprietary data it was never trained on.\n- **Supports citations/traceability** since answers can be tied back to specific retrieved passages.\n\n## Typical components\n\n- **Embedding model** \u2013 converts text into vector representations for semantic search.\n- **Vector store / index** (e.g., FAISS, Pinecone, pgvector) \u2013 stores and searches those vectors.\n- **Retriever** \u2013 finds the top-k most relevant chunks for a query (semantic, keyword, or hybrid search).\n- **Generator** \u2013 the LLM that synthesizes a final answer from the query + retrieved context.\n\n## Common failure modes (worth knowing if you're building one)\n\n- **Poor chunking** \u2014 text split in ways that break semantic meaning.\n- **Retrieval mismatch** \u2014 embeddings don't capture the right relevance signal, so wrong/irrelevant chunks get retrieved.\n- **Context overflow** \u2014 too many/large chunks stuffed into the prompt, diluting relevance or exceeding context limits.\n- **Stale index** \u2014 knowledge source updated but embeddings/index not refreshed.\n- **No grounding check** \u2014 model still hallucinates or ignores retrieved context, especially if retrieval quality is low.\n\nIf you're actually implementing or debugging a RAG pipeline, let me know what you're working on and I can help more concretely (e.g., chunking strategy, retrieval quality issues, evaluation approach).",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 787,
+      "cacheReadInputTokens": 2674,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008408800000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2674,
+    "output_tokens": 787,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 787,
+        "cache_read_input_tokens": 2674,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008408800000000001,
+  "duration_ms": 10225
+}

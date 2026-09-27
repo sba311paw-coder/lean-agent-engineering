@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly lays out the pipeline 'USER -> AGENT APPLICATION -> LLM -> tool decision -> AGENT APPLICATION -> TOOL' and instructs to 'check which stage is actually inconsistent' among decision inconsistency, silent failure/swallowing, or inconsistent input, tracing exactly where the boundary breaks.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'Don't assume #1 until you've ruled out #2 with logs/traces' and later asks 'is this fully nondeterministic on identical input, or does it vary based on how the question is phrased?' before committing to a fix path, and recommends reproducing failures and comparing traces before changing anything.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicit 'What not to do' section: 'Don't just add more tools or another agent/orchestration layer \u2014 that adds complexity without fixing a decision-consistency problem,' favoring cheap fixes like tightening prompts/tool descriptions first.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012024
+}

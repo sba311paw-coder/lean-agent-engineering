@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "Short answer: probably none. Before reaching for a large observability framework, let's check whether you actually have a capability gap.\n\n**You said you already have:**\n- Logging that shows tool-call failures\n- Tests that show latency\n\nThat's two of the three pillars of observability already working (logs + performance signal). So the question is: what specific problem is unsolved that a framework would fix?\n\n**Ask yourself (capability-gap test):**\n\n1. **What exact capability is missing?**\n   - Is it *storage/querying* (you can't search/filter past logs)?\n   - Is it *aggregation* (you want p95 latency across runs, not per-test)?\n   - Is it *tracing* (you need to see the causal chain: LLM call \u2192 tool call \u2192 result, especially across multiple agent turns)?\n   - Is it *alerting* (you want to know about failures without watching logs)?\n   - Or is it just \"this is what people use in production\" \u2014 not an actual gap?\n\n2. **Can existing tools solve it?**\n   - Structured logging (`structlog` or stdlib `logging` with JSON formatter) + `grep`/`jq` covers a lot.\n   - Python's `time.perf_counter()` + logging already gives you latency; aggregating it is a few lines with `statistics` or a simple CSV/SQLite table.\n   - If you need trace-like nesting (LLM call contains tool calls), a simple correlation ID (`run_id`) threaded through your logs often solves 90% of what a tracing tool gives you, with zero new dependencies.\n\n3. **What would a large framework cost you?**\n   - New dependency surface, possibly a SaaS account/API key (new credential to manage), network calls out (data leaves your machine \u2014 relevant if prompts/tool outputs contain sensitive data), a learning curve, and ongoing maintenance.\n   - For a single Python agent, this is often disproportionate to the problem.\n\n**If you do have a real gap**, name it and I can help pick something proportionate \u2014 e.g.:\n- Just need structured local logs \u2192 stdlib `logging` + JSON formatter, no dependency.\n- Need traces across LLM/tool calls \u2192 `OpenTelemetry` (vendor-neutral, you control export target) is the right-sized choice \u2014 lighter than committing to a specific vendor platform.\n- Need an LLM-specific trace UI (prompts, tool calls, token/cost per step) \u2192 something purpose-built like Langfuse (self-hostable) is more proportionate than a general-purpose \"large\" observability framework.\n\nWhat's the actual problem you're hitting \u2014 can't correlate a tool failure with the LLM call that triggered it, can't see latency trends over time, or something else? That'll tell us if you need a framework at all, or just a small local addition.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 886,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 448,
+      "webSearchRequests": 0,
+      "costUSD": 0.011105,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 448,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 886,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 448,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 886,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 448,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 448
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011105,
+  "duration_ms": 11914
+}

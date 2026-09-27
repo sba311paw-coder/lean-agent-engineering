@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__original__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Title says 'Not necessarily \u2014 diagnose first' and recommendation states to run eval 'before committing to a re-embed'.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Covers retrieval ('Are the right documents/chunks even being retrieved?'), context construction ('Prompt/context assembly bug... Check prompt template'), and generation ('LLM hallucination despite good context').",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 3 'Test the embedding model directly' instructs to 'log the retrieved chunks', 'Take 10-20 known query\u2192correct-chunk pairs' and compute similarity before any replacement.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009478
+}

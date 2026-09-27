@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__original__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent sometimes calls the correct tool, but sometimes skips the tool and answers from its own knowledge. Help me investigate the problem. Do not immediately suggest adding another framework or tool. First identify the likely failure boundary and what evidence I should collect.",
+  "response": "# Investigating Inconsistent Tool Calling\n\nThis is a common but tricky class of bug because it's non-deterministic and usually stems from an ambiguous decision boundary rather than a broken integration. Let's work through it systematically.\n\n## Likely Failure Boundary\n\nBefore adding anything, the issue almost always lives in one (or a combination) of these layers:\n\n1. **Prompt/instruction layer** \u2014 the system prompt doesn't make tool use *mandatory* for certain intents; it reads as a suggestion (\"you can use X to...\") rather than a rule (\"you must call X when...\").\n2. **Tool description/schema layer** \u2014 the tool's name, description, or parameter docs are ambiguous, so the model's judgment about \"is this tool relevant right now\" varies run to run.\n3. **Query framing layer** \u2014 user phrasing determines whether the model *recognizes* the need for the tool. Slight rewordings of the same underlying request may or may not trigger it.\n4. **Context/history layer** \u2014 earlier turns, prior tool results, or accumulated context bias the model toward answering from memory (e.g., it thinks it already has the answer from a previous call).\n5. **Model decoding randomness** \u2014 at nonzero temperature, borderline decisions can genuinely go either way even with identical input.\n6. **Orchestration/framework layer** \u2014 something in your agent loop (e.g., truncated tool list, conditional tool availability, retries) intermittently hides or deprioritizes the tool.\n\nMost \"sometimes calls, sometimes doesn't\" bugs trace back to **#1\u2013#4** \u2014 it's a judgment-call problem, not a plumbing problem. That's why jumping to \"add a stricter framework/router\" often just masks the symptom.\n\n## Evidence to Collect First\n\nTo localize the boundary, gather a small dataset of paired examples, not just anecdotes:\n\n**A. Transcript pairs (same intent, different outcome)**\n- Find 5\u201310 cases where the tool *was* called and 5\u201310 where it *wasn't*, for what you consider the same underlying task.\n- Record: exact user message, full system prompt at that time, full tool list/schemas passed, conversation history length, temperature setting.\n\n**B. Isolate the variable**\n- Replay the \"skipped\" cases with fresh context (no prior turns) \u2014 does it now call the tool? This tells you if history/context is biasing it.\n- Replay at temperature 0 \u2014 does the skip still happen? This tells you if it's genuine randomness vs. a real ambiguity in the prompt.\n\n**C. Tool visibility check**\n- Confirm the tool is actually present in the request payload every single time (log the raw API request, not just your framework's abstraction). Sometimes tools get dropped due to conditional logic, token budget trimming, or caching bugs \u2014 this masquerades as \"model chose not to call it.\"\n\n**D. Model's own reasoning**\n- If using extended thinking or asking it to explain, capture *why* it decided not to call the tool in the failing cases. Often it will reveal it believed it \"already knew\" the answer, or judged the tool \"not applicable\" for a reason you can fix in the description.\n\n**E. Phrasing diff**\n- Diff the user queries character-by-character between success/failure cases. Often a single word difference (e.g., \"check\" vs \"look up\") changes the model's inferred need.\n\n## Suggested Next Step\n\nOnce you have ~10 paired transcripts, share a few side-by-side here (prompt + query + tool schema + outcome). We can look for the actual pattern \u2014 e.g., is it context-length dependent, phrasing dependent, or truly stochastic \u2014 before deciding whether the fix is a prompt rule, a tool description rewrite, or something structural.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 572,
+      "outputTokens": 1205,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013193999999999997,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 572,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1205,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 572,
+        "output_tokens": 1205,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013193999999999997,
+  "duration_ms": 15877
+}

@@ -1,0 +1,63 @@
+{
+  "key": "security-01__original__baseline__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent has a tool that can delete customer records from our production database. The user asked the agent to delete 500 records. The LLM has correctly decided to call the delete tool. Should the agent execute the tool immediately?",
+  "response": "# No \u2014 this should not execute immediately\n\nA bulk delete of 500 customer records from a **production database** is a high-risk, hard-to-reverse action. Even though the LLM correctly identified the right tool and arguments, \"correct tool call\" and \"safe to auto-execute\" are different things. This is a textbook case for a human-in-the-loop confirmation step.\n\n## Why it should pause for confirmation\n\n| Risk factor | Why it matters here |\n|---|---|\n| **Scale** | 500 records is likely far more than a typical single-record correction \u2014 could indicate a misunderstood request, bad filter/query, or scope error |\n| **Reversibility** | Deletes are often irreversible (or expensive to reverse) without a backup/restore process |\n| **Environment** | \"Production\" means real customer data and potential real-world/business/legal impact (e.g., GDPR deletion obligations, accidental data loss liability) |\n| **Ambiguity risk** | LLMs can misinterpret scope \u2014 \"delete inactive users\" could mean 500 different things depending on how \"inactive\" was defined in the query |\n\n## Recommended pattern\n\n1. **Dry-run / preview step** \u2014 Show the agent's interpretation: \"This will delete 500 records matching [criteria]. Here's a sample of 10.\" Let the user verify the filter logic before committing.\n2. **Explicit confirmation gate** \u2014 Require the user to type a confirmation (e.g., \"yes, delete 500 records\") rather than a simple thumbs-up, especially past some threshold (e.g., >10 or >50 records).\n3. **Tiered autonomy by risk** \u2014 Auto-execute low-risk/reversible actions (read, single-record soft-delete), but require confirmation for bulk, destructive, or production-scoped actions.\n4. **Audit logging with attribution** \u2014 Log who requested the deletion, when, and what criteria were used, tied to the requesting user's identity, so there's a clear record if something needs to be investigated or reversed.\n5. **Prefer soft-delete over hard-delete** \u2014 If your schema supports it, mark records as deleted/inactive rather than permanently removing them, giving you a recovery window.\n6. **Rate/volume limits** \u2014 Even with confirmation, consider a hard cap or an extra approval step (e.g., a second admin) for deletions above a certain size.\n\n## Bottom line\nTreat \"tool selection correctness\" and \"execution safety\" as two separate gates. The agent got the first one right by picking the delete tool \u2014 but for irreversible, large-scale, production-impacting actions, it should present the plan and require explicit user confirmation (ideally with a preview of affected records) before executing.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 555,
+      "outputTokens": 864,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.00975,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 555,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 864,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 555,
+        "output_tokens": 864,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.00975,
+  "duration_ms": 10979
+}

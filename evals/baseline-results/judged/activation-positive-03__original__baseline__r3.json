@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__original__baseline__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly separates pipeline into 'Query \u2192 Retrieval \u2192 Context Assembly \u2192 Generation \u2192 Answer' and dedicates sections 2, 3, 4 to checking each stage separately with distinct verdicts for each.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before touching your retrieval system, you want to isolate where grounding breaks down' and structures the entire response around building a diagnostic sample and quantifying evidence before recommending any architecture change.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Suggests isolation experiments such as 'Take the exact assembled context + query and manually ask the LLM (via playground)' to isolate generation faithfulness, and 'Try moving it to the top/bottom and see if grounding improves' to isolate ordering effects in context construction.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012864
+}

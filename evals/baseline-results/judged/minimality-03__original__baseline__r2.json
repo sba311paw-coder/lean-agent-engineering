@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__original__baseline__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Lists specific gaps (distributed tracing, correlation across sessions, dashboards/alerting, cost tracking, anomaly detection) and asks 'Is there a specific failure mode you can't currently diagnose with logs + tests?' to assess actual gap vs existing coverage.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States existing logging+tests+failure/latency tracking 'is the core of observability' and suggests a lightweight middle ground (structured JSON logs with trace ID) building on current setup rather than replacing it.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly mentions 'the framework's setup/maintenance cost (new dependency, config, possibly a hosted service with its own auth/data handling)' as a factor to weigh against the pain it removes.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009032
+}

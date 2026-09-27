@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__original__baseline__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I am building a small Python AI agent for my own use. It needs to answer questions, call two existing Python functions when necessary, and return the results to me. I do not need multiple agents, distributed services, or production scale yet. What architecture should I start with?",
+  "response": "# Simple Single-Process Agent Architecture\n\nFor your use case, skip anything resembling multi-agent frameworks, orchestration layers, or microservices. Here's a minimal, effective architecture:\n\n## Core Structure\n\n```\nyour_agent/\n\u251c\u2500\u2500 main.py          # Entry point, chat loop\n\u251c\u2500\u2500 tools.py         # Your two existing functions, wrapped\n\u251c\u2500\u2500 llm_client.py    # Thin wrapper around the LLM API call\n\u2514\u2500\u2500 config.py        # API keys, model name, etc.\n```\n\n## Design\n\n**1. Tool definitions (`tools.py`)**\nWrap your two existing functions with a schema the LLM can understand (name, description, parameters). Most LLM APIs (Anthropic, OpenAI) support native \"tool use\" / \"function calling\" \u2014 use that instead of building your own parser.\n\n```python\nTOOLS = [\n    {\n        \"name\": \"your_function_1\",\n        \"description\": \"...\",\n        \"input_schema\": {...}\n    },\n    {\n        \"name\": \"your_function_2\",\n        \"description\": \"...\",\n        \"input_schema\": {...}\n    },\n]\n\ndef dispatch(tool_name, tool_input):\n    if tool_name == \"your_function_1\":\n        return your_function_1(**tool_input)\n    elif tool_name == \"your_function_2\":\n        return your_function_2(**tool_input)\n```\n\n**2. Agent loop (`main.py`)**\nA simple loop: send message + tool definitions \u2192 if the model requests a tool call, execute it and send the result back \u2192 repeat until the model gives a final text answer.\n\n```python\ndef run_agent(user_input, history):\n    history.append({\"role\": \"user\", \"content\": user_input})\n\n    while True:\n        response = call_llm(history, tools=TOOLS)\n\n        if response.stop_reason == \"tool_use\":\n            tool_call = extract_tool_call(response)\n            result = dispatch(tool_call.name, tool_call.input)\n            history.append(response.to_message())\n            history.append(tool_result_message(tool_call.id, result))\n        else:\n            history.append(response.to_message())\n            return response.text\n```\n\n**3. State**\nJust keep conversation history in a Python list in memory. No database, no vector store, no session manager needed unless you want persistence across runs \u2014 in which case, just pickle/JSON-dump the history list to a file on exit.\n\n## Why this is enough\n\n- **Native tool-calling** (Anthropic/OpenAI SDKs) already handles the reasoning about *when* to call a function \u2014 you don't need a custom planner, ReAct scaffolding, or LangChain.\n- **No framework overhead** (LangChain, CrewAI, AutoGen) \u2014 for two tools and single-user use, these add abstraction cost without real benefit.\n- **Single process, synchronous loop** is trivial to debug and modify.\n\n## When to add complexity later\n\n- More tools with complex dependencies \u2192 consider a lightweight registry pattern (still no framework needed).\n- Need persistent memory across sessions \u2192 add a simple JSON/SQLite store.\n- Need concurrency (multiple requests at once) \u2192 wrap in FastAPI, still single agent.\n\nWant me to sketch a concrete working example using the Anthropic API's tool-use format?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 563,
+      "outputTokens": 1036,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011486000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 563,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1036,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 563,
+        "output_tokens": 1036,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011486000000000001,
+  "duration_ms": 11497
+}

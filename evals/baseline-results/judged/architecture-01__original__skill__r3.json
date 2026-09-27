@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__original__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response gives a structured investigation plan tracing from reproducing failures, to tool definitions, input context, schemas, and app routing before considering a framework change.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States wrong tool selection happens 'at the boundary between the LLM's decision and the agent application's handling of that decision' and lists specific checks (tool definitions, ambiguous descriptions, routing/dispatch) to locate the first incorrect boundary.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly says 'No \u2014 replacing the framework is almost certainly the wrong first step' and recommends 'tighten tool descriptions/names' as the smallest fix, only justifying a framework change 'if you've traced this and found the framework itself is structurally incapable' (rare).",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00936
+}
