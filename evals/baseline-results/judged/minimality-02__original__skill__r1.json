@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__original__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly walks through 'What capability is missing?', notes current implementation works, native tool-calling support exists, and estimates the direct solution is 'maybe 30\u201380 lines of plain Python.'",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Final recommendation: 'Keep your direct model-API implementation' and offers only to tighten the existing loop rather than migrate to a framework.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete triggers: 'many interchangeable model providers behind one interface,' 'complex multi-step chains, retrieval pipelines, or persistent memory management,' and 'coordinating multiple agents/subagents with shared infra.'",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009258
+}

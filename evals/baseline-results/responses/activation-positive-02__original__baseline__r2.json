@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__original__baseline__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent sometimes calls the correct tool, but sometimes skips the tool and answers from its own knowledge. Help me investigate the problem. Do not immediately suggest adding another framework or tool. First identify the likely failure boundary and what evidence I should collect.",
+  "response": "# Investigating Inconsistent Tool Calling\n\nThis is a common but tricky failure mode. Let's be systematic before touching architecture. The goal right now is to **localize where the decision breaks down**, not to fix it yet.\n\n## Step 1: Map the decision pipeline\n\nEvery agent turn goes through roughly these stages:\n\n```\nUser input \u2192 System/tool-definition prompt \u2192 Model decides \"tool or no tool\" \u2192 \n(if tool) \u2192 tool call formatted \u2192 tool executed \u2192 result returned \u2192 \nmodel incorporates result \u2192 final answer\n```\n\nThe bug could live in **any** of these. Your first job is figuring out which stage.\n\n## Step 2: Likely failure boundaries (ranked by frequency in practice)\n\n1. **Prompt/instruction ambiguity** \u2014 the system prompt says \"use the tool when relevant\" but doesn't define *relevant* precisely, so the model uses judgment inconsistently. This is the #1 cause.\n2. **Tool description quality** \u2014 if the tool's name/description doesn't clearly signal *when* to use it, the model falls back to parametric knowledge, especially for questions it's confident it can answer.\n3. **Context/position sensitivity** \u2014 tool definitions or instructions get \"buried\" once conversation history grows, or compete with earlier turns that didn't use tools (the model pattern-matches on recent behavior).\n4. **Ambiguous user phrasing** \u2014 some phrasings clearly demand fresh/external data, others are ambiguous enough that \"answer from memory\" is a plausible interpretation.\n5. **Non-determinism** \u2014 even with identical input, sampling temperature > 0 means the model can choose differently across runs. Easy to mistake for a \"bug\" when it's just variance.\n6. **Silent tool failures** \u2014 tool call attempted, errored, and model quietly recovered with its own knowledge instead of surfacing the failure (worth ruling out \u2014 check tool call logs, not just final output).\n\n## Step 3: Evidence to collect\n\nBefore any fix, gather a small dataset (20-30 examples is enough to see a pattern):\n\n- **Full transcripts**, not just final answers \u2014 you need to see whether a tool call was *attempted and failed*, or *never attempted*.\n- **Exact user prompt text** for each case, tool-call vs no-tool-call, side by side.\n- **Model's reasoning/thinking trace** if available \u2014 does it mention the tool and decide against it, or not consider it at all?\n- **Temperature/sampling settings** \u2014 is it fixed or default? Run the same failing prompt 3-5 times to check for variance.\n- **Position in conversation** \u2014 does skipping correlate with turn number / context length?\n- **Tool call latency or errors** in logs for the \"skipped\" cases specifically.\n- **Confidence signals** \u2014 do skipped cases cluster around questions where the correct answer is \"well-known\" (so the model feels it doesn't need the tool)?\n\n## Step 4: Categorize what you find\n\nOnce you have transcripts, sort failures into buckets:\n- Never attempted tool + answer was correct (arguably fine, but inconsistent)\n- Never attempted tool + answer was wrong/stale (real bug)\n- Attempted tool, failed silently, fell back to memory (different bug \u2014 error handling, not decision-making)\n- Attempted tool, succeeded, but model still overrode with own knowledge in final answer (yet another distinct bug \u2014 ignoring tool output)\n\nThese four buckets have **different root causes and different fixes**, which is why collecting evidence first matters \u2014 a fix aimed at bucket 1 won't touch bucket 3.\n\n---\n\nOnce you've pulled some transcripts, share a few examples (especially contrasting a working case vs a skipped case with similar phrasing) \u2014 I can help spot the pattern.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 572,
+      "outputTokens": 1221,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013354000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 572,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1221,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 572,
+        "output_tokens": 1221,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013354000000000001,
+  "duration_ms": 15745
+}

@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly says 'Before jumping to switch embedding models' and frames diagnosis before recommendation, only giving model suggestions conditionally under 'If you've confirmed it's genuinely an embedding quality issue.'",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Covers retrieval failure, chunking failure, generation failure ('right chunks retrieved but LLM ignores them'), and mentions query-document mismatch and reranking, tracing multiple pipeline stages.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Suggests 'Quick test: Take a failing query, manually inspect the top-k retrieved chunks' and later recommends running a small eval with 20-50 Q&A pairs before switching models, indicating evidence collection first.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009932
+}

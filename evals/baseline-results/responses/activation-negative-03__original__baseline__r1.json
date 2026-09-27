@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__baseline__r1",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "# Retrieval Augmented Generation (RAG)\n\nRAG is a technique that combines information retrieval with text generation to improve the accuracy, relevance, and factual grounding of outputs from large language models (LLMs).\n\n## How It Works\n\n1. **Query/Input** \u2013 A user submits a question or prompt.\n2. **Retrieval** \u2013 Instead of relying solely on the LLM's internal (pretrained) knowledge, the system searches an external knowledge base (documents, databases, vector stores, etc.) for relevant information related to the query.\n3. **Augmentation** \u2013 The retrieved content is inserted into the prompt as additional context.\n4. **Generation** \u2013 The LLM generates a response using both the original query and the retrieved context.\n\n## Why It's Useful\n\n- **Reduces hallucinations** \u2013 Grounds responses in real, verifiable source material rather than relying purely on the model's memorized (and potentially outdated or incorrect) knowledge.\n- **Up-to-date information** \u2013 The model can access current data without needing to be retrained, since the knowledge base can be updated independently.\n- **Domain-specific knowledge** \u2013 Enables LLMs to answer accurately about specialized or proprietary content (e.g., internal company documents) they weren't trained on.\n- **Source attribution** \u2013 Since retrieved documents are known, responses can cite sources, improving transparency and trust.\n- **Cost-effective** \u2013 Avoids the expense of fine-tuning or retraining a model every time new information becomes available.\n\n## Typical Architecture\n\n- **Vector database** (e.g., Pinecone, Weaviate, FAISS, Chroma) storing embeddings of documents.\n- **Embedding model** to convert both the query and documents into vector representations for similarity search.\n- **Retriever** that finds the most relevant chunks of text based on semantic similarity.\n- **Generator** (the LLM) that synthesizes a final answer using the retrieved context.\n\n## Example Use Cases\n\n- Customer support chatbots that reference a company's product documentation.\n- Enterprise search tools that answer questions based on internal wikis or files.\n- Legal or medical assistants that cite specific case law or research papers.\n- Coding assistants that pull from a specific codebase or API documentation.\n\nIn short, RAG lets an LLM \"look things up\" before answering, rather than relying purely on what it learned during training\u2014making outputs more accurate, current, and traceable.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 504,
+      "outputTokens": 783,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008838,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 504,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 783,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 504,
+        "output_tokens": 783,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008838,
+  "duration_ms": 8574
+}

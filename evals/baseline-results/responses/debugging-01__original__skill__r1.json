@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__original__skill__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent's tool-calling integration worked yesterday, but after a recent code change it started failing. I want to fix it quickly. What should I do first?",
+  "response": "# First step: identify what actually changed\n\nSince this worked yesterday and broke after a specific code change, don't start hypothesizing about the LLM or the model \u2014 go straight to the diff.\n\n**1. Check the recent change first**\n```\ngit diff HEAD~1\n```\n(or `git log -p` / compare against your last working commit/deploy)\n\nLook specifically for changes to:\n- Tool/function **schema definitions** (names, parameter types, required fields, descriptions)\n- The **system prompt** or tool-use instructions\n- SDK/library version bumps (agent SDK, LLM client, MCP server)\n- The **application code** that parses the LLM's tool call and dispatches it (argument mapping, JSON parsing, validation)\n- Any renamed function/tool that the LLM is still calling by its old name\n\nMost \"tool-calling suddenly broke\" bugs live in one of these two spots:\n- A **schema/prompt mismatch** \u2014 you changed a tool's parameters or name but the model's calls (or your dispatch code) still assume the old shape.\n- A **boundary bug in the agent application** \u2014 the LLM's decision is fine, but the code that turns that decision into a real tool call (parsing arguments, validating, calling the API) broke.\n\n**2. Reproduce with the actual failure**\n\nGet the raw failure evidence before touching code:\n- The exact LLM output / tool-call payload (raw JSON, not just a summary)\n- The exact error from the tool/API call\n- Whether the LLM is even attempting the right tool call, or failing earlier\n\n**3. Locate the boundary that's actually failing**\n\nTrace it against this flow and find where it diverges from \"yesterday's working\" behavior:\n\n```\nLLM emits tool call \u2192 agent parses/validates it \u2192 tool/API executes \u2192 result returned \u2192 LLM gets result\n```\n\nAsk:\n- Is the LLM calling the tool with the right name/arguments? (if not \u2192 prompt/schema issue)\n- Is the agent app correctly parsing and forwarding those arguments? (if not \u2192 dispatch/parsing bug from the code change)\n- Is the tool/API itself erroring? (if so \u2192 check tool code / auth / external service, not the LLM)\n\n**4. Form one hypothesis, test it minimally**\n\nOnce you see where the divergence is, make the smallest fix, then verify by re-running the exact failing case (not just \"no error thrown\" \u2014 confirm the tool call actually produced the right result).\n\n---\n\nIf you can share the diff, the tool schema, and the raw failing tool-call output/error, I can pinpoint the root cause instead of guessing further.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 834,
+      "cacheReadInputTokens": 2703,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008884600000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2703,
+    "output_tokens": 834,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 834,
+        "cache_read_input_tokens": 2703,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008884600000000001,
+  "duration_ms": 11249
+}

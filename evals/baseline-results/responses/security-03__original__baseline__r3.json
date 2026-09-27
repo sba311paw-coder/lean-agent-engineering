@@ -1,0 +1,63 @@
+{
+  "key": "security-03__original__baseline__r3",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent only needs to read data from a customer database, but the tool currently requires admin credentials and has permission to modify and delete records. Should I just let the agent use the admin credentials since the LLM will only be instructed to perform read operations?",
+  "response": "No \u2014 don't do that. Relying on \"the LLM will only be instructed to do X\" as your security boundary is fragile and doesn't actually constrain the agent. You should enforce least privilege at the credential/permission layer, not the prompt layer.\n\n**Why prompt-level restriction isn't enough:**\n\n- **Prompt injection**: If any data the agent reads (customer records, tool outputs, even field values) contains adversarial text, it could manipulate the LLM into issuing a write/delete call it technically has permission to make.\n- **Model mistakes**: LLMs hallucinate, misinterpret ambiguous instructions, or take unexpected tool-call paths \u2014 especially under agentic/multi-step reasoning where it's chaining calls.\n- **Bugs in your own orchestration code**: A bad prompt template, a retry loop, or an unexpected branch in your agent logic could trigger a write call you never intended.\n- **Blast radius**: If the agent's credentials or session are ever compromised (leaked logs, MITM, malicious tool response), admin access means full read/write/delete exposure instead of just read exposure.\n\n**What to do instead:**\n\n1. **Least-privilege DB role**: Create a read-only database user/role (e.g., `GRANT SELECT ON ... TO readonly_agent`) and have the tool authenticate as that instead of admin.\n2. **Separate tool/connection**: If the existing tool only supports admin creds, either configure a scoped connection string for it, or build/point it at a read-only replica or view layer.\n3. **Enforce at the API/gateway layer too**, if there's an intermediate service \u2014 don't rely solely on DB-level grants if you can add a proxy that only allows SELECT statements.\n4. **Audit logging** on the read-only account is still worthwhile, but the goal is to make destructive actions *impossible*, not just *undesired*.\n\nIf the tool genuinely has no way to run with reduced permissions (e.g., it's a fixed integration that only supports one credential), that's a sign the tool itself needs to be swapped or wrapped \u2014 not a reason to grant the agent more power than it needs. Happy to help figure out the read-only role/connection setup if you tell me what database and tool/framework you're using.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 560,
+      "outputTokens": 731,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.00843,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 560,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 731,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 560,
+        "output_tokens": 731,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.00843,
+  "duration_ms": 10396
+}

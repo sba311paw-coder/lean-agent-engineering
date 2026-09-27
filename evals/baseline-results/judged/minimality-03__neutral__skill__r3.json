@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly asks 'What capability is actually missing?' and enumerates common actual gaps (correlation, aggregation, retention) vs. what user already has (failure visibility, latency measurement).",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 2 'Can the existing system solve it directly?' shows how structured logging, decorators, and existing log stacks (CloudWatch/Datadog) can solve 80% of problems without new frameworks.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States framework adds 'new service/SaaS dependency, API keys, network calls from your agent, cost, and a new failure mode' vs. local change being '30\u201350 lines of code and zero new dependencies'.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010152000000000001
+}

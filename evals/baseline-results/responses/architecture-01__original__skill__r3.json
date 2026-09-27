@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__original__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. I am thinking about replacing the entire agent framework with a different framework. Is that the right first step?",
+  "response": "No \u2014 replacing the framework is almost certainly the wrong first step. That's jumping to the most expensive fix (option 7 on the \"simplify first\" list \u2014 additional agent/orchestration layer or framework swap) before diagnosing where the failure actually occurs. A framework swap won't fix a wrong-tool-selection problem if the root cause isn't the framework.\n\n**Why this matters:** wrong tool selection happens at the boundary between the LLM's decision and the agent application's handling of that decision. Swapping frameworks changes the plumbing around that boundary but doesn't necessarily fix what's causing the bad decision.\n\n**First, investigate the actual failure boundary:**\n\n1. **Reproduce it.** Get 3-5 concrete examples of the wrong tool being chosen. Same task each time, or does it vary?\n\n2. **Check the tool definitions.** This is the most common root cause:\n   - Are tool names/descriptions ambiguous or overlapping (e.g., `search` vs `lookup` doing similar things)?\n   - Do descriptions clearly state *when* to use each tool vs when not to?\n   - Are there too many tools presented at once, diluting the model's ability to discriminate?\n\n3. **Check the input context.** Is the system prompt/instructions telling the model how to choose between tools, or just listing them?\n\n4. **Check tool schemas.** Are parameter names/types confusing enough that the model picks a tool it can \"explain\" more easily?\n\n5. **Compare a failing case to a working case.** What's different in the context, phrasing, or history that leads to the wrong pick?\n\n6. **Check if it's a routing/application problem, not a model problem.** Does your app correctly pass the full available toolset and correctly execute whatever the model picks? Sometimes the \"wrong tool\" is actually the app mis-registering or mis-dispatching a correct model decision.\n\n**Only if** you've traced this and found the framework itself is structurally incapable of doing tool routing correctly (rare) \u2014 then a framework change might be justified. But that would be evidence-driven, not a first guess.\n\n**Smallest fix to try first:** tighten tool descriptions/names and add explicit disambiguation guidance in the prompt. This resolves the vast majority of \"wrong tool chosen\" issues and costs you an afternoon, not a rewrite.\n\nIf you can share 2-3 examples of the wrong-tool-choice (the task, the tools available, and which one got picked vs. which was correct), I can help pinpoint the actual boundary that's failing.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 822,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 461,
+      "webSearchRequests": 0,
+      "costUSD": 0.010517,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 461,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 822,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 461,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 822,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 461,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 461
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010517,
+  "duration_ms": 11807
+}

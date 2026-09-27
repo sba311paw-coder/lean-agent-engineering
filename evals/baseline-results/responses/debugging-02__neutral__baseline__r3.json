@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Before jumping to \"swap the embedding model,\" it's worth diagnosing *why* your RAG agent is giving wrong answers\u2014embedding quality is only one of several common failure points, and switching models without diagnosis often doesn't fix the real issue.\n\n## First, narrow down the failure mode\n\n**Retrieval problem** (wrong/irrelevant chunks retrieved):\n- Check retrieved chunks for a few failing queries \u2014 are they topically relevant at all?\n- If retrieved chunks are irrelevant \u2192 embedding model or chunking strategy is likely the culprit\n- If retrieved chunks are relevant but the answer is still wrong \u2192 it's a generation/prompting problem, not embeddings\n\n**Generation problem** (right chunks, wrong answer):\n- Model may be ignoring context, hallucinating, or conflating sources\n- Fix: better prompt (explicit \"answer only from context\"), lower temperature, or a stronger LLM \u2014 not embeddings\n\n**Chunking problem**:\n- Chunks too large \u2192 dilute relevant info with noise\n- Chunks too small \u2192 lose context/coherence\n- No overlap \u2192 cuts sentences/facts in half\n\n**Other common culprits**:\n- Too few chunks retrieved (top_k too low)\n- No reranking step after initial retrieval\n- Stale/duplicate/conflicting documents in the index\n- Query phrasing mismatch (short question vs. long document prose)\n\n## If it *is* an embedding problem\n\nCommon upgrade paths depending on your current setup:\n\n| Current | Consider | Notes |\n|---|---|---|\n| `text-embedding-ada-002` (OpenAI) | `text-embedding-3-large` or `text-embedding-3-small` | Better MTEB scores, `3-small` is cheaper AND better than ada-002 |\n| Generic open-source (e.g. old `all-MiniLM`) | `bge-large-en-v1.5`, `bge-m3`, or `nomic-embed-text` | Strong open-source options, good for self-hosting |\n| Any general-purpose model | Domain-specific fine-tuned embeddings | If your docs are legal/medical/code-heavy, generic embeddings underperform |\n| Any model, multilingual data | `bge-m3` or `multilingual-e5-large` | Handles cross-lingual retrieval much better |\n\nCheck the [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard) for current rankings on retrieval-specific benchmarks before picking.\n\n## My suggestion\n\nBefore switching models, spend 15 minutes doing this:\n1. Pull 5-10 failing queries\n2. Log what chunks got retrieved for each\n3. Manually judge: relevant chunks + wrong answer = generation issue; irrelevant chunks = retrieval/embedding issue\n\nIf you can share what embedding model, chunk size, and vector DB you're currently using, plus an example of a failing query + retrieved chunks, I can give a much more targeted recommendation instead of a generic list.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 514,
+      "outputTokens": 995,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010978,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 514,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 995,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 514,
+        "output_tokens": 995,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010978,
+  "duration_ms": 12549
+}

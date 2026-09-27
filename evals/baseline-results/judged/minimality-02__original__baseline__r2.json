@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__original__baseline__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response breaks down the actual task ('call two functions, return results') and notes it's ~30-50 lines of direct API code, correctly assessing low complexity.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'keeping your current direct-API implementation is the more maintainable choice' and recommends formalizing the existing tool-calling loop over adopting LangChain.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete triggers under 'When it *would* make sense': multiple providers, complex branching chains, built-in memory needs, RAG retrievers/loaders, team-wide standardization.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008648
+}

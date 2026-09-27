@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response walks through the standard tool-calling loop: model call \u2192 stop_reason 'tool_use' \u2192 tool execution \u2192 appending tool_use/tool_result messages \u2192 second model call \u2192 final response, effectively tracing the architecture.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes model output ('call_model(messages)', response.stop_reason) from app-level execution ('run_tool(...)', 'messages.append(...)'), noting the app must explicitly re-invoke the LLM after tool execution \u2014 a boundary between LLM decision-making and orchestration code.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists distinct failure boundaries: conversation history not updated, malformed/missing tool_use_id, loop stopping early, output truncation/serialization issues, and system prompt conflicts.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Immediately provides a ranked list of 'most likely causes' and fixes without first asking about the user's framework/SDK or code; the request to 'share the relevant snippet' for precise diagnosis only appears at the very end, after fixes were already proposed.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.021462000000000002
+}

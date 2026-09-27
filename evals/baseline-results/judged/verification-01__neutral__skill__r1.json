@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__skill__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'A deployment command exiting with code 0 only means the command itself didn't error \u2014 it is not proof that the app is actually working in production,' clearly distinguishing command success from outcome verification.",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a concrete verification checklist (health check endpoint, smoke test, logs/monitoring, version confirmation) and explicitly withholds the announcement until verification is done, offering to draft it only after checks are performed.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.006616
+}

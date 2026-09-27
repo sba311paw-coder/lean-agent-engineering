@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__baseline__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "I don't have access to your files, code, or environment, so I can't inspect the actual bug \u2014 but I can give you a fast, systematic way to debug a broken tool-calling integration. Here's a triage checklist ordered by how often each cause is the culprit:\n\n## 1. Check the tool schema/definition first (most common cause)\nA recent code change often breaks this silently:\n- **JSON Schema validity** \u2014 malformed `parameters`/`input_schema` (missing `type`, bad `required` array, unsupported `format`) will cause the model to either not call the tool or fail validation.\n- **Name mismatches** \u2014 tool name in the schema vs. the name your dispatcher/switch statement expects.\n- **Description regressions** \u2014 if you edited the tool's description and removed key trigger phrases, the model may stop selecting it (behavioral, not an error).\n\n## 2. Check how tool results are being returned\n- Confirm the response is still using the correct role/type (e.g., `tool_result` block with matching `tool_use_id`).\n- If you switched SDK versions, check for breaking changes in message formatting (this happens often between Claude SDK versions).\n\n## 3. Check the diff itself\n- `git diff` (or your VCS equivalent) on the last commit touching:\n  - tool registration/loading code\n  - the request payload builder\n  - any middleware/wrapper around the model call\n- Look specifically for renamed variables, reordered args, or an accidentally removed `await`/callback.\n\n## 4. Reproduce with a minimal case\n- Strip down to one simple tool call, log the **raw request payload** sent to the API and the **raw response**, and compare against a known-good example from docs or a previous working commit.\n\n## 5. Check error surface\n- Is it throwing an explicit error, silently not calling the tool, or calling it with malformed arguments? Each points to a different layer (schema vs. model behavior vs. execution/dispatch code).\n\n---\n\nIf you paste the actual error message, the tool schema, and the diff of the recent change, I can pinpoint the fix directly rather than giving general guidance.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 518,
+      "outputTokens": 672,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007755999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 518,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 672,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 518,
+        "output_tokens": 672,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007755999999999999,
+  "duration_ms": 10084
+}

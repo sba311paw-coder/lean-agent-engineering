@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__original__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly breaks down the task ('Call function A, Call function B, Return results') and walks through a capability-gap checklist assessing whether the complexity warrants a framework.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends 'Keep the direct API implementation' and describes a ~30-80 line plain Python loop as sufficient, explicitly preferring simplicity over LangChain.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Dedicated section 'When LangChain (or similar) would actually pay for itself' lists concrete evidence (many chained/branching steps, agent orchestration across large tool inventories, team-wide standardization) that would justify adding the framework.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009496000000000001
+}

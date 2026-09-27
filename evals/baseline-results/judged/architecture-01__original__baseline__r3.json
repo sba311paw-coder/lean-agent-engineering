@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__original__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists likely root causes and suggests pulling failure cases, but does not explicitly trace the agent's actual architecture (e.g., how tool selection flows, prompt/model/framework layers) before diagnosing; it's more a general causal checklist than a structured architecture trace.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It identifies plausible failure points (ambiguous descriptions, too many tools, weak examples, schema, system prompt, model capability) and suggests finding 'always the same two tools confused' patterns, but doesn't pinpoint a single 'first incorrect boundary' in the user's specific setup\u2014stays at hypothetical/general level.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with 'No \u2014 replacing the whole framework is a pretty drastic first move' and lays out cheaper diagnostics before framework swap, explicitly deferring architectural replacement to a last resort.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009564
+}

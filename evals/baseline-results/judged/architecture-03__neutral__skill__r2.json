@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__skill__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response picks 'YOUR SCRIPT' as the Python Agent App, Anthropic/OpenAI LLM via SDK, and tool_a/tool_b as the two existing Python functions, used consistently throughout diagram and code.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'the LLM's tool-call request is a suggestion, not authorization. Your script is what actually invokes the function' and separates LLM decision (stop_reason == tool_use) from dispatch()/validation execution in the script.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides full while-loop code: sends messages, checks stop_reason, dispatches tool calls, appends tool_result content, loops until final text response is returned.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Dedicated 'What you don't need' section explicitly rejects LangChain, vector DB/RAG, MCP server, and multi-agent setups unless a concrete need arises (e.g., 'only worth it if you want the tools reusable across multiple different agent clients').",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012492
+}

@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__original__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I am building an agent that reads documents and retrieves information from a vector database. The answers are sometimes poorly grounded. Before changing the retrieval system, help me determine whether the problem is retrieval, context construction, or final answer generation. What evidence should I collect first?",
+  "response": "Before touching the retrieval system, isolate which of the three stages is actually failing. \"Poorly grounded\" can mean the right information was never found, it was found but lost before reaching the model, or it was present but the model didn't use it correctly \u2014 and each has a different fix.\n\n## Trace the pipeline\n\n```\nQuery \u2192 Retrieval (vector search) \u2192 Context Construction (chunk selection,\nranking, dedup, truncation, prompt assembly) \u2192 Generation (LLM) \u2192 Answer\n```\n\nFor each failing answer, you need visibility into what happened at every arrow, not just the final output.\n\n## Evidence to collect (build a small eval set first)\n\nPick 15\u201330 real queries where grounding failed, ideally with a known correct source passage for each. For each one, log and inspect three separate things:\n\n**1. Retrieval output (raw, before any filtering)**\n- Query actually sent to the vector DB (raw or rewritten?)\n- Top-k doc IDs/chunks returned + similarity scores\n- Does the known-correct passage appear anywhere in top-k? At what rank?\n\nIf the correct passage isn't retrieved at all \u2192 **retrieval problem** (embedding mismatch, chunking too coarse/fine, wrong index, stale data, k too small).\n\n**2. Context actually sent to the LLM**\n- The exact assembled prompt/context string, not what you assume was assembled\n- Compare it against step 1's raw results: was anything dropped by reranking, deduplication, token-budget truncation, or ordering (e.g., relevant chunk pushed past the truncation cutoff or buried in a \"lost in the middle\" position)?\n\nIf the correct passage was retrieved but isn't in the final prompt, or is present but mangled/truncated \u2192 **context construction problem**.\n\n**3. Generation behavior given that exact context**\n- The full final prompt (system + context + query) and raw model output\n- For each claim in the answer, check: is it supported by a sentence in the context that was actually sent? Or did the model add outside knowledge, misread the context, or ignore it?\n\nIf the correct passage was present intact in the prompt but the answer contradicts or ignores it \u2192 **generation problem** (prompt doesn't instruct grounding strongly enough, model prioritizing parametric knowledge, ambiguous instructions, or context genuinely doesn't answer the question and the model should have said so but didn't).\n\n## Triage\n\nRun this over your eval set and bucket each failure into one of the three categories. Look at the distribution before deciding what to fix \u2014 don't assume it's retrieval just because that's what's easiest to blame.\n\nQuick signals per bucket:\n- Mostly missing-from-top-k \u2192 retrieval (embedding/chunking/index issue).\n- Present in retrieval but missing/truncated in final prompt \u2192 context construction (token budget, reranker, dedup logic).\n- Present intact in final prompt but answer unsupported \u2192 generation/prompting (grounding instructions, temperature, or the model fabricating beyond context).\n\n## One cheap diagnostic test\n\nTake 5 known-good query/passage pairs, manually construct the \"ideal\" context (skip retrieval entirely, hand it the correct chunk), and send that directly to the LLM. If the answer is well-grounded now, the problem is upstream (retrieval or context construction) \u2014 generation is fine. If it's still poorly grounded even with perfect context, the problem is generation/prompting, and improving retrieval won't help at all.\n\nThis one test alone often tells you which half of the pipeline to invest in before you touch anything else.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 2348,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 497,
+      "webSearchRequests": 0,
+      "costUSD": 0.025921,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1201,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 497,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 2348,
+    "output_tokens_details": {
+      "thinking_tokens": 1201
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 497,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2348,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 497,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 497
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.025921,
+  "duration_ms": 27012
+}

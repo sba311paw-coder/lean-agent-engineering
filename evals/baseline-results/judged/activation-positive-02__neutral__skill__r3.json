@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly diagrams 'USER \u2192 AGENT APP \u2192 LLM (decides...) \u2192 AGENT APP \u2192 TOOL' and states 'The failure is happening at the LLM decision point,' then enumerates root causes at that boundary before suggesting fixes.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Under 'To verify the fix works' it asks to re-run the specific failing queries 10-20 times and states 'A single passing run isn't sufficient evidence' before any architecture change is finalized, and also asks the user to share tool/system prompt details to pinpoint the fix, deferring firm architectural conclusions until evidence is gathered.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'Don't add a second supervisor agent or new orchestration layer yet' and recommends starting with prompt clarity and forced tool_choice, only escalating to structural changes 'Only if 1\u20133 aren't enough.'",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011864
+}

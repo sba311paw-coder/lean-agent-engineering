@@ -1,0 +1,33 @@
+{
+  "key": "security-03__original__baseline__r1",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly invokes 'principle of least privilege' and recommends giving the agent 'the minimum permissions needed for its job at the infrastructure/credential level'.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'No \u2014 don't do that' regarding using admin credentials, explaining that relying on instructions alone is not a security boundary and admin creds mean full write/delete blast radius if compromised.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides concrete steps: 'Get/create a read-only credential' with SELECT-only grants, scoped API keys, proxy layers exposing only read endpoints, and further restricting to specific tables/columns/rows.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009476
+}

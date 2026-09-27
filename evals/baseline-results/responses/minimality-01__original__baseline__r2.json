@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__original__baseline__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I have a Python application with an existing function that can send email successfully. I want my AI agent to send an email when appropriate. Should I add an MCP server for email, or can I use what I already have? Help me decide based on the minimum reliable architecture.",
+  "response": "# Short answer: You likely don't need an MCP server. Just expose your existing function as a tool.\n\n## Decision framework\n\nMCP servers earn their complexity when you need one or more of:\n- **Cross-process/cross-language boundaries** (agent runtime is separate from your Python app)\n- **Reuse across multiple different agents/clients** (Claude Desktop, multiple apps, teammates)\n- **Third-party or dynamic tool discovery** (you don't control the tool implementation)\n- **Isolation** (running untrusted or sandboxed code)\n\nYou have none of these triggers \u2014 you have a working Python function, in the same codebase, used by one agent. Adding MCP here means:\n- A server process to run, monitor, and keep alive\n- Serialization overhead (stdio/HTTP transport) for a function call\n- Another moving part that can fail independently (connection drops, protocol mismatches)\n- No reuse benefit since nothing else consumes it\n\n**Minimum reliable architecture = direct function-calling tool**, wired straight into your agent loop in-process.\n\n## What \"direct\" looks like\n\n```python\ndef send_email_tool(to: str, subject: str, body: str) -> dict:\n    \"\"\"Send an email. Use only when explicitly asked or clearly appropriate\n    (e.g., confirmations, notifications).\"\"\"\n    try:\n        result = your_existing_send_email_function(to, subject, body)\n        return {\"status\": \"success\", \"result\": result}\n    except Exception as e:\n        return {\"status\": \"error\", \"message\": str(e)}\n```\n\nRegister this directly in your agent's tool schema (whatever SDK/framework you're using \u2014 Claude tool-use, LangChain, etc.). No new process, no transport layer, no protocol translation.\n\n## Reliability considerations regardless of MCP or not\n\n1. **Confirmation gate** \u2014 for anything with side effects (especially email), add a human-in-the-loop check or explicit intent detection before firing, unless you're fully comfortable with autonomous sends.\n2. **Error surface** \u2014 return structured success/failure to the agent so it can react (retry, tell the user, etc.) rather than throwing raw exceptions.\n3. **Rate/abuse limiting** \u2014 cap sends per session so a reasoning loop can't spam.\n4. **Least privilege** \u2014 only give the agent the email tool, not blanket access to your mail credentials/config.\n5. **Logging/audit** \u2014 log every send (recipient, subject, timestamp) since email is externally visible and hard to undo.\n\n## When to revisit MCP later\n\nIf you later want the *same* email tool available to Claude Desktop, a teammate's agent, or a different app without duplicating code \u2014 that's the point to extract it into an MCP server. Right now, that's speculative complexity you don't need.\n\n**Bottom line:** wrap your existing function as an in-process tool call. Skip MCP until you have an actual multi-consumer or process-isolation requirement.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 562,
+      "outputTokens": 948,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010603999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 562,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 948,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 562,
+        "output_tokens": 948,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010603999999999999,
+  "duration_ms": 12151
+}

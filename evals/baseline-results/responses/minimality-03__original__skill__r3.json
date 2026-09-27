@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__original__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My Python agent already has logging and tests that show me tool-call failures and latency. I am considering adding a large observability framework because I saw it recommended for AI agents. Should I add it?",
+  "response": "Short answer: probably not, at least not yet.\n\n**Run the capability-gap test first:**\n\n1. **What exact capability is missing?** You need to articulate this concretely. \"It was recommended for AI agents\" isn't a capability gap \u2014 it's a trend. Ask instead: what question can't you currently answer? Examples of real gaps might be:\n   - Distributed tracing across multiple services/agents (not just one process)\n   - Correlating a single user request across retries, sub-agent calls, and tool chains\n   - Long-term trend analysis across thousands of runs\n   - Token/cost tracking per request\n   - Alerting on production anomalies in real time\n\n2. **Does your existing system already provide it?** You already have logging and tests showing tool-call failures and latency. That covers:\n   - Debugging individual failures (logging)\n   - Regression prevention (tests)\n   - Basic performance visibility (latency logs)\n\n   If your agent is a single process without multi-service fan-out, a framework's main selling points (distributed tracing, span correlation across services) may be solved problems for you already.\n\n3. **Can a simpler local solution close the actual gap?** If what you're missing is, say, aggregating latency percentiles or failure rates over time, that's often a few lines of code (structured logging + a simple script or existing log aggregation you may already have \u2014 e.g., piping to a file and using `jq`, or a lightweight metrics counter) \u2014 not a new framework.\n\n4. **What new permissions/cost/maintenance does it introduce?** Large observability frameworks typically add:\n   - A new dependency surface and upgrade burden\n   - Often a network call/exporter to a third-party or self-hosted backend\n   - Configuration and instrumentation code scattered through your agent\n   - Sometimes SDKs that themselves wrap your LLM/tool calls, which is another place for bugs to hide\n\n**Recommendation:** Don't add it because it's popular in the AI-agent space. Add it only if you can name a specific question your current logs/tests can't answer, and confirm that a small local addition (structured logging fields, a simple metrics counter, an existing APM you already run for other services) can't answer it more cheaply. If your agent is still single-process and pre-production-scale, the frameworks solve problems you likely don't have yet \u2014 you can always add one later when the gap is concrete (e.g., you're running multiple agents/services and need cross-service trace correlation).\n\nIf you tell me what specific question you're trying to answer that your logs can't answer today, I can help you figure out whether it needs a framework or just a small addition to what you have.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 835,
+      "cacheReadInputTokens": 2714,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0088968,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2714,
+    "output_tokens": 835,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 835,
+        "cache_read_input_tokens": 2714,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0088968,
+  "duration_ms": 12177
+}

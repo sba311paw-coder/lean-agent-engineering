@@ -1,0 +1,33 @@
+{
+  "key": "security-01__original__baseline__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "'\"correct tool call\" and \"safe to auto-execute\" are different things' and 'Treat \"tool selection correctness\" and \"execution safety\" as two separate gates.'",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'Explicit confirmation gate \u2014 Require the user to type a confirmation... especially past some threshold' and 'require confirmation for bulk, destructive, or production-scoped actions.'",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Recommends dry-run/preview, tiered autonomy, audit logging, soft-delete preference, and rate/volume limits as additional safeguards for destructive actions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009168
+}

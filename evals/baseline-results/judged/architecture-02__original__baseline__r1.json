@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__original__baseline__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Tool result \u2192 message history wiring' explicitly examines the handoff between Agent App and LLM, checking tool_call_id matching and whether the second call is even made.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 2 explicitly instructs to 'Log the exact payload sent to the final LLM call' and confirm the tool result is present and correctly formatted in that request.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The response focuses entirely on tracing the message/payload boundary and logging, never suggesting to modify the tool; it states the tool already 'executes correctly and returns the right temperature' and treats that as given, not something to change.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009346
+}

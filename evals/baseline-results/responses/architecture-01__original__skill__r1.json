@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__original__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My AI agent sometimes chooses the wrong tool. I am thinking about replacing the entire agent framework with a different framework. Is that the right first step?",
+  "response": "No \u2014 replacing the framework is a large, risky change for what is likely a small, local problem. Swapping frameworks won't fix a tool-selection issue unless the framework itself is the actual root cause, which is rarely the case.\n\n**Why this isn't the right first step:**\n- Wrong tool selection is a decision-quality problem, usually rooted in prompt/schema/context issues \u2014 not an orchestration-layer problem.\n- A framework rewrite touches everything (auth, logging, retries, integrations) and risks introducing new bugs while not fixing the original one.\n- You'd be replacing a known, partially-working system with an unknown one, without evidence the framework is the cause.\n\n**What to check first, in order:**\n\n1. **Tool descriptions/schemas** \u2014 Are the tool names, descriptions, and parameter docs clear and distinguishable? Vague or overlapping descriptions are the #1 cause of wrong-tool selection.\n2. **Tool count/overlap** \u2014 Are there too many similar tools available at once? LLMs pick wrong tools more often when 10+ tools with similar purposes are all exposed simultaneously.\n3. **System prompt guidance** \u2014 Does the prompt tell the model *when* to use each tool, with examples of correct vs. incorrect cases?\n4. **Trace actual failures** \u2014 Look at 5-10 real transcripts where it picked the wrong tool. Is it consistently confusing two specific tools? That's a strong signal of a naming/description clash, not a framework flaw.\n5. **Model/provider issue** \u2014 Is this happening with one model but not another? If so, it may be a model capability issue, not framework or prompt.\n6. **Where in the pipeline is the failure?** Using the boundary model: is the LLM making a bad decision, or is the agent application presenting bad/ambiguous options to the LLM in the first place?\n\n**Only consider a framework change if:**\n- You've fixed descriptions/prompts/tool count and the problem persists across models, AND\n- You can point to a specific framework limitation (e.g., it truncates tool schemas, doesn't support forced tool choice, mishandles multi-tool responses) that directly causes the misselection.\n\n**Suggested next step:** Pull 5-10 failure transcripts, identify which specific tools get confused, and check their descriptions/schemas for overlap or ambiguity first. That's a same-day fix versus a framework migration that could take weeks and may not even solve the problem.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 797,
+      "cacheReadInputTokens": 2706,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0085152,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2706,
+    "output_tokens": 797,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 797,
+        "cache_read_input_tokens": 2706,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0085152,
+  "duration_ms": 11658
+}

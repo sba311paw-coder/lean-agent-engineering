@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__original__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicit pipeline diagram 'Query \u2192 Retrieval \u2192 Context Construction \u2192 Generation \u2192 Answer' and separate sections for each stage's evidence collection clearly trace boundaries between the three.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before touching the retrieval system, isolate which of the three stages is actually failing' and details specific evidence to log (query sent, top-k scores, assembled prompt, final output) before any architecture change, culminating in a triage step 'before deciding what to fix'.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The 'One cheap diagnostic test' section describes bypassing retrieval and hand-feeding the ideal context to isolate whether generation alone is at fault, explicitly stating this isolates 'which half of the pipeline to invest in.'",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01093
+}

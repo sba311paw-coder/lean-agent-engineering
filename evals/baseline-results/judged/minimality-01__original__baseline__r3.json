@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__original__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Identifies the missing piece as exposing the function as a 'local tool/function call' to the agent (tool-calling registration), not the email-sending logic itself.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'You almost certainly don't need an MCP server' and instructs to wrap the existing implementation directly: '# your existing, already-working implementation'.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly says MCP should only be used for real needs like multiple clients, process isolation, sandboxing, and concludes 'None of these sound like your situation... that's a refactor to do when the need is real, not preemptively.'",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009210000000000001
+}

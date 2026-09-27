@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly assesses complexity via the 'Capability-gap check' table, noting 'you have 2 functions' and identifying that the existing code already implements the full agent loop.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends 'Keep the direct API call + two functions as-is. It's simple, testable, and easy to reason about,' explicitly preferring the simpler existing implementation over migration.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States specific justifying evidence: 'a specific unmet need (e.g., \"I want to add a vector DB for retrieval\" or \"I need to orchestrate 6+ tools with conditional branching\")' and lists multi-agent orchestration, retrieval, provider-agnostic swapping as concrete triggers.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00979
+}

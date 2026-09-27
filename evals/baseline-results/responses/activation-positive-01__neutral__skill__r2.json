@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "This is a classic \"correct link in the chain, wrong output\" bug \u2014 the tool executes fine, so the break is somewhere *after* the tool call and *before* the final response is generated. Let's trace the architecture rather than guessing at fixes.\n\n## Where the bug is likely hiding\n\nUsing the agent loop:\n\n```\nLLM -> tool call -> AGENT APP -> TOOL (weather API) -> result\n                         |\n                         v\n                 (does the result actually\n                  get back to the LLM?)\n                         |\n                         v\n                       LLM -> final response\n```\n\nThe tool succeeding is not evidence the LLM ever saw the result. Check these boundaries in order:\n\n**1. Result isn't being passed back to the LLM at all**\nMost common cause. The agent app calls the tool, gets data, but never appends a `tool_result` message back into the conversation before asking the model for a final response. Check your loop: after the tool call, are you sending a follow-up request that includes the tool output in the message history?\n\n**2. Result is malformed or empty by the time it reaches the LLM**\nLog the exact payload sent back as the tool result (not just what the tool function returned). Serialization bugs (e.g., returning an object instead of a string, an empty JSON `{}`, or swallowing the value in a `try/except`) are common.\n\n**3. Tool result ID mismatch**\nIf using an API with `tool_use_id` / `tool_call_id` pairing, a mismatched ID means the model can't associate the result with its request, and some providers will silently drop or ignore it.\n\n**4. System prompt or instructions discourage using tool output**\nLess common, but check if your system prompt says something like \"always answer concisely\" in a way that's causing the model to summarize away the data, or if there's a token/output limit truncating the response.\n\n**5. Agent stops before the second LLM call**\nIf your loop only does one LLM call and treats \"tool called\" as terminal, it'll never generate a final response that incorporates the result.\n\n## Fastest way to isolate it\n\n1. Log the raw tool result payload as constructed by your app (not the tool's return value \u2014 the actual message object sent to the LLM).\n2. Log the full message array right before the final LLM call.\n3. If the result is present and correct in that final request but the response still ignores it \u2014 it's a prompt/model issue.\n4. If the result is missing or malformed in that request \u2014 it's an agent application bug (most likely).\n\n## Fix\n\n- If missing: ensure your loop appends the tool result message and makes a second call to the LLM with the updated history before treating the turn as complete.\n- If malformed: fix serialization so the tool result is a clean string/JSON the model can read.\n- If ID mismatch: fix the correlation between the tool call and tool result.\n\nOnce fixed, verify with an integration test: call the agent end-to-end with a real weather query and assert the final text response contains the expected data (e.g., temperature value), not just that the tool call succeeded.\n\nIf you can share your agent loop code (the part between the tool call and the final response), I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 978,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 459,
+      "webSearchRequests": 0,
+      "costUSD": 0.012069,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 459,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 978,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 459,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 978,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 459,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 459
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012069,
+  "duration_ms": 13554
+}

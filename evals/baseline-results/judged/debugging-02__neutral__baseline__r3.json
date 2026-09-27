@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before jumping to \"swap the embedding model,\" it's worth diagnosing why' and only provides model options under an 'If it *is* an embedding problem' conditional, ending with a suggestion to diagnose for 15 minutes before switching.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates 'Retrieval problem', 'Generation problem', and 'Chunking problem' sections, describing how to check retrieved chunks, whether context is relevant, and whether generation ignores context.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The 'My suggestion' section instructs to 'Pull 5-10 failing queries', 'Log what chunks got retrieved', and 'Manually judge' before any model change, and asks the user to share current setup details for a targeted recommendation.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010054
+}

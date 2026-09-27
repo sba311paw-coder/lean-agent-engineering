@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__original__baseline__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My AI agent sometimes chooses the wrong tool. I am thinking about replacing the entire agent framework with a different framework. Is that the right first step?",
+  "response": "Short answer: probably not. Replacing the whole framework is a big, expensive move for what's usually a narrower problem. Tool-selection mistakes are more often caused by fixable things upstream of \"which framework you use.\"\n\n**Before ripping out the framework, check these first:**\n\n1. **Tool descriptions/schemas are ambiguous or overlapping**\n   - Do two tools sound like they do the same thing? Agents often pick the wrong one when descriptions are vague (\"search data\" vs \"query database\").\n   - Are parameter names/descriptions clear enough that the model knows when each tool applies?\n\n2. **Too many tools available at once**\n   - If the agent has 20+ tools in context, selection accuracy drops. Consider grouping/gating tools by task phase, or using a router step.\n\n3. **Missing or weak examples**\n   - Few-shot examples of correct tool choice (especially for edge cases) often fix this faster than anything else.\n\n4. **System prompt doesn't give decision criteria**\n   - Does it explicitly say *when* to use tool A vs tool B? \"Use X for real-time data, use Y for historical records\" type guidance helps a lot.\n\n5. **Model choice/version**\n   - Some models are just better at function calling / tool selection. Sometimes swapping the underlying model fixes this without touching the framework at all.\n\n6. **Ordering and structure of tool definitions**\n   - Some frameworks let tool order or nesting affect selection quality \u2014 worth checking if you're hitting a framework-specific bug.\n\n**When framework replacement actually makes sense:**\n- You've fixed the above and errors persist consistently\n- The framework has structural limits (e.g., poor support for tool routing, no way to scope tools per step, bad debugging/tracing so you can't even diagnose what's happening)\n- You need capabilities (multi-agent orchestration, better guardrails) genuinely absent from your current stack\n\n**Suggested next step:** Pull a sample of the actual failure cases \u2014 what tool was picked, what should have been picked, and what the user asked. That will tell you whether it's a prompt/schema problem (cheap fix) or a framework limitation (expensive fix). Want to share a few examples? I can help pinpoint which bucket it falls into.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 536,
+      "outputTokens": 730,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008372,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 536,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 730,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 536,
+        "output_tokens": 730,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008372,
+  "duration_ms": 9584
+}

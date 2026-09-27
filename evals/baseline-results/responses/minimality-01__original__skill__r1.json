@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__original__skill__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I have a Python application with an existing function that can send email successfully. I want my AI agent to send an email when appropriate. Should I add an MCP server for email, or can I use what I already have? Help me decide based on the minimum reliable architecture.",
+  "response": "Short answer: **use what you already have.** Don't add an MCP server for this.\n\n## Why\n\nRun through the capability-gap test:\n\n1. **What capability is missing?** None. You already have a working Python function that sends email successfully.\n2. **Does an existing skill/tool provide it?** Yes \u2014 your existing function *is* the tool.\n3. **Can the application solve it directly?** Yes. Wrap your existing function as a tool definition (function-calling schema) in whatever agent framework/SDK you're using. That's a small local change, not a new service.\n4. **Does adding an MCP server introduce new cost?** Yes, and for no benefit here:\n   - A new process/server to run, deploy, and monitor.\n   - A new transport layer (stdio/SSE) between your agent and a capability you already have in-process.\n   - Extra latency and another failure point (network/process boundary) for something that's currently a plain function call.\n   - Ongoing maintenance of a protocol server for one function.\n\nMCP servers earn their complexity when you need to **share a tool across multiple, independent agent processes or products written in different runtimes**, or when the capability lives outside your process (e.g., a third-party service you don't control). Neither applies here \u2014 you have one Python app, one function, in-process.\n\n## Minimum reliable architecture\n\n```\nUSER \u2192 AGENT APPLICATION \u2192 LLM (decides: send_email(to, subject, body))\n                \u2193\n        AGENT APPLICATION validates args + authorization\n                \u2193\n        calls your existing send_email() function directly\n                \u2193\n        result \u2192 LLM \u2192 final response \u2192 USER\n```\n\nConcretely:\n\n- Expose your existing function to the LLM as a **tool schema** (name, description, JSON parameters) via your agent framework's native tool-calling.\n- In your tool-handling code, call the existing function directly \u2014 no new process, no new protocol.\n- Enforce authorization/validation **in the application layer**, not by trusting the LLM's decision:\n  - Validate the recipient, subject, and body before calling `send_email()`.\n  - Since sending an email is an **irreversible, external-facing action**, add a safeguard appropriate to your risk tolerance \u2014 e.g., restrict allowed recipients/domains, require confirmation for first-time recipients, or log every send with the triggering context.\n  - The LLM's tool call is a *request*, not authorization \u2014 your application code is the enforcement point.\n\n## Verification\n\nBefore calling it done:\n- Unit test the tool wrapper (right args passed through to `send_email()`).\n- Integration test: LLM triggers the tool call in a scripted scenario \u2192 email actually sent (or mocked in test env) \u2192 confirm via logs/mail provider response.\n- Confirm failure paths (bad address, send failure) surface back to the agent/user sensibly rather than silently failing.\n\n**Bottom line:** an MCP server would add a network/process boundary, deployment surface, and maintenance burden to replace a function call you already have working. That's complexity added without a capability gap to justify it. Wrap the existing function as a tool call in your agent app instead.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 996,
+      "cacheReadInputTokens": 2732,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010510400000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2732,
+    "output_tokens": 996,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 996,
+        "cache_read_input_tokens": 2732,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010510400000000001,
+  "duration_ms": 13717
+}

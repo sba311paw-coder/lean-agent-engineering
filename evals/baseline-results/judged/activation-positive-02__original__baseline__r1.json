@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__original__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 'Likely Failure Boundary' enumerates six layers (prompt, tool description, query framing, context/history, decoding randomness, orchestration) and narrows down to '#1\u2013#4' as most likely, directly tracing the tool-selection boundary.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The 'Evidence to Collect First' section (transcript pairs, isolating variables, tool visibility check, model's own reasoning, phrasing diff) is presented before any architecture change, and the 'Suggested Next Step' explicitly says to gather evidence 'before deciding whether the fix is a prompt rule, a tool description rewrite, or something structural.'",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'jumping to \"add a stricter framework/router\" often just masks the symptom' and frames the issue as 'a judgment-call problem, not a plumbing problem,' avoiding recommending new frameworks/tools.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01157
+}

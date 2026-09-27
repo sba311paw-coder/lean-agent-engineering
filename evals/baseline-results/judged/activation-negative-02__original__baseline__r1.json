@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-02__original__baseline__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response gives a clear, structured educational explanation of tool calling with definition, mechanism steps, example, use cases, and significance.",
+      "criterion": "Give a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response contains no debugging steps, code execution, or workflow initiation\u2014purely explanatory content.",
+      "criterion": "Do not automatically initiate a debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0066560000000000005
+}

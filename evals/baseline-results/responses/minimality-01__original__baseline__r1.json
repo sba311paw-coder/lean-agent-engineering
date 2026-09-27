@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__original__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I have a Python application with an existing function that can send email successfully. I want my AI agent to send an email when appropriate. Should I add an MCP server for email, or can I use what I already have? Help me decide based on the minimum reliable architecture.",
+  "response": "# Short answer: You probably don't need an MCP server. Use what you have.\n\nMCP servers exist to solve a specific problem: giving an agent access to *external* tools/data it couldn't otherwise reach, often across process/language/network boundaries, in a standardized way. If your Python app already has a working `send_email()` function and your agent runs in the same process/codebase, wrapping that in MCP adds a layer of indirection (a server, a protocol, a client, serialization) for zero functional gain.\n\n## Decision framework\n\n**Keep your existing function (expose it as a plain tool/function call) if:**\n- The agent and the email function live in the same process or same codebase\n- Only this one agent/app needs to send email\n- You're not trying to share this capability across multiple different agents, languages, or teams\n- You want the fewest moving parts to debug and secure\n\n**Reach for an MCP server if:**\n- Multiple *separate* agents/apps (possibly in different languages, different processes, maybe even different vendors' agent frameworks) all need the same email capability, and you want one governed implementation instead of N copies\n- You want to swap agent frameworks later without rewriting integration code\n- You need the email tool to be usable by a general-purpose MCP client (e.g., Claude Desktop, another team's agent) outside your own app\n- You want a process/security boundary between the agent's tool-calling and the credential-holding email logic (e.g., agent runs untrusted, email service is locked down separately)\n\n## Minimum reliable architecture for your case\n\nSince you already have a working function, the leanest, most reliable path is:\n\n1. **Wrap it as a tool definition** the agent can call directly (function calling / tool-use schema), not as a network service.\n2. **Add guardrails at the call site**, since this is the actual risk surface for \"AI agent sends email\":\n   - Validate/allowlist recipient addresses (don't let the model invent arbitrary `To:` addresses unchecked)\n   - Require the agent to produce structured args (to, subject, body) that you validate before calling the real function\n   - Consider a confirmation step or dry-run mode before actually sending, especially early on\n   - Log every send attempt (who/what triggered it, what was sent) for auditability\n3. **Keep credentials where they already are** (in your app's config/secrets), not exposed to the model.\n\nThis gives you: fewer components, no new network/process boundary to secure or keep alive, and no protocol translation layer that could fail. You get all the reliability of your already-tested email function, just gated behind a tool schema.\n\n## When to revisit this\n\nIf later you find yourself needing the *same* email-sending capability from another agent, another service, or you want non-engineers to plug your email tool into their own MCP-compatible agent \u2014 that's the signal to extract it into an MCP server. Don't build that boundary speculatively; add it when a second real consumer shows up.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 562,
+      "outputTokens": 930,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010424000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 562,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 930,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 562,
+        "output_tokens": 930,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010424000000000001,
+  "duration_ms": 13441
+}

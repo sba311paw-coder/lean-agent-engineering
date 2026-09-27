@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly asks 'What capability is missing?' and identifies it as 'Let the agent trigger email sending,' noting the function already provides this in-process.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'Does the existing system already provide it? Yes' and recommends wrapping 'your existing, already-tested function' as a direct tool call instead of MCP.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Response explicitly argues against MCP 'merely because it is available,' stating 'MCP is solving a problem you don't have' and only lists specific scenarios (multi-language reuse, separate process/permissions, third-party clients) where MCP would be justified.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010862
+}

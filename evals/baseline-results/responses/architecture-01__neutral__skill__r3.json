@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks is unlikely to fix this \u2014 wrong tool selection is almost always a boundary problem (prompt, tool descriptions, schema, or routing logic), not a framework limitation. Before considering a switch, it's worth locating *where* the decision is going wrong.\n\n**Where the failure likely lives:**\n\n```\nUSER \u2192 AGENT APPLICATION \u2192 LLM (picks tool) \u2192 AGENT APPLICATION \u2192 TOOL\n```\n\nThe wrong-tool choice happens at the LLM decision boundary, but the *cause* is usually upstream in how the application presents tools to the LLM.\n\n**Most common root causes, roughly in order of likelihood:**\n\n1. **Ambiguous or overlapping tool descriptions** \u2014 two tools sound similar enough that the model can't reliably distinguish them.\n2. **Too many tools exposed at once** \u2014 if the agent has 15+ tools available for every call, selection accuracy drops regardless of framework.\n3. **Poor or missing parameter/return schemas** \u2014 the model can't tell what a tool actually does from its signature.\n4. **No examples or guardrails in the tool description** \u2014 \"use X for Y, not for Z\" type disambiguation is missing.\n5. **Missing intermediate validation** \u2014 the application isn't checking the tool call against context before executing it (i.e., no capability-gap check at the application layer).\n6. **Model/task mismatch** \u2014 occasionally a genuinely a reasoning limitation, but this is rare compared to #1\u2013#4.\n\n**Before switching frameworks, try (cheapest fixes first):**\n\n- Audit tool descriptions for overlap \u2014 rewrite so each tool's purpose is unambiguous and mutually exclusive.\n- Reduce the active toolset per call if possible (only expose relevant tools for the current context/state).\n- Add few-shot examples of correct tool choice in the system prompt or tool description.\n- Add an application-level check: if a tool call doesn't match expected parameters/context, reject and ask the model to retry rather than executing blindly.\n- Log actual failures \u2014 which tools get confused with which? This tells you if it's a naming/description problem vs. something structural.\n\n**Framework switching is a last resort because:**\n\n- Nearly all major frameworks (LangChain, LlamaIndex, raw Anthropic/OpenAI tool-calling, custom loops) use the same underlying mechanism \u2014 you describe tools, the model picks one. None of them \"solve\" ambiguous tool descriptions for you.\n- Switching adds real cost: new dependencies, new failure modes, migration time, and no guarantee the same ambiguity issue won't resurface, since the root cause travels with your tool definitions, not the framework.\n\n**My suggestion:** show me (or describe) the specific tools and a failure example \u2014 which tool got picked instead of which. That'll tell us if this is a description/schema fix (very likely, ~30 min) or something deeper. Do you want to go through that?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 955,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 443,
+      "webSearchRequests": 0,
+      "costUSD": 0.011774999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 443,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 955,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 443,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 955,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 443,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 443
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011774999999999999,
+  "duration_ms": 13057
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__original__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly instructs to identify 'What exact capability is missing?' with concrete examples like distributed tracing, cost tracking, alerting.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Point 2 explicitly checks 'Does your existing system already provide it?' and notes logging/tests already cover debugging, regression, and latency visibility, favoring reuse over adding new tooling.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Point 4 lists 'new dependency surface and upgrade burden,' 'network call/exporter,' 'configuration and instrumentation code scattered,' and 'another place for bugs to hide' as maintenance/dependency costs.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009094000000000001
+}

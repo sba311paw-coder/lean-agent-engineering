@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__original__baseline__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Asks 'What specific gap does it fill?' and distinguishes trace-level detail vs logging, directly checking if a real capability gap exists beyond current logging/tests.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends 'incrementally upgrading what you have' with structured logging and lightweight metrics 'rather than a full APM suite,' explicitly preferring reuse/extension of existing setup over adopting new framework.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists 'Integration surface area', 'Maintenance burden' (version upgrades, breaking changes, dependency compatibility), 'Cognitive overhead', and 'Vendor lock-in risk' as concrete costs.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009792
+}

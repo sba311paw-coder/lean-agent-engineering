@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__skill__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "For a small personal agent that answers questions and calls two existing Python functions, keep it minimal \u2014 you don't need a framework.\n\n## Recommended architecture\n\n```\nUSER\n |\n v\nAGENT APPLICATION (your Python script)\n |\n v\nLLM (via API \u2014 e.g. Anthropic SDK)\n |\n | decision / structured tool call\n v\nAGENT APPLICATION (validates + dispatches)\n |\n v\nYOUR TWO EXISTING FUNCTIONS\n |\n | result\n v\nAGENT APPLICATION\n |\n v\nLLM (final answer)\n |\n v\nUSER\n```\n\n## What to actually use\n\n1. **LLM access**: the official SDK for whichever model you're calling (e.g. `anthropic` Python package), using native **tool calling / function calling**. Define your two functions as tool schemas (name, description, JSON input schema). No framework needed \u2014 this is a built-in capability of the API.\n\n2. **Agent loop**: plain Python. A loop that:\n   - sends the user message + tool definitions to the LLM\n   - if the LLM returns a tool call, your code validates arguments and invokes the matching Python function directly\n   - sends the tool result back to the LLM\n   - returns the final text response\n\n   This is maybe 30\u201350 lines of code \u2014 no LangChain, no orchestration layer, no multi-agent setup. Adding a framework here would be complexity without a corresponding capability gap.\n\n3. **Tool dispatch**: a simple `if/elif` or dict mapping `{tool_name: function}`. Don't build a plugin system for two functions.\n\n4. **State**: if it's single-turn or short conversations, just keep the message list in memory (a Python list). No database/vector store needed unless you actually need persistence or retrieval \u2014 don't add one speculatively.\n\n## Things to skip (for now)\n\n- MCP server \u2014 only useful if you need to expose these tools to *other* agents/clients, not for a single self-contained script.\n- Frameworks (LangChain/LlamaIndex/etc.) \u2014 they add abstraction and dependency weight you don't need for two tools.\n- RAG/vector DB \u2014 only if your question-answering needs retrieval over documents; not implied by your description.\n- Multi-agent orchestration \u2014 one agent, one loop is sufficient here.\n\n## A few practical things worth doing anyway\n\n- **Validate tool inputs** before calling your functions \u2014 the LLM's tool call is a *suggestion*, not authorization. Check types/ranges in your dispatch code, especially if either function has side effects (writes files, calls external services, etc.).\n- **Set a max iteration count** on the tool-call loop to avoid infinite loops if the LLM keeps requesting tools.\n- **Log tool calls and results** (stdout or a simple file) so you can debug behavior later \u2014 cheap insurance for an agent.\n- If either function is irreversible or costly (e.g., sends an email, deletes something), add a confirmation step before executing it, even in a personal tool.\n\nIf you tell me what the two functions do (read-only lookups vs. something with side effects) and which LLM provider you're using, I can sketch the actual ~40-line implementation.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1039,
+      "cacheReadInputTokens": 2701,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0109342,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2701,
+    "output_tokens": 1039,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1039,
+        "cache_read_input_tokens": 2701,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0109342,
+  "duration_ms": 12699
+}

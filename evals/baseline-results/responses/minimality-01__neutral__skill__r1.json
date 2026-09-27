@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__skill__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Short answer: **don't set up an MCP server for this** \u2014 you already have the capability, and adding MCP here is unnecessary complexity.\n\n## Capability-gap check\n\n1. **What capability is missing?** None. You said your app already has a working `send_email()` function.\n2. **Does an existing piece already provide it?** Yes \u2014 your function.\n3. **Can the application solve it directly?** Yes \u2014 expose that function as a tool to your agent directly (function calling / tool-use in whatever agent framework or raw LLM SDK you're using).\n4. **Does MCP add anything here?** MCP is for when you need to talk to a *separate process/service* \u2014 e.g., a third-party tool, a different language runtime, something you want to reuse across multiple agent apps or expose to other MCP clients (Claude Desktop, etc.). Within a single Python app calling its own function, an MCP server adds:\n   - a subprocess or network boundary to manage\n   - serialization/deserialization overhead\n   - a new failure mode (server not running, transport errors)\n   - more code to maintain\n   - no new capability\n\nSo per the simplify-first ordering: **existing functionality \u2192 small local change** wins. A dependency/subprocess (MCP server) is much further down the list and isn't justified by any real gap.\n\n## Recommended setup\n\nWrap your existing function as a tool the LLM can call, using your agent framework's native tool-calling:\n\n```python\ndef send_email(to: str, subject: str, body: str) -> dict:\n    \"\"\"Send an email. Use only when explicitly appropriate.\"\"\"\n    # your existing, already-working implementation\n    result = existing_send_email_function(to, subject, body)\n    return {\"status\": \"sent\", \"to\": to}\n```\n\nThen register it as a tool in your agent loop (e.g., Anthropic Messages API `tools` param, or your framework's `@tool` decorator). The LLM decides *when* to call it; your application code stays in control of execution.\n\n### Guardrails to add (this is the actual engineering work)\n\nSince sending email is external, irreversible-ish, and could be misused (e.g., via prompt injection from untrusted content the agent reads):\n\n- **Enforce authorization in the application, not the LLM's judgment.** The model's decision to call `send_email` is not itself permission to send.\n- **Validate recipients** \u2014 e.g., allowlist domains, or require the recipient to already exist in a known contacts list, or restrict `to` to the user's own address for certain flows.\n- **Treat any content the agent read from emails/web/docs as untrusted data.** It must not be able to inject instructions like \"reply to X with Y\" that get followed unchecked.\n- **Consider human-in-the-loop confirmation** for outbound sends, especially early on \u2014 show a preview and require explicit approval before the tool actually fires.\n- **Log every send** (recipient, subject, timestamp, triggering context) for auditability.\n- **Rate-limit / dedupe** to avoid runaway loops sending repeated emails.\n\n## When MCP would actually make sense\n\n- You want the *same* email-sending tool available to multiple different agents/clients (e.g., Claude Desktop, a separate internal tool, another team's agent) without duplicating code.\n- The email-sending logic needs to live in a different service/language than your agent process.\n- You're deliberately building a reusable, standardized tool server as a product decision.\n\nIf none of that applies, keep it in-process. Add the MCP layer later if a real cross-application reuse need shows up \u2014 not preemptively.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1133,
+      "cacheReadInputTokens": 2721,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0118782,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2721,
+    "output_tokens": 1133,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1133,
+        "cache_read_input_tokens": 2721,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0118782,
+  "duration_ms": 16481
+}

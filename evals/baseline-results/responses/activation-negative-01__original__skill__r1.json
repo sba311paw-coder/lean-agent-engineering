@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-01__original__skill__r1",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "What is an LLM?",
+  "response": "An **LLM (Large Language Model)** is a type of AI model trained on large amounts of text data to understand and generate human-like language.\n\n**Core idea:** It's a neural network (typically based on the \"transformer\" architecture) that learns statistical patterns in text \u2014 grammar, facts, reasoning patterns, style \u2014 by predicting the next word (or \"token\") in a sequence, over and over, across massive datasets.\n\n**Key characteristics:**\n- **Large**: Trained on billions to trillions of words, with model sizes ranging from millions to hundreds of billions of parameters (the internal weights it learns).\n- **General-purpose**: Not built for one specific task \u2014 it can write, summarize, translate, code, answer questions, and reason across many domains.\n- **Probabilistic**: It generates output by predicting likely next tokens, not by \"looking up\" facts in a database.\n- **Context-driven**: It responds based on the input (prompt) it's given, using patterns learned during training.\n\n**What it's good at:** language generation, summarization, translation, coding assistance, reasoning over provided context, and conversation.\n\n**Limitations:**\n- Can produce plausible-sounding but incorrect information (\"hallucination\").\n- Knowledge is frozen at its training cutoff unless connected to external tools/data.\n- No true understanding or consciousness \u2014 it's pattern-matching at massive scale, not reasoning like a human.\n\n**Examples:** GPT-family models, Claude (me), Gemini, Llama, etc.\n\nThis is a general informational question rather than an engineering task, so no build/debug workflow is needed here \u2014 just a direct explanation. Let me know if you want to go deeper into how they're trained, how they're used in applications, or how to work with them effectively in a project.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 563,
+      "cacheReadInputTokens": 2664,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0061668,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2664,
+    "output_tokens": 563,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 563,
+        "cache_read_input_tokens": 2664,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0061668,
+  "duration_ms": 8146
+}

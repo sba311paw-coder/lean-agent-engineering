@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Includes an explicit architecture diagram tracing LLM decision -> Agent Application invokes tool -> tool returns result -> Agent Application feeds back -> LLM final response.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates 'AGENT APPLICATION invokes tool' from 'LLM decides' and 'LLM generates final response', and later distinguishes app-level bugs (steps 1/2) from LLM/post-processing issues (steps 3/4/5).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Enumerates concrete failure boundaries: message not appended, no second LLM call, malformed tool result, system prompt suppression, and post-processing hooks/filters.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Ends with 'Fastest way to isolate it' instructing to log the message list before the second LLM call to determine which boundary is broken, explicitly stating 'no need to guess further' rather than jumping straight to a fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010688
+}

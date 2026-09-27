@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__original__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My Python agent already has logging and tests that show me tool-call failures and latency. I am considering adding a large observability framework because I saw it recommended for AI agents. Should I add it?",
+  "response": "Short answer: probably not, at least not yet. Run this through the capability-gap test before adding it.\n\n**1. What capability is actually missing?**\n\nYou need to answer that concretely. \"Observability\" isn't a capability \u2014 it's a category. Break down what a large framework typically gives you that you don't have:\n\n- Distributed tracing across multi-step/multi-agent workflows\n- Centralized dashboards across environments/services\n- Token/cost tracking and aggregation\n- Alerting on anomalies (latency spikes, error-rate thresholds)\n- Cross-run comparison / eval integration\n- Multi-user or team-wide visibility\n\nIf your logging + tests already cover tool-call failures and latency for your use case, ask: which of the above do I *actually need right now*, versus which sound useful because they were recommended in a blog post or tutorial?\n\n**2. Does your existing system already solve it?**\n\nLogging + tests covering failures and latency is often sufficient for:\n- Single-agent or small multi-agent systems\n- Pre-production or low-traffic production\n- One or a few developers debugging locally\n\nIt's usually *not* sufficient once you have:\n- Multiple concurrent users/sessions you need to distinguish in traces\n- Multi-step chains where you need to see the full call graph, not just individual tool calls\n- A need for cost tracking across many runs\n- On-call / alerting requirements (someone needs to be paged, not just have logs to grep later)\n\n**3. Cost of adding it now**\n\nA large observability framework typically brings: new dependency surface, often a hosted/SaaS component (data leaves your environment \u2014 check if that includes prompts/outputs with user data), configuration and maintenance burden, and sometimes vendor lock-in to a specific tracing format.\n\n**4. Smallest adequate solution ladder**\n\nBefore a full framework, consider:\n- Structured logging (JSON logs with trace/span IDs you generate yourself) \u2014 often gets you 80% of tracing value with zero new dependencies\n- A lightweight tracing library (just span/trace primitives, no dashboard/backend) if you need causal ordering across steps\n- Only reach for a full framework when you have concrete evidence of a gap: e.g., \"I spent 3 hours grepping logs across services trying to reconstruct one failed request\" is real evidence; \"I saw it recommended\" is not.\n\n**Recommendation:** Don't add it based on the recommendation alone. Write down 2-3 specific failures your current setup couldn't diagnose (if any exist yet). If you can't name any, you don't have evidence of a gap \u2014 hold off. If you can, try closing that specific gap with structured logging or a minimal tracing shim first, and only escalate to a full framework if that's insufficient.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 886,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 469,
+      "webSearchRequests": 0,
+      "costUSD": 0.011189000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 469,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 886,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 469,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 886,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 469,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 469
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011189000000000001,
+  "duration_ms": 12869
+}

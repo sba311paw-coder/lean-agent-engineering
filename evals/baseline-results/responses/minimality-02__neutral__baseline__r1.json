@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__baseline__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "Here's a practical migration path from a direct API-calling script to LangChain, going from simplest to more \"framework-y.\"\n\n## 1. Decide how much framework you actually need\n\nFor \"calls two functions and returns results,\" you likely don't need the full `AgentExecutor`/ReAct machinery. Two solid options:\n\n- **LCEL + tool binding** (lightweight, you control the loop)\n- **LangGraph's `create_react_agent`** (LangChain's current recommended way to build agents \u2014 more structure, built-in loop, easy to extend later)\n\nI'd lean toward LangGraph since you're deliberately calling it \"an AI agent\" \u2014 it's a lighter lift than the old `AgentExecutor` and is where LangChain is investing.\n\n## 2. Wrap your two functions as Tools\n\n```python\nfrom langchain_core.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get current weather for a city.\"\"\"\n    ...  # your existing logic\n    return result\n\n@tool\ndef search_docs(query: str) -> str:\n    \"\"\"Search internal docs for relevant info.\"\"\"\n    ...\n    return result\n\ntools = [get_weather, search_docs]\n```\n\nKey point: docstrings and type hints matter \u2014 they become the schema the model uses to decide when/how to call each tool.\n\n## 3. Swap your direct API client for a LangChain chat model\n\n```python\nfrom langchain_anthropic import ChatAnthropic\n# or from langchain_openai import ChatOpenAI\n\nllm = ChatAnthropic(model=\"claude-sonnet-5\")\n```\n\nThis replaces whatever `requests`/SDK calls you were making directly.\n\n## 4. Build the agent\n\n**Option A \u2014 LangGraph prebuilt (recommended for parity + room to grow):**\n\n```python\nfrom langgraph.prebuilt import create_react_agent\n\nagent = create_react_agent(llm, tools)\n\nresult = agent.invoke({\"messages\": [(\"user\", \"What's the weather in Rome and check docs for X?\")]})\nprint(result[\"messages\"][-1].content)\n```\n\n**Option B \u2014 Manual LCEL loop (if you want to keep your exact control flow):**\n\n```python\nllm_with_tools = llm.bind_tools(tools)\n\nresponse = llm_with_tools.invoke(messages)\nfor tool_call in response.tool_calls:\n    selected_tool = {\"get_weather\": get_weather, \"search_docs\": search_docs}[tool_call[\"name\"]]\n    tool_result = selected_tool.invoke(tool_call[\"args\"])\n    messages.append(...)  # append ToolMessage with result\nfinal = llm_with_tools.invoke(messages)\n```\n\nThis mirrors what a hand-rolled function-calling loop typically looks like, just with LangChain's message/tool abstractions.\n\n## 5. Migration checklist\n\n- **Keep the old script running side-by-side** during migration; diff outputs on the same inputs to confirm parity.\n- **Port error handling**: wrap tool functions so exceptions become readable strings returned to the model rather than crashing the graph.\n- **Check your prompt**: any system prompt/instructions you had should move into the `messages` list or `create_react_agent(..., prompt=...)`.\n- **Structured output**: if you were parsing JSON from the raw API response, look at `.with_structured_output()` instead of manual parsing.\n- **Add observability**: set `LANGCHAIN_TRACING_V2=true` + LangSmith API key to get tracing for free \u2014 useful once you have a loop instead of two direct calls.\n- **Streaming**: if your original code streamed responses, use `.stream()`/`.astream()` \u2014 semantics differ slightly from raw API streaming, so test this specifically.\n\n## 6. Don't over-migrate\n\nIf your two functions are always called in a fixed, non-LLM-decided order, you may not need \"agent\" behavior at all \u2014 a plain LCEL chain (prompt \u2192 llm \u2192 function \u2192 function) might be simpler and more predictable than letting the model choose tool calls dynamically.\n\nWant me to sketch this out matching your actual function signatures/logic? If you paste the current script (or its structure), I can give you a closer 1:1 rewrite.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 550,
+      "outputTokens": 2017,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.02127,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 660,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 550,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2017,
+    "output_tokens_details": {
+      "thinking_tokens": 660
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 550,
+        "output_tokens": 2017,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.02127,
+  "duration_ms": 22332
+}

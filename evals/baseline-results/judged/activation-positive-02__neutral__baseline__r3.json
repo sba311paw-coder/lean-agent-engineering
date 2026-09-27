@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response discusses ambiguous trigger conditions and gives example prompts that should/shouldn't trigger the tool, but only asks the user to share their own tool description and failing examples at the very end ('Can you share the tool description and a couple of example prompts where it worked vs. didn't?'), after already prescribing a full solution rather than first tracing the actual boundary in the user's case.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "The response immediately proposes multiple architectural changes (tool_choice forcing, an orchestration-layer validation/re-prompt step, temperature adjustments) before ever asking for evidence; the request for evidence ('Can you share the tool description and a couple of example prompts...') only appears as an afterthought at the end, not as a gate before suggesting changes.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "The response recommends adding a 'lightweight router/classifier' upstream and a separate 'orchestration layer' validation/re-prompt step, and references framework-specific tool_choice forcing ('if your framework supports it') \u2014 these add extra machinery rather than avoiding unnecessary frameworks.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.16666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.016068
+}

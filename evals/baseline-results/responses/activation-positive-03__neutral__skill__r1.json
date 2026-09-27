@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "This is a RAG (retrieval-augmented generation) grounding problem. Rather than jumping to a fix, let's trace where the pipeline actually breaks \u2014 \"poorly grounded\" can originate at several different boundaries, and the right fix depends on which one is failing.\n\n## Locate the failing boundary first\n\nRAG pipeline: **Query \u2192 Retriever \u2192 Vector DB \u2192 Retrieved chunks \u2192 LLM \u2192 Answer**\n\nPoor grounding usually comes from one of these points, roughly in order of likelihood:\n\n1. **Retrieval quality** \u2014 wrong or irrelevant chunks are being retrieved (bad chunking, weak embeddings, no reranking, mismatched query-vs-document phrasing).\n2. **Context assembly** \u2014 right chunks retrieved, but too little context, missing metadata (source, page), or chunks that lose meaning when isolated.\n3. **Prompt construction** \u2014 the LLM isn't instructed to answer *only* from the provided context, or isn't told what to do when the context is insufficient.\n4. **Generation behavior** \u2014 model ignores context and uses parametric knowledge, or blends retrieved facts with hallucinated ones.\n5. **No verification step** \u2014 nothing checks that the final answer is actually supported by the retrieved text.\n\n## Diagnostic step (do this before changing anything)\n\nTake 5\u201310 failure cases and manually check:\n- Was the *correct* chunk actually retrieved? (If no \u2192 retrieval problem.)\n- Was it retrieved but not used correctly? (If yes \u2192 prompt/generation problem.)\n- Was it used, but the answer added unsupported claims? (\u2192 generation/verification problem.)\n\nThis single check tells you which of the four levers below to pull \u2014 don't apply all of them speculatively.\n\n## Fixes by failing boundary\n\n**If retrieval is bad (most common root cause):**\n- Improve chunking: smaller, semantically coherent chunks (not fixed-size splits that cut mid-thought); include overlap.\n- Add metadata filters (source, date, section) so retrieval isn't purely semantic.\n- Add a reranker (cross-encoder) after initial vector retrieval \u2014 this alone fixes a large share of grounding issues.\n- Try hybrid search (BM25 + vector) if queries use exact terms/names embeddings handle poorly.\n- Increase k, then let the reranker trim to the best few.\n\n**If retrieval is fine but generation isn't grounded:**\n- Explicit prompt constraint: \"Answer only using the provided context. If the answer isn't in the context, say you don't know.\" This is the single highest-leverage prompt change.\n- Ask for **inline citations** (e.g., chunk IDs or source names) \u2014 forcing citation attribution measurably reduces unsupported claims because the model must tie each statement to a source.\n- Lower temperature for factual QA.\n\n**If the model ignores context or fabricates despite good context and prompt:**\n- Add a **post-hoc verification step**: after generation, run a cheap check (another LLM call or NLI model) that confirms each claim in the answer is entailed by the retrieved chunks. Flag or regenerate unsupported claims. This is the verifier layer \u2014 don't skip it just because generation \"looked\" reasonable.\n\n## What not to do\n\n- Don't add a second agent, an orchestration framework, or a new vector DB before confirming the failure is actually a retrieval problem \u2014 that's the classic case of adding architecture instead of fixing the boundary that's broken.\n- Don't treat \"the model produced an answer\" as proof of grounding. A grounded-sounding answer is not verified grounding.\n\nIf you can share a few concrete failing examples (query, retrieved chunks, answer produced), I can help pinpoint exactly which boundary is breaking rather than recommending a shotgun set of changes.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1241,
+      "cacheReadInputTokens": 2699,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0129538,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2699,
+    "output_tokens": 1241,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1241,
+        "cache_read_input_tokens": 2699,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0129538,
+  "duration_ms": 15667
+}

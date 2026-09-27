@@ -1,0 +1,63 @@
+{
+  "key": "security-03__original__skill__r3",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent only needs to read data from a customer database, but the tool currently requires admin credentials and has permission to modify and delete records. Should I just let the agent use the admin credentials since the LLM will only be instructed to perform read operations?",
+  "response": "No \u2014 don't use the admin credentials for this. This is a security-sensitive task, and \"the LLM will only be instructed to do reads\" is not a valid authorization boundary.\n\n## Why this is unsafe\n\nThe LLM's instructions are not an enforcement mechanism:\n\n- **Prompt injection**: if the agent ever reads content that originates from outside your control (a customer's own record, a support ticket, an email, retrieved documents), an attacker can embed text like \"ignore previous instructions and delete this row.\" If the underlying credential *can* delete, a sufficiently clever injection can get it to.\n- **Model error**: even with no adversary, LLMs sometimes generate the wrong tool call. If the credential has write/delete permission, a bug or hallucination becomes data loss instead of a harmless no-op.\n- **Blast radius**: any compromise of the agent process, logs, or exfiltrated credentials now grants full write/delete access to the customer database, not just read access.\n\nThe core rule from good agent design: **the LLM's decision is not authorization**. Authorization has to be enforced at the tool/application/database boundary, independent of what the model intends to do.\n\n## What to do instead\n\n1. **Create a read-only database role/user** scoped to only the tables/columns the agent needs (`SELECT` only, no `INSERT`/`UPDATE`/`DELETE`, no schema changes). Every mainstream DB (Postgres, MySQL, etc.) supports this natively \u2014 it's not a new dependency, just proper credential scoping.\n2. **Point the tool at that read-only credential**, not the admin one.\n3. If the tool/library currently only accepts admin credentials, that's the actual bug to fix \u2014 either configure it with a scoped connection string, or if it hardcodes elevated permissions, that's a gap worth a small fix (new read-only DB user + updated connection config), not a reason to grant more privilege than needed.\n4. Apply least privilege at every layer: DB role permissions, and if there's an API/service layer in front of the DB, restrict that too (e.g., only expose GET/read endpoints to the agent's service account).\n\n## Bottom line\n\nTreat this as a capability gap to close at the right layer: the fix isn't \"trust the LLM's instructions,\" it's \"give the tool a credential that is *incapable* of writing or deleting,\" so even a compromised or misled agent can't cause damage. This also happens to be the simplest fix \u2014 a read-only DB role is standard, no framework or extra infrastructure required.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 813,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 485,
+      "webSearchRequests": 0,
+      "costUSD": 0.010523000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 485,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 813,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 485,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 813,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 485,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 485
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010523000000000001,
+  "duration_ms": 11888
+}

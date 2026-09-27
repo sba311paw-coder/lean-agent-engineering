@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__original__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States 'What exact capability is missing? None... The capability exists.' Correctly identifies no capability gap.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly recommends wiring the existing function directly into the agent's tool-calling loop, with a diagram showing 'Agent application calls your existing send_email() function directly'.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States 'MCP would be redundant complexity for a gap that doesn't exist' and 'adding MCP is complexity without a corresponding capability gain \u2014 skip it', avoiding recommending MCP just because it's available.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01003
+}

@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__original__baseline__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Message history / conversation assembly' explicitly discusses how the tool result gets fed back into the conversation sent to the LLM, and framing states the issue is in the handoff, not the tool.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'Fastest way to isolate it' section instructs to 'Log (or print) the exact raw request payload sent to the LLM for the final completion call' to check for presence of temperature.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opening statement says 'the issue is almost certainly in how the tool result gets fed back... not in the tool itself,' explicitly steering away from changing the tool first and toward tracing the boundary.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009382
+}

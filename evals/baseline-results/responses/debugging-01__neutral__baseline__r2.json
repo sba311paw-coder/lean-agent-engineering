@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "I don't have visibility into your files, code, or environment, so I can't inspect the actual bug directly. But I can give you a fast, structured way to debug a broken tool-calling integration. Since this broke *after a recent code change*, the fastest path is almost always: **diff-first, then narrow down by layer.**\n\n## 1. Check the diff first (fastest win)\nBefore anything else, look at exactly what changed:\n```bash\ngit diff HEAD~1 HEAD    # or whatever range covers the \"recent\" change\n```\nLook specifically for changes to:\n- Tool/function schema definitions (names, param types, required fields)\n- The system prompt or tool-choice config\n- SDK/library version bumps (`package.json`, `requirements.txt`, lockfiles)\n- Serialization of tool calls/results (JSON encoding, escaping)\n\nMost \"tool calling broke\" bugs trace to one of these.\n\n## 2. Common failure points, roughly in order of likelihood\n\n**a. Schema mismatch**\n- Tool name in code doesn't match name the model is told about\n- JSON schema has invalid type (e.g., missing `\"type\": \"object\"` at top level)\n- Required field renamed/removed but still referenced elsewhere\n\n**b. Tool result formatting**\n- Tool results not being returned in the exact structure the SDK expects (e.g., missing `tool_call_id`, wrong role, not JSON-stringified when it should be)\n\n**c. Model/API version drift**\n- SDK auto-updated and changed the expected message format\n- Model deprecated a tool-calling mode you were relying on\n\n**d. Prompt/config change**\n- Tool choice mode changed (e.g., `auto` \u2192 `none`, or a forced tool that no longer exists)\n- System prompt edited in a way that confuses tool selection\n\n**e. Async/await or callback wiring**\n- If a recent refactor touched the handler that dispatches tool calls, check that the function is actually being invoked and its return value isn't silently swallowed (e.g., unhandled promise, wrong return shape)\n\n## 3. Fast triage steps\n1. **Log the raw request/response** going to the model \u2014 confirm tools are actually being sent in the payload.\n2. **Log what the model returns** \u2014 is it attempting a tool call at all, or failing silently?\n3. **Isolate with a minimal repro** \u2014 strip down to one tool, one simple prompt, run outside your app's full pipeline.\n4. **Bisect the diff** \u2014 if the change is large, use `git bisect` or just comment out chunks of the change to find the exact line.\n\n## If you want targeted help\nPaste in:\n- The diff (or relevant snippet) of the \"recent code change\"\n- The tool schema definition\n- The error message or unexpected behavior you're seeing (exception, silent failure, wrong output, etc.)\n- Which SDK/framework (OpenAI, Anthropic, LangChain, custom, etc.)\n\nWith that I can pinpoint the actual cause instead of listing possibilities.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 518,
+      "outputTokens": 976,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010796,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 518,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 976,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 518,
+        "output_tokens": 976,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010796,
+  "duration_ms": 12043
+}

@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__original__skill__r2",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I ran my production deployment command and it exited with code 0. Can I now tell my team that the application is successfully deployed and working in production?",
+  "response": "No \u2014 an exit code of 0 only tells you that the deployment *command* completed without throwing an error. It is not evidence that the application is actually running correctly in production. This is a case where \"a successful command is not automatically proof that the intended outcome was achieved.\"\n\n**Why exit 0 is weak evidence:**\n- It confirms the CLI/script finished, not that the app started, bound to a port, connected to its database, or is serving traffic.\n- Deployment tools often report success once artifacts are pushed/orchestration is triggered, before the app is actually healthy (rollout can still be in progress, crash-looping, or failing health checks after the command returns).\n- It says nothing about downstream effects: correct config/env vars in *this* environment, migrations applied, dependent services reachable, no regressions in real traffic.\n\n**What would actually justify telling your team \"it's deployed and working\":**\n\nPick the lowest level sufficient for the risk, ideally combining a couple:\n\n1. **Process/orchestration status** \u2013 e.g., `kubectl rollout status`, ECS service stable, systemd `active (running)`, no crash-loop restarts.\n2. **Health check** \u2013 hit the app's `/health` or equivalent endpoint and confirm 200 OK.\n3. **Smoke test** \u2013 exercise a real critical path (login, key API call, checkout, etc.) and confirm expected behavior.\n4. **Logs** \u2013 check for startup errors, unhandled exceptions, or repeated retries right after deploy.\n5. **Metrics/monitoring** \u2013 error rate, latency, and traffic dashboards look normal post-deploy (this is the strongest signal since it reflects real usage).\n6. **Version verification** \u2013 confirm the running build/version matches what you intended to deploy (avoids \"it deployed but not the version I think\").\n\n**Practical minimum before announcing success:** rollout/service status is healthy *and* a health check or smoke test passes. For anything customer-facing or revenue-impacting, also glance at error-rate/latency dashboards for a few minutes post-deploy before calling it done.\n\nSo: hold off on the announcement until you've done at least a health check plus a quick smoke test \u2014 then you can tell your team with actual confidence, not just an exit code.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 721,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007753599999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 721,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 721,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007753599999999999,
+  "duration_ms": 9720
+}

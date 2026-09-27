@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__original__skill__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Step 2 explicitly says 'Reproduce with the actual failure' and lists getting raw LLM output, exact error, and confirming what's happening before touching code.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1 'Check the recent change first' with `git diff HEAD~1` and a detailed list of likely culprits (schema, prompt, SDK version, dispatch code).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 3 explicitly traces the flow: 'LLM emits tool call \u2192 agent parses/validates it \u2192 tool/API executes \u2192 result returned \u2192 LLM gets result' and asks where it diverges.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Step 4 'Form one hypothesis, test it minimally' and instructs to make the smallest fix then verify by re-running the exact failing case.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009648
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__original__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Lists specific capability gaps to check (cost tracking, replay of full context, trend visualization, alerting) and ties recommendation to whether user actually has one of these gaps.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly credits existing logging/tests ('What you already have covers a lot') and suggests lightweight additions (SQLite/Postgres, simple metrics counter) that build on existing setup rather than replacing it.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States a full framework brings 'dependency weight, config surface, and vendor lock-in' and frames decision as avoiding unnecessary overhead unless pain point is real.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008150000000000001
+}

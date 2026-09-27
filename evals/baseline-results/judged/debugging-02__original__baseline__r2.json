@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__original__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Probably not yet.\" explicitly advises against immediate replacement.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Covers retrieval (log top-k chunks), context construction (chunking, indexing, prompt content), and generation (\"Check: is the retrieved context actually being passed to the model?\").",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "\"Suggested quick test\" section instructs to manually inspect 5-10 failing examples for chunks retrieved and prompt content before concluding it's the embedding model.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0088
+}

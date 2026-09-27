@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__baseline__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "Since I can't see your current code, here's a general migration path for turning a manual \"call model \u2192 call two functions \u2192 return results\" script into a LangChain-based agent.\n\n## 1. Map your current pieces to LangChain concepts\n\n| Your current code | LangChain equivalent |\n|---|---|\n| Direct API call (e.g., `openai.chat.completions.create` or `anthropic.messages.create`) | `ChatOpenAI` / `ChatAnthropic` chat model wrapper |\n| Your two Python functions | LangChain `@tool`-decorated functions |\n| Manual parsing of function-call output from the API response | `model.bind_tools([...])` + LangChain's built-in tool-call parsing |\n| Your loop that calls a function then feeds result back to the model | An **agent executor** (or, better today, a **LangGraph** ReAct agent) |\n\n## 2. Define your tools\n\n```python\nfrom langchain_core.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get current weather for a city.\"\"\"\n    ...  # your existing function body\n\n@tool\ndef search_docs(query: str) -> str:\n    \"\"\"Search internal docs for a query.\"\"\"\n    ...  # your existing function body\n\ntools = [get_weather, search_docs]\n```\n\nJust wrap your existing function bodies \u2014 no logic changes needed. The docstring becomes the tool description the model sees, so make it accurate.\n\n## 3. Swap your direct API call for a chat model wrapper\n\n```python\nfrom langchain_anthropic import ChatAnthropic  # or langchain_openai import ChatOpenAI\n\nllm = ChatAnthropic(model=\"claude-sonnet-5\")\n```\n\nThis replaces your raw SDK client call. Model-specific params (temperature, max_tokens) pass through as kwargs.\n\n## 4. Build the agent loop\n\nLangChain's older `AgentExecutor` still works, but the current recommended approach (and where LangChain itself is pushing people) is **LangGraph's prebuilt ReAct agent**, which handles the \"call model \u2192 run tool \u2192 feed result back \u2192 repeat\" loop for you:\n\n```python\nfrom langgraph.prebuilt import create_react_agent\n\nagent = create_react_agent(llm, tools)\n\nresult = agent.invoke({\"messages\": [(\"user\", \"What's the weather in Paris?\")]})\nprint(result[\"messages\"][-1].content)\n```\n\nThis one call replaces your manual loop of: send prompt \u2192 get function call \u2192 execute function \u2192 send result back \u2192 get final answer.\n\nIf you want to stay in classic LangChain (no LangGraph dependency):\n\n```python\nfrom langchain.agents import create_tool_calling_agent, AgentExecutor\nfrom langchain_core.prompts import ChatPromptTemplate\n\nprompt = ChatPromptTemplate.from_messages([\n    (\"system\", \"You are a helpful assistant.\"),\n    (\"human\", \"{input}\"),\n    (\"placeholder\", \"{agent_scratchpad}\"),\n])\n\nagent = create_tool_calling_agent(llm, tools, prompt)\nexecutor = AgentExecutor(agent=agent, tools=tools)\nresult = executor.invoke({\"input\": \"What's the weather in Paris?\"})\n```\n\n## 5. Things to watch out for\n\n- **Package split**: install `langchain-core`, `langchain`, and the provider package (e.g. `langchain-anthropic`), plus `langgraph` if you go that route.\n- **Tool call format differences**: LangChain normalizes tool-calling across providers, so if you had provider-specific parsing logic for function-call JSON, you can delete it.\n- **Streaming/error handling**: if your current code has custom retry/error logic around the API call, decide whether to keep it wrapped around the LangChain model call or rely on LangChain's built-in retries (`llm.with_retry()`).\n- **Overhead**: for just two tools and a simple loop, LangChain/LangGraph adds real dependency weight and some abstraction overhead. If your use case stays this simple, it's worth asking whether you actually need the framework, or if you're anticipating growth (multi-step planning, memory, more tools, tracing via LangSmith) that justifies it.\n\n## 6. Suggested order of steps\n1. Get tool wrapping working standalone (call `tool.invoke(...)` manually, verify same output as your raw functions).\n2. Swap the model call to `ChatAnthropic`/`ChatOpenAI` and confirm `.bind_tools(tools)` produces correct tool-call requests.\n3. Replace your manual loop with `create_react_agent` (or `AgentExecutor`).\n4. Diff outputs against your old implementation on a few test prompts before cutting over.\n\nIf you paste your actual code (or describe what the two functions do and how the loop currently works), I can give you a much more concrete before/after conversion.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 550,
+      "outputTokens": 1946,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.020560000000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 370,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 550,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1946,
+    "output_tokens_details": {
+      "thinking_tokens": 370
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 550,
+        "output_tokens": 1946,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.020560000000000002,
+  "duration_ms": 20114
+}

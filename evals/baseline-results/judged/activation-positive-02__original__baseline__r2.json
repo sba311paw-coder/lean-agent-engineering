@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__original__baseline__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Step 2 lists ranked likely failure boundaries (prompt ambiguity, tool description quality, context position, phrasing, sampling variance, silent tool failures) and Step 1 maps the decision pipeline to localize where the break occurs.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 3 explicitly says 'Before any fix, gather a small dataset...' and lists specific evidence (transcripts, prompts, reasoning traces, temperature, logs) to collect prior to any architectural change.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The response never suggests adding a new framework or tool; it focuses entirely on diagnosis, ending with 'share a few examples... I can help spot the pattern' rather than recommending new tooling.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011004
+}

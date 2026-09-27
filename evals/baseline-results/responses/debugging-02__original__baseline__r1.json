@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__original__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My RAG agent is returning incorrect answers. I suspect the embedding model is the problem. Should I replace the embedding model first?",
+  "response": "# Not necessarily \u2014 diagnose first\n\nSwapping the embedding model is a big, expensive change (re-embed everything, re-index, possibly re-tune retrieval params). Before doing that, isolate where the failure actually happens. RAG pipelines fail at several distinct stages, and embeddings are just one of them:\n\n## 1. Retrieval vs. Generation failure\nFirst, log the retrieved chunks for a few failing queries and check:\n- **Are the right documents/chunks even being retrieved?** If yes \u2192 it's a generation/prompt problem, not embeddings.\n- **Are irrelevant chunks retrieved?** \u2192 could be embeddings, but also could be chunking or indexing.\n\n## 2. Common non-embedding culprits (cheaper to rule out first)\n\n| Issue | Symptom | Fix |\n|---|---|---|\n| Bad chunking (too large/small, split mid-sentence) | Relevant info retrieved but incomplete/garbled | Adjust chunk size/overlap |\n| Wrong top-k | Too few/many chunks, missing context or too much noise | Tune k |\n| Metadata/filter bugs | Wrong docs retrieved due to filter logic | Check filters |\n| Stale index | Retrieving old versions of docs | Re-index |\n| Query mismatch (short query vs. long chunks) | Poor semantic match | Try query rewriting/HyDE |\n| Prompt/context assembly bug | Right chunks retrieved but LLM ignores them or hallucinates | Check prompt template |\n| LLM hallucination despite good context | Retrieved context is correct but answer is still wrong | Not an embedding issue at all |\n\n## 3. Test the embedding model directly\nBefore replacing it, do a quick eval:\n- Take 10-20 known query\u2192correct-chunk pairs.\n- Compute cosine similarity between query and correct chunk vs. query and irrelevant chunks.\n- If correct chunks consistently rank low, embeddings are likely the problem.\n- Try the same queries with a different/better embedding model (e.g., `text-embedding-3-large` vs. whatever you're using) on a small sample \u2014 no need to migrate everything yet.\n\n## 4. Cheaper fixes to try before a full swap\n- Improve chunking strategy\n- Add reranking (e.g., cross-encoder rerank on top-k results) \u2014 often fixes \"embeddings retrieve okay-ish but not best\" issues\n- Hybrid search (BM25 + embeddings)\n- Better query preprocessing\n\n## Recommendation\nRun a small retrieval-quality eval (step 3) before committing to a re-embed. If embeddings test poorly on your eval set *and* chunking/retrieval config look fine, then yes, replace the model \u2014 but validate on a subset first, since a full re-index is costly to redo if it turns out the model wasn't the real issue.\n\nWant help writing a quick retrieval eval script or a chunking review checklist?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 529,
+      "outputTokens": 971,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010768,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 529,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 971,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 529,
+        "output_tokens": 971,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010768,
+  "duration_ms": 12474
+}

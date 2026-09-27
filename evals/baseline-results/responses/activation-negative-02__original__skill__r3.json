@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-02__original__skill__r3",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called \"function calling\") is a mechanism that lets an LLM go beyond generating text by requesting that external code be executed on its behalf, then using the result to continue its response.\n\n## How it works\n\n1. **Definition** \u2014 The application gives the LLM a list of available tools, each with a name, description, and expected input schema (e.g., `get_weather(location: string)`).\n2. **Decision** \u2014 During generation, the model decides (based on the user's request) that it needs a tool, and outputs a structured request instead of plain text \u2014 e.g., `{\"tool\": \"get_weather\", \"args\": {\"location\": \"Tokyo\"}}`.\n3. **Execution** \u2014 The LLM itself does *not* run the tool. The surrounding application (agent code) parses that structured output, validates it, and actually calls the real function, API, or database.\n4. **Result injection** \u2014 The tool's output is passed back into the conversation context.\n5. **Continuation** \u2014 The model reads the result and produces a final natural-language response (or calls another tool).\n\n## Why it matters\n\n- Lets models access **real-time or private data** (weather, databases, your files) they weren't trained on.\n- Lets models **take actions** (send an email, run code, query an API) rather than just describe them.\n- Forms the foundation of **agentic systems**, where an LLM can chain multiple tool calls together to complete multi-step tasks.\n\n## Important nuance\n\nThe model's decision to call a tool is just a *suggestion* \u2014 it is **not authorization**. The application is responsible for:\n- Validating the arguments before executing anything.\n- Enforcing permissions (e.g., the model shouldn't be able to trigger a delete or payment just because it \"decided\" to).\n- Treating any data returned by tools as **untrusted content**, not as instructions \u2014 since results can come from external sources like web pages or APIs that might contain misleading or injected text.\n\n**Simple example flow:**\n```\nUser: \"What's the weather in Tokyo?\"\n  \u2192 LLM: requests tool call get_weather(\"Tokyo\")\n  \u2192 App: validates & executes the real API call\n  \u2192 API: returns {\"temp\": 22, \"condition\": \"sunny\"}\n  \u2192 LLM: \"It's 22\u00b0C and sunny in Tokyo.\"\n```\n\nThis pattern is what powers most modern AI agents \u2014 coding assistants, customer support bots, research agents \u2014 since it's how they interact with the world beyond just generating text.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 778,
+      "cacheReadInputTokens": 2670,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008318,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2670,
+    "output_tokens": 778,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 778,
+        "cache_read_input_tokens": 2670,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008318,
+  "duration_ms": 10810
+}

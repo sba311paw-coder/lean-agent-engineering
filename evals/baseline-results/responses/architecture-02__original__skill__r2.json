@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__original__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My weather tool executes successfully and returns the correct temperature. I can see the result in the Agent App logs, but the final LLM response ignores the temperature and gives a generic answer. Where should I investigate first?",
+  "response": "## Where to look first: the boundary between \"tool result\" and \"second LLM call\"\n\nYour architecture is:\n\n```\nLLM -> tool call -> TOOL executes -> AGENT APPLICATION gets result -> ??? -> LLM (final response) -> USER\n```\n\nYou've confirmed the tool and the result are correct (visible in logs). So the bug is **not** in the tool. It's in the step marked `???` \u2014 how the agent application packages that result and feeds it back into the LLM for the final response. Investigate in this order:\n\n### 1. Is the tool result actually being sent back to the LLM at all?\nThe most common cause of this exact symptom: the app logs the result (for observability) but never appends it to the conversation/message history sent in the follow-up LLM call. Check the actual outgoing request payload for the second LLM call \u2014 not just your logs \u2014 and confirm the tool result message is present in it.\n\n### 2. Is it attached to the correct tool_call_id / role?\nIf you're using an API that requires matching a `tool_result` (or `function` response) to a specific `tool_call_id`, a mismatched or missing ID will cause many providers to silently drop or ignore the result, or the model will disregard it because it can't associate it with its own request.\n\n### 3. Is the result malformed or buried?\nCheck the exact content/shape of what's sent \u2014 e.g. an object dumped as `[object Object]`, an empty string, a wrapped structure the model has to unpack, or the temperature nested somewhere non-obvious. A technically \"present\" but poorly formatted result often gets ignored or misread by the model.\n\n### 4. Is a second LLM call even happening, or is this a single-pass response?\nSome agent loops mistakenly generate a \"final answer\" using only the *first* LLM turn's text (before the tool ran) rather than re-invoking the LLM after the tool result is available. Confirm there really are two LLM calls, and that the final response is generated from the second one.\n\n### 5. System prompt / prior turns overriding it\nLess likely given the symptom, but check if the system prompt or earlier conversation turns instruct the model to answer from general knowledge, or if there's conflicting content (e.g., a stale assistant turn with a generic weather answer) that's confusing which source to trust.\n\n---\n\n## Suggested fastest diagnostic step\n\nLog (or breakpoint) the **exact payload of the second LLM API call** \u2014 not your app's internal log of the tool result, but the literal request body sent to the model. That single artifact will tell you immediately whether this is a wiring bug (result never reached the LLM) versus a prompting/formatting bug (result reached the LLM but was ignored or misread).\n\nThat's the first incorrect boundary to rule in or out before touching prompts, models, or tool code.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 889,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 478,
+      "webSearchRequests": 0,
+      "costUSD": 0.011255000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 478,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 889,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 478,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 889,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 478,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 478
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011255000000000001,
+  "duration_ms": 12181
+}

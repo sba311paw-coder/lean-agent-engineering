@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__original__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides a full ASCII diagram tracing USER -> AGENT APPLICATION -> LLM -> AGENT APPLICATION -> TOOL/API -> AGENT APPLICATION -> LLM -> AGENT APPLICATION -> FINAL RESPONSE -> USER.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Diagram and text explicitly label steps as 'LLM' (decides to call tool, must receive tool result) versus 'AGENT APPLICATION' (invokes tool, receives result, parses/passes final response), and Candidate 1/3 separate app-side loop bugs from LLM behavior.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Enumerates three explicit candidate boundaries: 'Agent app never sends the tool result back to the LLM', 'Tool result is malformed or mismatched', 'LLM receives the result but the app discards/misparses the final response'.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'Don't guess \u2014 check them in this order' and provides concrete logging steps ('Add two log statements only... This single test will tell you definitively which of the three candidates it is') before any fix, ending with 'Once you run that log check, share the payload/response and I can pinpoint the exact fix.'",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013374
+}

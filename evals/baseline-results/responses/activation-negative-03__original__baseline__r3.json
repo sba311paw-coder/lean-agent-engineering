@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-03__original__baseline__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "# Retrieval Augmented Generation (RAG)\n\n**RAG** is an AI architecture that combines a large language model (LLM) with an external knowledge retrieval system, allowing the model to pull in relevant information from outside sources before generating a response.\n\n## How It Works\n\n1. **Query input** \u2013 A user asks a question or gives a prompt.\n2. **Retrieval** \u2013 The system searches an external knowledge base (documents, databases, vector stores, etc.) for content relevant to the query, typically using semantic/vector similarity search.\n3. **Augmentation** \u2013 The retrieved information is added to the prompt as context.\n4. **Generation** \u2013 The LLM generates a response using both its trained knowledge *and* the retrieved context.\n\n## Why It Matters\n\n- **Reduces hallucination** \u2013 Grounds responses in real, verifiable data rather than relying solely on the model's parametric memory.\n- **Up-to-date information** \u2013 LLMs have fixed training cutoffs; RAG lets them access current or frequently changing data without retraining.\n- **Domain-specific knowledge** \u2013 Enables use of private, proprietary, or specialized data (e.g., internal company docs) that wasn't part of the model's training set.\n- **Cost-effective** \u2013 Cheaper than fine-tuning a model on new data; you just update the knowledge base.\n- **Traceability** \u2013 Responses can cite sources, making outputs more verifiable and trustworthy.\n\n## Typical Components\n\n- **Embedding model** \u2013 Converts text into vector representations for similarity search.\n- **Vector database** (e.g., Pinecone, Weaviate, Chroma, FAISS) \u2013 Stores and indexes embeddings for fast retrieval.\n- **Retriever** \u2013 Fetches the most relevant chunks of text based on the query.\n- **LLM** \u2013 Generates the final answer using the retrieved context.\n\n## Common Use Cases\n\n- Customer support chatbots referencing internal documentation\n- Enterprise search and Q&A over private data\n- Coding assistants referencing a codebase\n- Research tools that cite academic papers\n- Legal/medical assistants grounded in specific regulations or literature\n\n**In short:** RAG = \"search first, then generate\" \u2014 it pairs a retrieval step with generation to make LLM outputs more accurate, current, and grounded in specific data.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 504,
+      "outputTokens": 751,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008518,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 504,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 751,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 504,
+        "output_tokens": 751,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008518,
+  "duration_ms": 9237
+}

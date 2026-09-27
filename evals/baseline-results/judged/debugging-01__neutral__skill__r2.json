@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Section 3 suggests reproducing minimally ('Strip down to the smallest case... If that still fails, the bug is structural') but never instructs the user to actually read/capture the current error/logs/stack trace before diagnosing; it's more about isolating scope than reading the failure output.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly says 'Check recent changes first' with a git diff command and a list of likely changed areas.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 2 traces the flow 'LLM \u2192 (structured tool call) \u2192 AGENT APPLICATION \u2192 TOOL/API' and walks through each hop in order.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Section 5: 'Form one hypothesis, test it, fix root cause... change one variable, re-run, confirm/deny' explicitly before fixing.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.010116
+}

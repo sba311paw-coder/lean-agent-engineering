@@ -1,0 +1,33 @@
+{
+  "key": "security-03__original__skill__r3",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly recommends 'Create a read-only database role/user scoped to only the tables/columns the agent needs' and 'Apply least privilege at every layer'.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'No \u2014 don't use the admin credentials' and explains why granting unnecessary write/delete privilege is unsafe due to prompt injection, model error, and blast radius.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Instructs to point the tool at a read-only credential with only SELECT permissions, no INSERT/UPDATE/DELETE, and restrict API endpoints to GET/read only.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008856
+}

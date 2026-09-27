@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__original__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My Python agent already has logging and tests that show me tool-call failures and latency. I am considering adding a large observability framework because I saw it recommended for AI agents. Should I add it?",
+  "response": "Short answer: probably not, at least not yet. Run the capability-gap test before adding it.\n\n**What capability are you actually missing?**\n\nYou say you already have:\n- Logging \u2192 capturing events/errors\n- Tests \u2192 showing tool-call failures\n- Latency visibility\n\nThat covers the core observability needs for an agent: *is it working, what failed, how slow is it*. A \"large observability framework\" typically adds things like distributed tracing across services, span correlation, dashboards, metrics aggregation, alerting pipelines, and often a hosted backend or agent-specific SDK.\n\nAsk yourself concretely:\n\n1. **What exact gap exists today?** E.g., \"I can't tell which step in a multi-tool chain caused a failure\" or \"I can't correlate a slow request across retries\" \u2014 those are real gaps a tracing tool solves. \"I saw it recommended\" is not a gap.\n2. **Can your existing logging/tests already answer it?** If your logs include request IDs, timestamps, and tool names, you likely already have enough to trace a single-agent failure by grep/query. A single-agent, single-process system rarely needs distributed tracing.\n3. **What does adding it cost?** New dependency, possibly a network egress to a third-party backend (cost, latency, another credential to manage), a new API to learn, more surface area to maintain and secure.\n4. **What evidence justifies it?** Not \"recommended for AI agents\" in general \u2014 that's marketing for multi-agent, multi-service, high-scale systems. Justify it with a concrete failure mode your current setup can't diagnose.\n\n**When it would be justified:**\n- Multiple agents/services calling each other and you need cross-process trace correlation.\n- You need aggregated dashboards across many users/sessions, not just local debug output.\n- You need alerting on latency/error-rate thresholds in production.\n- Team members other than you need shared visibility without reading raw logs.\n\n**When it's not justified (sounds like your case):**\n- Single agent, local logs + tests already surface failures and latency.\n- No one else needs a dashboard yet.\n- The only reason is \"I saw it recommended.\"\n\n**Recommendation:** Don't add it now. If you hit a specific diagnostic wall your logs/tests can't answer, extend what you have first (e.g., add request IDs, structured JSON logging, a simple latency histogram) before reaching for a framework. If a real gap remains after that, pick the smallest tool that closes it \u2014 not a full framework \u2014 and only add the framework when you have multi-service/production-scale needs that justify the added dependency and maintenance cost.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 837,
+      "cacheReadInputTokens": 2714,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008916799999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2714,
+    "output_tokens": 837,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 837,
+        "cache_read_input_tokens": 2714,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008916799999999999,
+  "duration_ms": 11532
+}

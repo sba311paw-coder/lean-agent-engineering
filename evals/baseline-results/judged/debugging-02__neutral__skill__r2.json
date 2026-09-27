@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States switching embedding models is 'often not the right fix' and defers recommendation until evidence confirms it, only offering to give a recommendation 'if you do confirm it's genuinely an embedding quality issue.'",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates and traces retrieval (log top-k chunks), context construction/chunking (chunk size/overlap issues), and generation (LLM ignored/hallucinated, prompt/context assembly) as distinct failure stages to check.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides a concrete diagnostic: 'Pick 3-5 known failure cases... manually check (a) was the correct chunk in the vector store, (b) was it retrieved in top-k, (c) did the LLM use it correctly' before any model change.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009994
+}

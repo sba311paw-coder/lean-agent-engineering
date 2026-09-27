@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response maps the flow 'AGENT APP -> LLM' and explicitly says 'the bug is somewhere between the tool result and the LLM's final synthesis' and discusses whether the agent app is feeding the result back correctly.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "It recommends 'log the exact message array/payload sent to the LLM on the final call' and check role, tool_call_id, and positioning before the assistant turn.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The response states the tool boundary is 'confirmed working' and structures the whole answer around isolating the break before proposing fixes, only suggesting tool-side changes after payload inspection determines where the fault lies.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010544
+}

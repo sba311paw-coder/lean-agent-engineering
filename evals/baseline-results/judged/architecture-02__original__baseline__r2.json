@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__original__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Sections 1-4 focus on the tool result \u2192 message history \u2192 LLM handoff, e.g. 'Verify the tool result message is actually appended to the conversation history' and 'Confirm the tool_call_id matches'.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Point 4 explicitly says: 'Log the exact payload sent in the final LLM request... print/log the full messages array right before the final completion call' and the closing 'Fastest debugging step' reiterates dumping the complete messages array sent to the final LLM call.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The response never suggests modifying the weather tool itself; all steps focus on formatting, message history, tool_call_id, and logging, and the tool is stated upfront as already working correctly ('the tool executes correctly and logs show the right temperature').",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009446
+}

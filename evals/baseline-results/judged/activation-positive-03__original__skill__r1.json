@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__original__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Pipeline diagram explicitly separates RETRIEVAL, CONTEXT CONSTRUCTION, and GENERATION, and provides distinct evidence-collection steps and diagnostic questions for each boundary.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response repeatedly emphasizes evidence-first approach: 'Don't guess \u2014 collect evidence,' and concludes 'you can make one targeted fix rather than changing the retrieval system on a hunch,' explicitly deferring architecture changes until evidence is gathered.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 3 describes an explicit isolation experiment: 'manually inject the ideal gold passage directly as context (bypassing retrieval entirely) and re-run generation... If the answer becomes well-grounded, the fault is upstream... If it's still poorly grounded... the fault is generation/prompting.'",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011698
+}

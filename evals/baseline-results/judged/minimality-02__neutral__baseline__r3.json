@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__baseline__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The 'Quick gut-check' and Step 1 explicitly assess complexity: 'If your agent really is just call model \u2192 maybe call one of two functions \u2192 return result' and asks about how functions/model calls are implemented to determine 'whether you're doing real function calling... or just orchestrating calls yourself.'",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It notes overhead ('LangChain adds real overhead... more dependencies, more abstraction to debug') and offers a simpler manual dispatch alternative in Step 6 ('a plain .bind_tools() call + manual dispatch (skip the executor entirely) may be a truer 1:1 migration'), but overall response still proceeds to give a full LangChain/LangGraph migration guide rather than strongly recommending staying simple when sufficient.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States framework pays off 'when you'll soon need things like multiple tools, memory, streaming, retries, multi-step planning, or LangSmith tracing' as justification for adopting it.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.013833999999999999
+}

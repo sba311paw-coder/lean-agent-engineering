@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States 'wrong answers in RAG are often *not* an embedding problem' and asks for diagnostic info before giving a specific recommendation, rather than immediately naming a replacement model.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Lists retrieval, chunking, generation, ranking failure types and suggests inspecting retrieved chunks vs LLM usage, but does not explicitly trace 'context construction' as a distinct step (chunking is mentioned but not how context is assembled/prompted).",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Suggests a 'quick test' of manually inspecting chunks, but still provides a full table of embedding model recommendations upfront rather than insisting evidence be gathered first before any suggestions.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.010036
+}

@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__original__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My RAG agent is returning incorrect answers. I suspect the embedding model is the problem. Should I replace the embedding model first?",
+  "response": "Not yet. Swapping the embedding model is a high-effort, hard-to-reverse change (re-embed entire corpus, re-index, possibly re-tune retrieval params) \u2014 it should be the last thing you try, not the first. Root-cause it first.\n\n## Where RAG failures actually come from\n\nA RAG pipeline has several boundaries, and the embedding model is only one of them:\n\n```\nQuery -> [query processing] -> [retriever/embedding+index] -> [reranker?] -> [context assembly] -> [LLM] -> Answer\n```\n\nWrong answers can come from:\n\n1. **Ingestion/chunking** \u2014 bad chunk boundaries, missing metadata, stale/duplicate docs, truncated documents\n2. **Indexing** \u2014 wrong index, mismatched embedding dimensions, stale index not rebuilt after doc updates\n3. **Retrieval** \u2014 top-k too small, similarity threshold wrong, filters excluding correct docs\n4. **Embedding model** \u2014 genuinely poor semantic match for your domain/language\n5. **Context assembly** \u2014 retrieved chunks correct but truncated/reordered/exceeding context window\n6. **Prompt/LLM** \u2014 correct context retrieved, but the LLM ignores it, hallucinates, or misreads it\n7. **Evaluation itself** \u2014 maybe the \"incorrect answers\" are actually correct and your expectations are wrong\n\n## Diagnostic steps before touching the embedding model\n\n1. **Reproduce** a few failing queries consistently.\n2. **Log and inspect what was actually retrieved** for those queries \u2014 the raw chunks, not just the final answer. This is the single highest-value check.\n3. Ask: **is the correct document even in the retrieved set?**\n   - If **no** \u2192 problem is in ingestion/chunking/indexing/retrieval (not necessarily the embedding model \u2014 check chunk size, top-k, filters first).\n   - If **yes, but ranked low** \u2192 could be embedding quality, or could be missing a reranker.\n   - If **yes, ranked well** \u2192 problem is downstream: context assembly or the LLM ignoring/misusing context (prompt issue).\n4. Check for **stale index** (docs updated but not re-embedded) \u2014 very common and easy to mistake for \"bad embeddings.\"\n5. Try a couple of failing queries with **keyword/BM25 search** as a sanity check \u2014 if keyword search finds the right doc easily, it's often chunking/retrieval config, not the embedding model.\n\n## When replacing the embedding model is actually justified\n\nOnly after you've confirmed: chunking is reasonable, index is fresh, top-k/threshold are sane, and the correct content **still doesn't show up in the top results** even with a keyword-search sanity check succeeding \u2014 that's real evidence of semantic-similarity failure, and swapping models is warranted.\n\n**Bottom line:** trace the pipeline and look at raw retrieved chunks for a handful of failing queries first. That's a cheap, reversible diagnostic step that will tell you whether the embedding model is actually the failing boundary \u2014 replacing it is expensive and should only happen once the evidence points there.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1022,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 454,
+      "webSearchRequests": 0,
+      "costUSD": 0.012489,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 454,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1022,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 454,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1022,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 454,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 454
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012489,
+  "duration_ms": 12621
+}

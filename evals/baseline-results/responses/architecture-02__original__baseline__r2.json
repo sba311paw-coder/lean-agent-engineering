@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__original__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My weather tool executes successfully and returns the correct temperature. I can see the result in the Agent App logs, but the final LLM response ignores the temperature and gives a generic answer. Where should I investigate first?",
+  "response": "# Where to Investigate: Tool Result \u2192 LLM Context Pipeline\n\nSince the tool executes correctly and logs show the right temperature, the break is happening **between the tool result and what the LLM actually sees**. Here's the priority order:\n\n## 1. Check the tool result formatting/serialization\n- Is the tool output being converted to a string properly before being added to the message history?\n- Common bug: the result object (e.g., `{temp: 72, unit: \"F\"}`) gets serialized as `[object Object]` or an empty string instead of proper JSON/text.\n- **Log the exact string** that gets inserted into the conversation, not just the raw tool return value.\n\n## 2. Verify the tool result message is actually appended to the conversation history\n- Check that after the tool call, you're constructing a message with `role: \"tool\"` (or equivalent) containing the result, and it's linked to the correct `tool_call_id`.\n- A very common bug: the tool result is generated but the conversation array sent back to the LLM in the *next* call doesn't include it (e.g., you rebuilt the messages array and dropped it, or appended it to the wrong array/session).\n\n## 3. Confirm the tool_call_id matches\n- If the `tool_call_id` in your tool response doesn't match the `id` from the original tool call the model made, some providers will silently ignore or error on the mismatched result, and the model may respond as if no tool result was given.\n\n## 4. Log the *exact payload* sent in the final LLM request\n- Don't trust \"it's in the logs\" from an earlier step \u2014 print/log the full messages array right before the final completion call. Confirm the tool result is physically present in that specific request.\n\n## 5. Check for truncation or context window issues\n- If you have a long system prompt or conversation history, confirm the tool result isn't getting truncated or dropped by a context-trimming step.\n\n## 6. Check system prompt instructions\n- Less likely but possible: if your system prompt says something like \"always answer generically\" or lacks instruction to use tool results, some models may deprioritize the tool output. Usually not the cause if the wiring is broken, but worth a quick check after the above.\n\n---\n\n**Fastest debugging step:** Add a log statement right before the final LLM call that dumps the complete messages array (as JSON) being sent. That will immediately tell you whether the tool result is present, correctly formatted, and correctly linked \u2014 which narrows down 90% of these cases in one step.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 553,
+      "outputTokens": 786,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008966,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 553,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 786,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 553,
+        "output_tokens": 786,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008966,
+  "duration_ms": 10763
+}

@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__original__baseline__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I am building an agent that reads documents and retrieves information from a vector database. The answers are sometimes poorly grounded. Before changing the retrieval system, help me determine whether the problem is retrieval, context construction, or final answer generation. What evidence should I collect first?",
+  "response": "# Diagnosing Poorly Grounded Answers: Retrieval vs. Context vs. Generation\n\nBefore touching your retrieval system, you want to isolate *where* grounding breaks down across the pipeline: **Query \u2192 Retrieval \u2192 Context Assembly \u2192 Generation \u2192 Answer**. Here's how to collect evidence systematically.\n\n## 1. Build a Diagnostic Sample First\n\nPull 20-30 cases where answers were poorly grounded (not random \u2014 cases you've flagged as bad). For each, you'll need to inspect the full trace: the query, retrieved chunks (with scores), the assembled context actually sent to the LLM, and the final answer. If you're not currently logging the *exact* prompt sent to the generator, add that logging first \u2014 this is the single highest-leverage thing you can do.\n\n## 2. Check Retrieval Quality (in isolation)\n\nFor each query, manually judge: **does relevant, sufficient information exist in the top-k retrieved chunks?**\n\n- **Recall check**: Do you know (or can you determine) the ground-truth source passage for each query? If so, is it in the top-k at all?\n- **Score inspection**: Are similarity scores for \"correct\" chunks meaningfully higher than irrelevant ones, or is everything clustered together (suggesting embedding/index issues)?\n- **k sensitivity**: Try increasing k substantially (e.g., top-20 instead of top-5) and see if the needed info shows up further down. If yes \u2192 retrieval ranking/recall problem. If no \u2192 the info may not be well-chunked or embedded at all.\n- **Query-side check**: Does the *query embedding* actually semantically match the relevant chunk? Sometimes the issue is query formulation (e.g., agent rephrases user question poorly before retrieval).\n\n**Verdict**: If correct info isn't retrievable even at high k \u2192 retrieval/indexing problem.\n\n## 3. Check Context Construction (often the hidden culprit)\n\nEven if retrieval finds the right chunks, things break here more often than people expect:\n\n- **Look at the literal assembled prompt.** Is the relevant chunk actually present, or was it truncated/dropped due to context length limits?\n- **Chunk boundaries**: Is the needed fact split across two chunks, with only one retrieved (context stitched incompletely)?\n- **Ordering effects**: Is the relevant chunk buried in the middle of a long context (\"lost in the middle\" effect)? Try moving it to the top/bottom and see if grounding improves.\n- **Formatting/noise**: Is there so much irrelevant retrieved content diluting the signal that the model can't tell what's authoritative?\n- **Deduplication/conflicts**: Are there contradictory or near-duplicate chunks confusing the model?\n\n**Verdict**: If the correct chunk *is* retrieved but gets lost, truncated, or buried in the final prompt \u2192 context construction problem.\n\n## 4. Check Generation (last, since it's usually not the primary cause)\n\nOnly if steps 2-3 look clean should you suspect the generator itself:\n\n- **Prompt them directly**: Take the exact assembled context + query and manually ask the LLM (via playground) \u2014 does it ground properly now? If yes but your agent doesn't, something differs in your actual system prompt/pipeline (e.g., missing instruction to cite sources, temperature too high, over-aggressive summarization before generation).\n- **Instruction check**: Does your generation prompt explicitly instruct the model to *only* use provided context and say \"I don't know\" otherwise? Weak grounding instructions are a very common, easy-to-fix cause.\n- **Hallucination vs. contradiction**: Is the model inventing facts not in context, or contradicting facts that *are* in context? These suggest different fixes (instruction-following vs. prompt clarity).\n\n## 5. Quantify, Don't Just Eyeball\n\nFor your 20-30 sample cases, tag each with a simple rubric:\n\n| Case | Correct info retrieved (Y/N/Partial) | Present in final context (Y/N) | Model used it correctly (Y/N) |\n|------|---------------------------------------|----------------------------------|-------------------------------|\n\nTally where the failures cluster. If most failures are \"N\" in column 2 \u2192 retrieval. If most are \"Y, Y, N\" \u2192 generation. If \"N, -, -\" \u2192 retrieval. This table alone will likely make the dominant failure mode obvious.\n\n## Bottom Line\n\nStart with **trace logging** (exact retrieved chunks + exact final prompt + answer), then work backward from the answer: confirm generation is faithful to context (or not), confirm context faithfully includes what was retrieved (or not), confirm retrieval actually found the right material (or not). Most \"grounding\" bugs turn out to be context assembly issues (truncation, ordering, dilution) rather than the vector search itself \u2014 so don't skip step 3 even if it's tempting to jump straight to re-tuning your retriever.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 572,
+      "outputTokens": 1632,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.017464,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 572,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1632,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 572,
+        "output_tokens": 1632,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.017464,
+  "duration_ms": 20019
+}

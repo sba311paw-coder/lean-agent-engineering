@@ -1,0 +1,63 @@
+{
+  "key": "verification-01__original__skill__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I ran my production deployment command and it exited with code 0. Can I now tell my team that the application is successfully deployed and working in production?",
+  "response": "Short answer: **No, not yet.** Exit code 0 only tells you the deployment *command* completed without throwing an error \u2014 it is not proof that the application is actually running correctly in production.\n\n## Why exit code 0 isn't sufficient\n\nExit code 0 typically just means \"the script/CLI didn't crash.\" It does **not** verify:\n\n- The app actually started and is listening/healthy\n- It's serving real traffic correctly (not just up, but *working*)\n- Dependent services (DB, cache, queues) are reachable\n- No errors are appearing in logs post-deploy\n- Users/clients can actually reach it (routing, load balancer, DNS, TLS)\n- Performance/behavior matches expectations (no silent regressions)\n\nA deploy tool can return 0 even if, say, the container crash-loops five seconds later, a migration silently failed, or the new version is up but the health check endpoint is broken.\n\n## What to check before declaring success\n\nPick the lowest level of verification that's actually sufficient for the risk, e.g.:\n\n1. **Health check** \u2013 Hit `/health` or equivalent endpoint, confirm 200 and expected response.\n2. **Smoke test** \u2013 Exercise one or two critical user flows (login, key API call, key page load).\n3. **Logs** \u2013 Check for errors/exceptions in the minutes following deploy.\n4. **Metrics/monitoring** \u2013 Confirm error rates, latency, and traffic look normal (e.g., no spike in 5xx).\n5. **Version check** \u2013 Confirm the deployed version/commit hash matches what you intended to ship.\n\n## Suggested message to your team\n\nInstead of \"it's deployed and working,\" something like:\n\n> \"Deployment command completed successfully. Verifying health checks and smoke tests now \u2014 will confirm shortly.\"\n\nThen follow up with an actual \"\u2705 confirmed healthy\" once you've checked at least a health endpoint and skimmed logs.\n\nDeployment is a high-impact, and if something's wrong, potentially costly-to-reverse action \u2014 worth the extra 5 minutes of verification before telling people it's solid.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 677,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0073136,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 677,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 677,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0073136,
+  "duration_ms": 9630
+}

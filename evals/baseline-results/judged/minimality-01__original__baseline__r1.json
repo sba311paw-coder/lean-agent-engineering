@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__original__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Identifies the real gap as exposing the function via a tool schema with guardrails (validation, confirmation, logging), not connectivity/access, which is what MCP would solve.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'You probably don't need an MCP server. Use what you have.' and 'the leanest, most reliable path is: Wrap it as a tool definition the agent can call directly... not as a network service.'",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly frames MCP as unnecessary indirection here ('adds a layer of indirection... for zero functional gain') and only recommends it for future multi-consumer/cross-language scenarios, not because it's available.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009572
+}

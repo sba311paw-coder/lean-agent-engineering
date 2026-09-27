@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response draws the flow diagram 'USER \u2192 AGENT APPLICATION \u2192 LLM (picks tool) \u2192 AGENT APPLICATION \u2192 TOOL' before diagnosing, explicitly tracing where decisions happen.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'The wrong-tool choice happens at the LLM decision boundary, but the *cause* is usually upstream in how the application presents tools to the LLM' and lists root causes like ambiguous tool descriptions as the first likely failure point.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly argues 'Switching frameworks is unlikely to fix this' and 'Framework switching is a last resort because... None of them solve ambiguous tool descriptions for you', recommending cheaper fixes first.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00982
+}

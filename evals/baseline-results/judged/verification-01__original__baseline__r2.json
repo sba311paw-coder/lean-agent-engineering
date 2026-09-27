@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__original__baseline__r2",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states exit code 0 only confirms the CLI/tool completed without internal error, not that the app is 'actually running correctly in production,' and lists failure modes that still yield exit code 0.",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a concrete checklist to perform before claiming success (health check endpoint, logs, smoke tests, monitoring, version check, rollout status, stability wait) and suggests a message to the team that defers confirmation until verification is done.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007398
+}

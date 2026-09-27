@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__original__skill__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides a full architecture diagram from USER -> AGENT APPLICATION -> LLM -> AGENT APPLICATION -> TOOL/API -> AGENT APPLICATION -> LLM -> FINAL RESPONSE -> USER, tracing the flow explicitly.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Diagram labels distinct steps as 'LLM <-- decides to call weather tool' vs 'AGENT APPLICATION <-- receives tool_call, invokes tool', and later separates 'Application \u2192 LLM' and 'LLM \u2192 Final Response' boundaries, explicitly stating 'root cause is in the agent application's message-history handling, not the model.'",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly identifies 'exactly two candidate boundaries': Boundary 1 (Application \u2192 LLM) and Boundary 2 (LLM \u2192 Final Response), each with detailed sub-causes.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Provides a 'Recommended diagnostic sequence' with logging steps and ends with 'let's not patch anything until that boundary is identified,' explicitly deferring fixes until investigation is done.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013158
+}

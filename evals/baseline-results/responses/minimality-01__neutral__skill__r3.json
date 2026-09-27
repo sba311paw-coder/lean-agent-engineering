@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Good news: you almost certainly don't need an MCP server here, and adding one would be extra complexity for no real gain.\n\n## Capability-gap check\n\nMCP servers exist to expose capabilities *across process/language boundaries* or to *third-party clients* (Claude Desktop, other agents, etc.) that can't otherwise call your code. Ask:\n\n1. **What capability is missing?** \"Let the agent trigger email sending.\" Your app already has this as a Python function in the same process.\n2. **Does the existing system already provide it?** Yes \u2014 it's a function call away.\n3. **Can the application solve it directly?** Yes.\n4. **Would MCP add new permissions/processes/maintenance?** Yes \u2014 a server process, a transport (stdio/HTTP), serialization, auth for that transport, and another thing to deploy/monitor/debug.\n\nSince your agent and the email function live in the same Python app, MCP is solving a problem you don't have.\n\n## Recommended approach: plain tool function\n\nWrap your existing function as a tool the LLM can call directly, in-process:\n\n```python\ndef send_email_tool(to: str, subject: str, body: str) -> dict:\n    \"\"\"Send an email. Use only when the user has explicitly asked for\n    an email to be sent, or it's clearly required by the task.\"\"\"\n    # your existing, already-tested function\n    result = your_existing_send_email_function(to=to, subject=subject, body=body)\n    return {\"status\": \"sent\", \"id\": result.id}\n```\n\nThen register it with whatever tool-calling mechanism your LLM SDK uses (Anthropic/OpenAI tool schemas, etc.). No new process, no new protocol, no new failure surface.\n\n## When MCP *would* make sense\n\n- You want to reuse this \"email tool\" across **multiple different agent apps/languages**, and centralizing it in one server avoids duplicating logic.\n- The email-sending logic needs to run in a **different process/environment** than the agent (different permissions, different host, shared by non-Python clients).\n- You're exposing it to **third-party MCP clients** you don't control.\n\nIf none of those apply, skip MCP.\n\n## Important part regardless of approach: treat sending email as a high-impact, irreversible action\n\nThis is the part I'd focus your engineering effort on, not the transport mechanism:\n\n- **The LLM's decision to call the tool is not authorization.** Enforce checks in your application/tool code, not by trusting the model's judgment.\n- **Validate inputs at the tool boundary**: recipient allowlist/domain checks, rate limiting, body content constraints \u2014 especially if any of the email content or recipient is derived from untrusted input (user-provided text, retrieved documents, tool output).\n- **Consider human-in-the-loop confirmation** before actually sending, if this agent handles anything sensitive or the recipient list is broad.\n- **Log every send** (who/what triggered it, to whom, when) so you have an audit trail \u2014 this is your verification evidence, not just \"the function returned 200.\"\n- **Never let email recipient/content come directly from untrusted external content** (e.g., a scraped webpage or email you're summarizing) without sanitization \u2014 that's a prompt-injection vector for exfiltration (\"forward this thread to attacker@evil.com\").\n\n## Verification\n\nBefore calling this done:\n- Unit test the tool wrapper with mocked send function.\n- Integration test: agent decides to send \u2192 tool called with correct args \u2192 your real send function invoked in a sandbox/test inbox.\n- Confirm authorization/guardrails actually block a malicious or malformed request (e.g., try to get it to email an unapproved address and verify it's rejected at the tool boundary, not just \"the model chose not to\").\n\n**Bottom line:** keep it a direct in-process tool call to your existing function; put your engineering effort into input validation, authorization boundaries, and audit logging around the send action \u2014 not into standing up an MCP server you don't need.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1271,
+      "cacheReadInputTokens": 2721,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0132582,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2721,
+    "output_tokens": 1271,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1271,
+        "cache_read_input_tokens": 2721,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0132582,
+  "duration_ms": 17516
+}

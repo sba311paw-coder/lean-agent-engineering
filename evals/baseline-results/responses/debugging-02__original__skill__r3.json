@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__original__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My RAG agent is returning incorrect answers. I suspect the embedding model is the problem. Should I replace the embedding model first?",
+  "response": "Not yet \u2014 replacing the embedding model is an expensive, high-effort change, and \"incorrect answers\" in a RAG pipeline can originate at several different points. Swapping the model first is guessing rather than diagnosing. Let's trace the pipeline and find the actual failing boundary before changing anything.\n\n**A RAG pipeline, boundary by boundary:**\n\n```\nQUERY\n  |\n  v\nQUERY PROCESSING (rewriting, expansion)\n  |\n  v\nEMBEDDING MODEL (query -> vector)\n  |\n  v\nRETRIEVAL (vector search / index)\n  |\n  v\nRERANKING (optional)\n  |\n  v\nCONTEXT ASSEMBLY (chunking, truncation, ordering)\n  |\n  v\nLLM GENERATION (prompt + context -> answer)\n  |\n  v\nANSWER\n```\n\nWrong answers can come from a failure at *any* of these, not just embeddings. Cheapest checks first:\n\n**1. Reproduce and categorize the failure**\nPull 5\u201310 failing queries. For each, ask: is the retrieved context actually correct/relevant, or is the context fine but the LLM ignoring/misreading it?\n\n- If retrieved chunks are irrelevant \u2192 retrieval problem (could be embeddings, but also chunking/index/filters).\n- If retrieved chunks are relevant but the answer is still wrong \u2192 generation problem, not embeddings at all. Swapping the embedding model wouldn't fix this.\n\n**2. If it's a retrieval problem, check cheaper causes before the model itself**\n- **Chunking**: chunks too large/small, splitting mid-sentence, losing context.\n- **Indexing**: stale index, missing documents, wrong metadata filters excluding correct docs.\n- **Query mismatch**: user's phrasing very different from document phrasing (a query-rewriting step or hybrid search fixes this without touching the embedding model).\n- **top_k too small**: correct doc retrieved but ranked below cutoff.\n- **Similarity metric mismatch**: e.g., cosine vs dot product misconfigured for the model.\n\nMost retrieval quality issues in practice come from chunking, indexing, or query formulation \u2014 not the embedding model itself.\n\n**3. Only conclude \"embedding model\" if:**\nYou've confirmed relevant documents *do exist* in the index, chunking is reasonable, top_k is reasonable, and correct documents still rank low or aren't retrieved for embedding-similarity reasons specifically (e.g., you can show semantically identical text getting low cosine similarity).\n\n**4. If it's a generation problem instead**\nCheck the prompt template, whether context is truncated before reaching the LLM, and whether the LLM is hallucinating over provided context vs. contradicting it.\n\n**Verification before/after any fix**\nBuild a small eval set (10\u201320 query/expected-doc pairs) and measure retrieval precision/recall before changing anything. Then any fix \u2014 chunking, filters, or embedding model \u2014 has a before/after number instead of a guess.\n\n**Bottom line**: replacing the embedding model is a legitimate fix *if the evidence points there*, but it's costly (re-embed entire corpus, re-index, possible dimension changes) and should be the last thing tried, not the first. Start by categorizing whether it's a retrieval or generation failure \u2014 that alone often reveals the fix is much simpler (chunking, top_k, or prompt) and no model swap is needed.\n\nWant to share a few example failing queries with their retrieved chunks? That'll tell us quickly which boundary is actually broken.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1188,
+      "cacheReadInputTokens": 2699,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0124238,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2699,
+    "output_tokens": 1188,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1188,
+        "cache_read_input_tokens": 2699,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0124238,
+  "duration_ms": 15356
+}

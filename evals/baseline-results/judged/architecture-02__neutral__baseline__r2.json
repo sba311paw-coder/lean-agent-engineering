@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response discusses checking whether 'the tool's return value is appended to the conversation/message history before the final generation call' and whether the handoff between tool execution and final generation is connected, directly addressing the app-to-LLM tool-result handoff.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly instructs: 'Log the exact payload sent to the final generation call \u2014 not just \"tool ran,\" but the full message array/prompt including the tool output. Confirm the temperature value is literally present in that payload.'",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The response frames debugging steps as a numbered 'How to debug' list after the causes, and does explicitly recommend logging/tracing before concluding, but it doesn't explicitly warn against modifying the tool itself, and earlier sections (e.g., 'Output parsing bug') implicitly suggest checking/altering tool-adjacent code before the trace is confirmed.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.010494
+}

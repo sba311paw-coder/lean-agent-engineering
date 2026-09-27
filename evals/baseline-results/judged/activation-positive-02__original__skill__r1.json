@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__original__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly identifies 'LLM decision point' as the boundary and breaks it into three sub-boundaries: prompt/instruction, tool-description, and input-variability boundaries.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a detailed 'Evidence to collect before changing anything' section with 7 specific items, and ends by asking user to share paired transcripts before further diagnosis.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Includes a 'What not to do yet' section stating 'Don't add a validator agent, a routing layer, or a second framework,' and instead suggests tightening descriptions/prompts/config.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010596000000000001
+}

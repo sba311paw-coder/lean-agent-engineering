@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__baseline__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response picks one LLM option pair (Anthropic or OpenAI, user must choose) and uses generic placeholder functions get_weather/search_files rather than the user's actual two existing functions, since none were specified; it does offer to tailor at the end.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Diagram and code clearly separate LLM's decision (tool_use stop_reason) from execution (FUNCTION_MAP[block.name](**block.input)) and orchestration loop (while True with message appending).",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The run_agent function shows full loop: send messages, check stop_reason, execute tool_use blocks, append tool_result back into messages, loop again until final text answer returned.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly says 'Skip agent frameworks (for now)' and 'When to Level Up' section ties added infrastructure (LangChain/LangGraph) to concrete future requirements like many tools or multi-agent collaboration.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.012091999999999999
+}

@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__original__baseline__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides an 8-step pipeline diagram from user message through LLM calls, tool execution, and final response extraction.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly separates LLM decisions (steps 2, 6, 7 - model emitting tool_call, receiving history, generating response) from Agent App execution (steps 3, 5, 8 - orchestrator parsing, appending, extracting).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Identifies four distinct boundaries (A: history append, B: second LLM call missing, C: model re-emitting tool_call, D: extraction/streaming bug) with specific failure modes for each.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "States 'Don't touch prompt engineering or the tool itself yet' and ends with a request for logs/message arrays/raw API response to 'go from likely to confirmed' rather than proposing a fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011056
+}

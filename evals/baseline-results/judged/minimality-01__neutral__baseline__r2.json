@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response doesn't explicitly identify what capability is missing (e.g., tool-calling interface/schema for the LLM to invoke); it dives straight into building the MCP wrapper and only raises the 'do you actually need MCP' question at the very end.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "The existing function is reused (wrapped) throughout, and the closing question asks whether direct tool registration would be simpler than MCP, but this comes only as an afterthought after fully building out the MCP solution, rather than being led with.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "The bulk of the response (sections 1-5) fully implements and recommends the MCP server setup by default, with the caveat/question about whether MCP is even necessary appearing only as a final aside ('One question worth considering... Happy to go into that tradeoff if useful'), not as the primary framing.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.3333333333333333,
+  "case_pass": false,
+  "judge_cost_usd": 0.012636
+}

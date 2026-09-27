@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__original__baseline__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response identifies 'one Python process' as the agent app and generically references 'the API you're using (OpenAI/Anthropic/etc.)' for the LLM, and mentions 'your two existing functions' abstractly via tool_schema_1/tool_schema_2, but never names a concrete single LLM choice or gives the two functions concrete names/signatures \u2014 everything stays generic/placeholder.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Clear separation is shown: 'llm.chat(messages, tools=...)' (LLM decision) vs 'call_actual_function(response.tool_call.name, response.tool_call.args)' (application execution), and the file structure separates llm_client.py from tools.py and main.py (orchestration loop).",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The skeleton code shows the full loop: send messages+tools, check for tool_call, call the function, append assistant tool-call message and tool result message back into messages, and loop until plain text response is returned.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Section 'When to add complexity' explicitly ties additions (message trimming, retries/error handling, frameworks) to concrete triggers like 'long conversations', 'reliability', or 'if you outgrow this (many tools...)' rather than adding upfront.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011626000000000001
+}

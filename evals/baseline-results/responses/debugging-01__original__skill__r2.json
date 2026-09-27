@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__original__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration worked yesterday, but after a recent code change it started failing. I want to fix it quickly. What should I do first?",
+  "response": "Since this worked yesterday and broke after a code change, this is a regression \u2014 the fastest path is to find *what changed*, not to re-debug the whole integration from scratch.\n\nHere's the order I'd go in:\n\n**1. Check the diff first (before anything else)**\n```\ngit diff HEAD~1\n# or\ngit log -p -1\n```\nor whatever shows you the recent change. You said \"not a git repository\" isn't the case here necessarily, but if there's no VCS, compare against a backup/last-known-good copy if you have one. This alone often reveals the bug immediately (e.g., a renamed field, changed tool schema, altered system prompt).\n\n**2. Reproduce the failure with a minimal case**\nRun the smallest possible tool call that fails \u2014 don't debug through the full agent conversation. Isolate: is it the LLM not calling the tool, calling it with wrong args, or the tool/application layer rejecting a valid call?\n\n**3. Locate the failing boundary**\nTool-calling failures usually break at one of these seams:\n- **LLM \u2192 structured call**: did a prompt, tool description, or schema change alter what the model produces?\n- **Agent app \u2192 tool**: did argument parsing, validation, or a permission check change?\n- **Tool \u2192 result**: did an API contract, auth token, or dependency version change?\n\nLook at the actual error/log output at each seam rather than guessing which one it is.\n\n**4. Compare against the working version**\nIf you have the last-good commit/version, run the *same test call* against both old and new code. Whatever differs in behavior points you straight at the root cause.\n\n**5. Form one hypothesis, test it, fix root cause**\nOnce you see where it diverges (e.g., \"tool schema now requires a field the LLM doesn't populate,\" or \"a validation function changed and now rejects valid input\"), fix that specific thing \u2014 don't patch around it with retries or prompt tweaks unless that's genuinely the root cause.\n\n**6. Verify**\nRe-run the same reproduction case that failed, plus a couple of adjacent cases, to confirm the fix and that you didn't just mask the symptom.\n\nIf you can share the actual error message/log and the diff of the recent change, I can help pinpoint the boundary faster.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 716,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 458,
+      "webSearchRequests": 0,
+      "costUSD": 0.009444999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 458,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 716,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 458,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 716,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 458,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 458
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009444999999999999,
+  "duration_ms": 10990
+}

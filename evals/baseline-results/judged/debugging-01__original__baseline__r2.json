@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__original__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Section 2 asks to 'check the exact error' and get raw response, but doesn't explicitly instruct to reproduce the failure with a minimal test case; it's implied but not clearly stated as a step to 'reproduce'.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Diff the recent change first' explicitly recommends git diff/log or manual comparison of recent changes.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Section 2 distinguishes failure modes (not calling tool, malformed args, parsing failure, API rejection) which touches on tracing flow, but doesn't explicitly describe tracing data/control flow through the system step-by-step.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Section 4 'Quick isolation test' suggests rolling back parts and testing, which implies hypothesis testing, but no explicit statement of forming a hypothesis before fixing.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.625,
+  "case_pass": false,
+  "judge_cost_usd": 0.009637999999999999
+}

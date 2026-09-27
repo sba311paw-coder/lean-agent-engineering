@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "# Debugging: Weather tool result ignored in final answer\n\nThis is a classic **agent architecture boundary problem** \u2014 the tool call is succeeding, but somewhere between \"tool result exists\" and \"LLM produces final answer,\" the data isn't making it back into the model's context correctly.\n\n## Where to look (in order of likelihood)\n\nUsing the architecture model \u2014 `AGENT APPLICATION \u2192 TOOL \u2192 AGENT APPLICATION \u2192 LLM` \u2014 the bug is almost always in the return leg, not the tool itself.\n\n**1. Tool result not actually appended to the conversation**\nMost common cause. The app calls the tool, logs the result, but then either:\n- forgets to append a `tool_result` message to the message array, or\n- appends it with the wrong `tool_use_id` (doesn't match the tool call), or\n- appends it *after* a new user/assistant turn instead of immediately following the tool call.\n\nCheck the exact message array sent to the LLM on the final call \u2014 not the logs, the actual payload. Logging \"the tool returned X\" doesn't guarantee X was in the prompt.\n\n**2. Tool result format doesn't match what the model expects**\nIf you're returning a raw object/dict but the API expects a string or specific content block shape, some SDKs silently drop or mangle it. Print the serialized tool_result block right before sending.\n\n**3. Wrong tool_use_id pairing**\nIf you have multiple tool calls in flight, or retries, the `tool_result` might be tagged with a stale or mismatched ID. The model then can't correlate it and treats it as noise.\n\n**4. Response truncation / token limits**\nIf the tool result is large or system prompt + history is long, the result may get truncated out of context before the model sees it.\n\n**5. System prompt overrides it**\nIf your system prompt says something like \"answer directly and concisely\" without instructing the model to *use* tool results, some models default to generic phrasing especially if the result arrives in an unexpected shape.\n\n**6. You're only doing one LLM call, not two**\nSome hand-rolled loops call the LLM once (with tools), get the tool call, run it, log it \u2014 but then **never send it back to the LLM for a second turn**. The \"final answer\" you're seeing may actually be a fallback/default response generated separately, not a model response at all.\n\n## Fastest way to isolate it\n\nReproduce with a minimal test: skip your app, manually construct a message array with a fake `tool_result` for the weather call, and send it to the LLM directly. If the model uses it correctly there \u2192 bug is in your app's request construction. If the model still ignores it \u2192 bug is in formatting/prompt.\n\n## Fix\n\nOnce you find the failing boundary, the fix is almost always: ensure the tool result is correctly appended to the message history with the matching ID, then make the actual second LLM call with that updated history before returning the final answer.\n\nCan you share the code where the tool result gets appended to the message array and the follow-up LLM call is made? That's the specific spot I'd want to see to pinpoint it.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 967,
+      "cacheReadInputTokens": 2705,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010215,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2705,
+    "output_tokens": 967,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 967,
+        "cache_read_input_tokens": 2705,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010215,
+  "duration_ms": 14570
+}

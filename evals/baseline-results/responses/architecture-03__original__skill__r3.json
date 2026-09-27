@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__original__skill__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I am building a small Python AI agent for my own use. It needs to answer questions, call two existing Python functions when necessary, and return the results to me. I do not need multiple agents, distributed services, or production scale yet. What architecture should I start with?",
+  "response": "For a single-user script with two known tools, you don't need a framework, multi-agent setup, or orchestration layer \u2014 that would be complexity without a demonstrated need. Here's the minimal, reliable architecture:\n\n## Core loop (single process, in-memory state)\n\n```\nUSER INPUT\n   -> AGENT APPLICATION (your script)\n        -> LLM call with tool definitions\n        -> LLM returns either: plain text, OR a structured tool call\n        -> if tool call:\n              AGENT APPLICATION validates args, calls the real Python function\n              AGENT APPLICATION sends result back to LLM\n              LLM produces final answer\n   -> return answer to USER\n```\n\n## What to actually use\n\n1. **Native tool-calling / function-calling API** of whatever model provider you're using (Anthropic tool use, OpenAI function calling, etc.). No LangChain/CrewAI/AutoGen needed for two tools \u2014 those add abstraction and failure modes you don't need yet.\n2. **A single Python script**, structured roughly as:\n   - `tools.py` \u2014 your two existing functions, unchanged, maybe with docstrings/type hints for schema generation.\n   - `tool_schemas` \u2014 a small manual JSON schema describing each function's name, description, and inputs (don't auto-generate this via a framework; writing it by hand for two tools is trivial and more reliable).\n   - `agent.py` \u2014 the loop: send messages + schemas to the model, inspect the response, if it's a tool call dispatch to the matching Python function, append the result, call the model again, return final text.\n3. **In-memory message list** for conversation state. No database, no vector store, no persistent memory layer unless you actually want history across separate runs \u2014 if you do, a plain JSON file is enough.\n4. **Application-level validation before calling a tool.** The LLM's decision to call a tool is not authorization by itself \u2014 your code should check argument types/ranges before executing, especially if either function has a side effect (writes a file, hits an API, etc.).\n5. **Basic error handling**: wrap each tool call in try/except, return the error as the \"tool result\" so the model can react to it sensibly instead of crashing your script.\n\n## What to skip for now\n\n- No MCP server \u2014 you're not exposing tools across processes or to other clients.\n- No multi-agent/orchestrator \u2014 one LLM, one loop, two tools is not an orchestration problem.\n- No framework \u2014 it would hide the two things you actually need to get right (schema correctness and tool dispatch).\n- No persistent DB/vector store unless you have a concrete retrieval need.\n\n## Verification before you call it done\n\n- Unit test each of your two functions directly (already-known behavior, isolated from the LLM).\n- Manually run a couple of prompts that should trigger each tool, and one that should trigger neither, and confirm the agent picks correctly and returns correct results.\n- Check that a malformed or missing argument from the model is caught by your validation, not silently executed.\n\nIf you outgrow this \u2014 many tools, need for retries/observability, multiple models, concurrent sessions \u2014 that's the point where adding a framework or MCP server becomes justified by an actual capability gap, not before.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1909,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 488,
+      "webSearchRequests": 0,
+      "costUSD": 0.021495000000000004,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 884,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 488,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1909,
+    "output_tokens_details": {
+      "thinking_tokens": 884
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 488,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1909,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 488,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 488
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.021495000000000004,
+  "duration_ms": 23996
+}

@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response suggests logging/debugging steps ('Print the raw API request/response', 'Run with verbose/debug logging') to help reproduce the failure, but never actually reads or reproduces the failure itself, nor asks for logs/tracebacks until the end as an afterthought.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section '2. Diff what actually changed' explicitly instructs checking tool schema changes, renamed tools, model version changes, SDK updates, and recommends 'git diff' the last working commit against HEAD.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The 'Fast diagnostic steps' section (print raw request/response, isolate with minimal script) touches on tracing data flow, but it's presented as a generic checklist rather than an actual trace through the user's specific control/data flow.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "The response provides a table of 'Symptom -> Likely cause' but never explicitly asks the user to pick one hypothesis to test before fixing; it jumps straight to a checklist of fixes/diagnostics without framing a single testable hypothesis first.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.010696
+}

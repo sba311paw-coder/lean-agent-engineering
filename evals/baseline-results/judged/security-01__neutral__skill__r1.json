@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"the LLM's tool call should never be treated as authorization by itself\" and \"Never let the LLM's stated intent substitute for a permission check.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Enforce authorization in the application, not the model\" with explicit permission and scope checks before execute_delete runs.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Sections on bulk threshold requiring human approval, soft-delete preference, audit logging, defensive input validation, and post-execution verification all add layered safeguards for destructive actions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009076
+}

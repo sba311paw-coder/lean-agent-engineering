@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__skill__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Tool succeeds but final response omits the result\n\nThis is a classic **agent architecture boundary issue** \u2014 the tool call succeeds, but somewhere between \"tool result\" and \"LLM final response\" the data is getting dropped or ignored. Let's trace it systematically rather than guessing.\n\n## Architecture recap\n\n```\nLLM decides to call weather tool\n      |\n      v\nAGENT APPLICATION invokes tool\n      |\n      v\nTOOL returns result  <-- you confirmed this works\n      |\n      v\nAGENT APPLICATION must feed result back to LLM\n      |\n      v\nLLM generates final response  <-- this is where it's failing\n```\n\nSince the tool itself is fine, the bug is in one of the boundaries **after** the tool call. Check these in order:\n\n## 1. Is the tool result actually being appended to the conversation?\n\nThe most common root cause: the app calls the tool, logs/prints the result, but never appends a `tool_result` message back into the message array sent to the LLM.\n\nCheck that after the tool call you're doing something like:\n```\nmessages.append({\n  \"role\": \"tool\",  # or \"user\" with tool_result content block, depending on API\n  \"tool_call_id\": ...,\n  \"content\": result\n})\n```\nThen re-invoking the LLM with the **updated** message list \u2014 not the original one.\n\n## 2. Are you making a second LLM call at all?\n\nSome homegrown agent loops stop after executing the tool and never send a follow-up completion request. Verify there's a loop like: *LLM call \u2192 if tool_call \u2192 execute \u2192 append result \u2192 call LLM again \u2192 return final text*. A single-turn implementation will silently drop the result.\n\n## 3. Is the result malformed for what the LLM expects?\n\n- Wrong `tool_call_id` mapping (mismatched to a different/stale call).\n- Result serialized as an object when a string was expected (or vice versa).\n- Result too large/truncated and getting stripped by a middleware step.\n\n## 4. Is a system prompt or instruction suppressing it?\n\nCheck for prompt instructions like \"don't repeat tool output\" or overly terse formatting instructions that might cause the model to summarize past the data instead of including it.\n\n## 5. Check for a hook, filter, or post-processing step\n\nIf you have any pre/post hooks (e.g., truncation, PII filtering, output formatter) between the LLM's raw output and what's shown to the user \u2014 the response could be arriving from the model correctly but stripped afterward. Log the raw LLM output *before* your app's post-processing to isolate this.\n\n## Fastest way to isolate it\n\nAdd one log statement right before the second (final) LLM call, printing the full message list you're sending. If the tool result is missing there \u2192 bug is in step 1/2 (app not appending it). If the tool result is present there but missing from the output \u2192 bug is in step 3/4/5 (LLM/post-processing).\n\nThat single log line will tell you exactly which boundary is broken \u2014 no need to guess further.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 953,
+      "cacheReadInputTokens": 2704,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0100748,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2704,
+    "output_tokens": 953,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 953,
+        "cache_read_input_tokens": 2704,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0100748,
+  "duration_ms": 12678
+}

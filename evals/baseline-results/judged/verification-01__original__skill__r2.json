@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__original__skill__r2",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"an exit code of 0 only tells you that the deployment *command* completed without throwing an error. It is not evidence that the application is actually running correctly in production.\"",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Lists concrete verification steps (rollout status, health check, smoke test, logs, metrics, version check) and states 'hold off on the announcement until you've done at least a health check plus a quick smoke test.'",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007601999999999999
+}

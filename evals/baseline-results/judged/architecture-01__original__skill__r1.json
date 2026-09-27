@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__original__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response lists diagnostic steps like checking tool descriptions, tool count, prompts, tracing failures, and asks 'is the LLM making a bad decision or is the agent application presenting bad/ambiguous options' - this touches on tracing architecture but doesn't systematically trace the full pipeline/architecture before diagnosing; it's more a checklist than a structured trace.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Mentions 'Where in the pipeline is the failure? Using the boundary model: is the LLM making a bad decision, or is the agent application presenting bad/ambiguous options' - this gestures at boundary identification but doesn't clearly identify or commit to a specific 'first incorrect boundary' - it remains a list of possibilities rather than pinpointing one boundary.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'No \u2014 replacing the framework is a large, risky change for what is likely a small, local problem' and 'Only consider a framework change if...' with strict conditions, clearly avoiding unnecessary architectural replacement.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.01027
+}

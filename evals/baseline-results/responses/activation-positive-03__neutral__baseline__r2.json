@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving Grounding in RAG Agents\n\nPoor grounding in retrieval-augmented systems usually stems from issues at one of four stages: **retrieval quality**, **context assembly**, **generation constraints**, or **verification**. Here's a systematic breakdown:\n\n## 1. Retrieval Quality\n\n- **Chunking strategy**: Ensure chunks are semantically coherent (not cut mid-sentence/mid-table). Try 200\u2013500 token chunks with overlap (10\u201320%), or use semantic/structure-aware chunking (by heading, paragraph) instead of fixed-size.\n- **Hybrid search**: Combine dense vector search with sparse/keyword search (BM25). Pure embedding similarity often misses exact terms, names, or numbers that matter for grounding.\n- **Re-ranking**: Add a cross-encoder reranker (e.g., Cohere rerank, bge-reranker) after initial retrieval to push the most relevant chunks to the top \u2014 embedding similarity alone is a weak relevance signal.\n- **Query transformation**: Use query rewriting/expansion (HyDE, multi-query) so retrieval isn't limited to the literal phrasing of the user's question.\n- **Metadata filtering**: If documents have dates, sources, or categories, filter before/during vector search to avoid pulling irrelevant-but-similar content.\n\n## 2. Context Assembly\n\n- **Reduce noise**: Don't stuff in every retrieved chunk \u2014 top-k with reranking (e.g., top 3\u20135 after reranking 20) beats dumping 20 raw chunks.\n- **Cite sources explicitly**: Include chunk IDs/source metadata inline in the context so the model can reference them, and instruct it to only use provided context.\n- **Order matters**: Put the most relevant chunks at the start or end of context (models attend less to the middle \u2014 \"lost in the middle\" effect).\n\n## 3. Generation Constraints (Prompting)\n\n- **Explicit grounding instructions**: e.g., *\"Answer only using the provided context. If the answer isn't in the context, say so explicitly. Cite the source for each claim.\"*\n- **Require citations**: Force the model to output `[source: doc_id]` per claim \u2014 this alone reduces hallucination because it forces the model to check itself against retrieved text.\n- **Lower temperature** for factual QA tasks (0\u20130.3).\n\n## 4. Verification / Post-Generation\n\n- **Groundedness check**: Run a second pass (LLM-as-judge or NLI model) that checks whether each generated sentence is entailed by the retrieved context. Flag or regenerate ungrounded claims.\n- **Attribution scoring**: Tools like RAGAS, TruLens, or Ragas' \"faithfulness\" metric can quantify how well answers are grounded in retrieved context \u2014 useful for regression testing as you tune the pipeline.\n\n## Quick Diagnostic\n\nTo find where your pipeline breaks down, check:\n1. **Is retrieval finding the right chunks?** (manually inspect top-k for known queries)\n2. **Is the right chunk in the context, but the model ignoring it?** \u2192 prompting problem\n3. **Is the model fabricating even when correct chunks are present?** \u2192 need stricter grounding instructions + citation requirements\n\n---\n\nIf you can share more details \u2014 what vector DB/embedding model you're using, chunk size, and an example of a poorly grounded answer \u2014 I can give more targeted advice.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 529,
+      "outputTokens": 1138,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.012438,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 529,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1138,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 529,
+        "output_tokens": 1138,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012438,
+  "duration_ms": 13106
+}

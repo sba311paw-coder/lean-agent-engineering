@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__baseline__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "# Simple Python AI Agent Architecture\n\nFor a personal-use agent with two function calls, keep it lightweight. Here's a practical approach:\n\n## Core Architecture\n\n```\nUser Input \u2192 LLM (with function schemas) \u2192 Decide: answer directly OR call function\n                                                  \u2193\n                                          Execute function \u2192 Return result \u2192 LLM formats response\n```\n\n## Recommended Stack\n\n**1. LLM Provider \u2014 pick one:**\n- **Anthropic API** (`anthropic` Python SDK) \u2014 native tool-use support, good docs\n- **OpenAI API** (`openai` SDK) \u2014 function calling, very mature ecosystem\n\nBoth support \"tool calling\" natively \u2014 you don't need a heavy framework for just 2 functions.\n\n**2. Skip agent frameworks (for now)**\nFor 2 functions, avoid LangChain/LlamaIndex/CrewAI \u2014 they add complexity/abstraction overhead you don't need yet. Plain SDK + a loop is simpler to debug and modify.\n\n## Minimal Implementation Pattern (Anthropic example)\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ntools = [\n    {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a location\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"location\": {\"type\": \"string\"}},\n            \"required\": [\"location\"]\n        }\n    },\n    {\n        \"name\": \"search_files\",\n        \"description\": \"Search local files by keyword\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"query\": {\"type\": \"string\"}},\n            \"required\": [\"query\"]\n        }\n    }\n]\n\ndef get_weather(location: str) -> str:\n    ...  # your existing function\n\ndef search_files(query: str) -> str:\n    ...  # your existing function\n\nFUNCTION_MAP = {\n    \"get_weather\": get_weather,\n    \"search_files\": search_files,\n}\n\ndef run_agent(user_message: str):\n    messages = [{\"role\": \"user\", \"content\": user_message}]\n\n    while True:\n        response = client.messages.create(\n            model=\"claude-sonnet-5\",\n            max_tokens=1024,\n            tools=tools,\n            messages=messages,\n        )\n\n        messages.append({\"role\": \"assistant\", \"content\": response.content})\n\n        if response.stop_reason != \"tool_use\":\n            # Final text answer\n            return \"\".join(b.text for b in response.content if b.type == \"text\")\n\n        tool_results = []\n        for block in response.content:\n            if block.type == \"tool_use\":\n                fn = FUNCTION_MAP[block.name]\n                result = fn(**block.input)\n                tool_results.append({\n                    \"type\": \"tool_result\",\n                    \"tool_use_id\": block.id,\n                    \"content\": str(result)\n                })\n\n        messages.append({\"role\": \"user\", \"content\": tool_results})\n```\n\n## Key Design Decisions\n\n| Concern | Recommendation |\n|---|---|\n| **State/memory** | Just a list of messages in-process; persist to a JSON file if you want history across runs |\n| **Config/secrets** | `.env` file + `python-dotenv` for API key |\n| **Error handling** | Wrap function calls in try/except, return error string as tool_result so the LLM can react |\n| **CLI interface** | `input()` loop, or `argparse` for one-shot mode |\n| **Logging** | Just `print()` or `logging` module \u2014 no need for tracing tools at this scale |\n\n## When to Level Up\nOnly reach for LangChain/LangGraph or a proper agent framework if you later need: many tools, multi-step planning, retries/branching logic, or multiple agents collaborating. For 2 functions, the ~50 lines above is the entire \"framework\" you need.\n\nWant me to tailor this to specific functions you're calling, or help you pick between Anthropic/OpenAI based on your use case?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 531,
+      "outputTokens": 1257,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013632000000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 531,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1257,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 531,
+        "output_tokens": 1257,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013632000000000002,
+  "duration_ms": 12304
+}

@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Tool Runs But Result Missing from Final Response\n\nThis is a common issue in agentic tool-calling flows. Here's a systematic breakdown of likely causes and fixes.\n\n## 1. Check the message flow structure\n\nThe most common cause: the tool result isn't being properly appended to the conversation history before the final generation call. Verify the sequence looks like:\n\n```\n[User message]\n[Assistant message: tool_call requested]\n[Tool result message: role=\"tool\" (or \"function\"), tool_call_id=..., content=result]\n[Assistant message: final response] \u2190 this is where the LLM sees the result\n```\n\nIf the tool result message is malformed (wrong role, missing `tool_call_id`, wrong `name`), many SDKs/APIs will silently drop it or the model won't associate it with the call.\n\n**Fix:** Log the exact payload sent to the model on the *second* call (the one generating the final response). Confirm the tool output is literally present in that request.\n\n## 2. Check for a \"double-call\" bug\n\nSome agent loops call the tool, get a result, but then re-invoke the model with only the *original* messages (forgetting to append the tool result) before generating the final answer \u2014 effectively discarding the result.\n\n**Fix:** Trace whether you're building a *new* message list vs. appending to the existing one that includes the tool response.\n\n## 3. Check the tool result content format\n\nIf your tool returns a complex object (dict, JSON, nested structure) and you're passing it as raw content rather than stringified, some frameworks fail silently or truncate it.\n\n**Fix:** Explicitly serialize (`json.dumps(...)`) the tool output into the content field, not just pass the raw Python object.\n\n## 4. Check for a system prompt or instruction issue\n\nSometimes the system prompt says something like \"always respond conversationally\" and the model interprets that as not needing to restate data, or there's an instruction telling it to be terse, causing it to acknowledge the call without echoing the value.\n\n**Fix:** Try explicitly instructing: *\"After receiving tool results, incorporate the specific values into your response to the user.\"*\n\n## 5. Check token limits / truncation\n\nIf the tool result is large and you're hitting a context window or max_tokens limit on the final response, the model may get cut off before including the result.\n\n**Fix:** Check `finish_reason` on the final completion \u2014 if it's `length`, that's your answer.\n\n## 6. Check for streaming issues\n\nIf you're streaming the final response and only capturing part of the stream (e.g., stopping at the first token or a specific chunk pattern), you might be dropping content.\n\n## Quick diagnostic steps\n\n1. **Log the raw request payload** sent to the LLM for the final generation step \u2014 confirm tool output is there.\n2. **Log the raw response** \u2014 see what the model actually returned, unfiltered by your app's post-processing.\n3. Check if you have **custom parsing** after the model response that might be filtering out the weather data (e.g., regex that strips certain patterns).\n\n---\n\nCould you share which framework/SDK you're using (LangChain, OpenAI function calling directly, Claude tool use, LlamaIndex, custom loop, etc.)? The exact fix depends heavily on how tool results get threaded back into the conversation.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 534,
+      "outputTokens": 1049,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011557999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 534,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1049,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 534,
+        "output_tokens": 1049,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011557999999999999,
+  "duration_ms": 13029
+}

@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__original__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. I am thinking about replacing the entire agent framework with a different framework. Is that the right first step?",
+  "response": "No \u2014 replacing the framework is a disproportionate first move for \"sometimes picks the wrong tool.\" That's almost never a framework problem; it's usually one of a few well-known, fixable issues at a specific boundary. Swapping frameworks is expensive, risks new bugs, and doesn't guarantee the root cause goes away (the same failure often reappears in the new framework).\n\nBefore considering a rewrite, trace the boundary where the wrong decision happens:\n\n**1. Tool definitions (most common culprit)**\n- Are tool names/descriptions ambiguous or overlapping? (e.g., `search` vs `lookup` vs `find` with unclear distinctions)\n- Do descriptions state *when* to use the tool, not just *what* it does?\n- Are parameter schemas clear enough that the LLM understands expected inputs?\n\n**2. Context at decision time**\n- Is the LLM given enough task context to disambiguate? (e.g., missing conversation history, unclear user intent)\n- Are there too many tools available at once, diluting selection accuracy?\n\n**3. System prompt / instructions**\n- Is there explicit guidance on tool selection priority or disambiguation rules?\n- Are there few-shot examples showing correct tool choice in ambiguous cases?\n\n**4. Application-layer logic**\n- Does the agent app validate the tool call before executing it, or blindly trust the LLM's choice?\n- Could you add a lightweight check/guardrail (e.g., confirm high-impact tool calls, or restrict tool availability based on task phase)?\n\n**5. Model behavior itself**\n- Is this a capability limit of the specific model, or a rare edge case not worth engineering around?\n\n### Suggested first steps\n1. Collect 5\u201310 concrete failure examples (what was chosen vs. what should have been chosen).\n2. Look for a pattern \u2014 is it always the same two tools confused? Same task type? Same missing context?\n3. Try the cheapest fix first: tighten tool descriptions/names, add disambiguation guidance to the prompt, or reduce the active toolset for that task phase.\n4. Re-test with the same failure cases.\n\nOnly escalate toward \"replace the framework\" if you've ruled out prompt/tool-definition issues *and* you can show the current framework has an architectural limitation (e.g., it can't inject the context you need, or can't support conditional tool availability) that a different framework specifically solves.\n\nIf you can share 2\u20133 examples of the wrong-tool-choice cases, I can help pinpoint which boundary is actually failing.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 830,
+      "cacheReadInputTokens": 2706,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008845200000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2706,
+    "output_tokens": 830,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 830,
+        "cache_read_input_tokens": 2706,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008845200000000001,
+  "duration_ms": 11529
+}

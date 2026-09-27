@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__baseline__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Here's a practical approach for wrapping your existing email function as an MCP server:\n\n## 1. Use the official MCP Python SDK (FastMCP)\n\nIt's the fastest way to turn a function into an MCP tool with proper schema generation.\n\n```python\n# email_mcp_server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom pydantic import BaseModel, EmailStr\nfrom typing import Optional\nimport logging\n\nfrom your_app.email import send_email  # your existing function\n\nmcp = FastMCP(\"email-server\")\n\nlogging.basicConfig(filename=\"email_agent.log\", level=logging.INFO)\n\n@mcp.tool()\ndef send_email_tool(\n    to: EmailStr,\n    subject: str,\n    body: str,\n    cc: Optional[list[EmailStr]] = None,\n) -> dict:\n    \"\"\"\n    Send an email on behalf of the user.\n    Use this only when the user has explicitly asked to send/notify someone via email.\n    \"\"\"\n    # --- guardrails before calling your real function ---\n    allowed_domains = None  # e.g. {\"yourcompany.com\"} to restrict recipients\n    if allowed_domains and not to.split(\"@\")[1] in allowed_domains:\n        return {\"success\": False, \"error\": \"Recipient domain not allowed\"}\n\n    try:\n        result = send_email(to=to, subject=subject, body=body, cc=cc)\n        logging.info(f\"Email sent to={to} subject={subject}\")\n        return {\"success\": True, \"result\": str(result)}\n    except Exception as e:\n        logging.error(f\"Failed to send email to={to}: {e}\")\n        return {\"success\": False, \"error\": str(e)}\n\nif __name__ == \"__main__\":\n    mcp.run(transport=\"stdio\")\n```\n\nRun it with `uv run email_mcp_server.py` or `python email_mcp_server.py`.\n\n## 2. Key design decisions\n\n**Transport**: Use `stdio` if the agent runs locally and spawns the server as a subprocess (simplest, most common). Use `sse`/streamable HTTP only if the server needs to be shared across multiple agent processes or run remotely.\n\n**Tool description matters a lot**: The docstring/description is what the LLM uses to decide *when* to call this tool. Be explicit about when it should and shouldn't be used (e.g., \"only after confirming recipient and content with the user\").\n\n**Return structured results, not exceptions**: Never let the tool raise \u2014 catch errors and return `{\"success\": False, \"error\": ...}` so the agent can react intelligently instead of crashing.\n\n**Don't put credentials in the MCP server args/config visible to the LLM.** Load SMTP/API keys from environment variables inside the server process, not as tool parameters.\n\n## 3. Safety measures worth adding (sending email is a real-world side effect)\n\n- **Dry-run / confirmation flag**: Consider requiring a `confirm: bool = False` param, or have the agent show a preview and require a second explicit call to actually send.\n- **Rate limiting**: Cap emails per minute/hour to prevent runaway loops.\n- **Domain/recipient allowlist**: Especially important if the agent has any autonomy over recipient selection.\n- **Audit log**: Log every send attempt with timestamp, recipient, subject (you already have this above).\n- **Human-in-the-loop for irreversible/external actions**: Many agent frameworks let you mark certain tools as requiring user approval before execution \u2014 worth doing for email specifically since it can't be undone.\n\n## 4. Wiring it into your agent\n\nIn your agent's MCP client config (e.g., `mcp_config.json` or however your framework registers servers):\n\n```json\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"email_mcp_server.py\"],\n      \"env\": {\n        \"SMTP_HOST\": \"...\",\n        \"SMTP_USER\": \"...\"\n      }\n    }\n  }\n}\n```\n\n## 5. Test independently first\n\nUse the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) (`npx @modelcontextprotocol/inspector python email_mcp_server.py`) to call the tool manually before connecting it to your agent \u2014 verifies schema, error handling, and actual send behavior in isolation.\n\n---\n\nOne question worth considering: do you actually need a separate MCP *server* process, or would it be simpler to register `send_email` directly as a native tool/function in your agent framework? MCP adds value if you want the tool to be reusable across multiple agents/processes or need process isolation \u2014 but if it's just this one app, a direct tool registration (no subprocess, no IPC) is less overhead. Happy to go into that tradeoff if useful.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 551,
+      "outputTokens": 2316,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.024262,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 773,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 551,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2316,
+    "output_tokens_details": {
+      "thinking_tokens": 773
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 551,
+        "output_tokens": 2316,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.024262,
+  "duration_ms": 23653
+}

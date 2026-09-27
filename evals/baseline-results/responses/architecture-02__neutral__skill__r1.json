@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__skill__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "# Diagnosing the ignored tool result\n\nThis is a classic case of losing the boundary between \"tool executed correctly\" and \"LLM saw and used the result.\" Since the tool logs show the correct temperature, the failure is happening *after* the tool call, on the way back into the model's final response. Let's trace the architecture:\n\n```\nLLM decides to call weather tool\n   -> AGENT APPLICATION calls tool\n   -> TOOL returns correct temperature (confirmed in logs)\n   -> AGENT APPLICATION should feed this result back to the LLM\n   -> LLM generates final answer (generic \u2014 ignores it)\n```\n\nThe bug is almost certainly at the **\"feed result back to LLM\"** boundary, not in the tool itself. Common root causes, roughly in order of likelihood:\n\n## 1. Tool result isn't actually appended to the conversation sent back to the LLM\nThe most common cause. Check that after the tool call, your code appends a proper tool-result message to the message array/history *before* calling the LLM again \u2014 and that this updated history is what's actually sent (not a stale copy of messages from before the tool call).\n\n## 2. Tool result format doesn't match what the model expects\nIf you're using an API with structured tool calling (e.g., `tool_use` / `tool_result` blocks), the result must be linked to the correct `tool_use_id`. If the ID is wrong, missing, or the content is malformed (e.g., not stringified, wrong role), some APIs will silently accept the request but the model won't correlate it correctly.\n\n## 3. The result is truncated, empty, or wrapped in an error-shaped object\nLogs showing \"the correct temperature\" isn't the same as the object *sent back to the model* containing that value cleanly. Check for:\n- Serialization bugs (e.g., logging the raw API response but sending a different, empty field to the LLM)\n- Silent exceptions swallowed after logging but before the result is attached to context\n\n## 4. A second LLM call is generating the final answer from a summarized/truncated context\nIf your pipeline has a separate \"final answer\" step that re-summarizes conversation history (rather than the same call continuing with tool results in context), that step may be operating on a version of context that drops the tool result \u2014 e.g., a context-window trimming step, a caching layer, or a prompt template that doesn't include tool outputs.\n\n## 5. System prompt/instructions conflict\nLess likely given your symptom, but check whether your system prompt instructs the model to answer generally without needing tool confirmation, or there's a default/fallback response path that fires regardless of tool output (e.g., a hardcoded \"I don't have real-time data\" disclaimer template that triggers before the tool result is checked).\n\n## Fastest way to isolate it\nAdd one temporary log point: print the **exact payload** sent to the LLM in the follow-up call (not the tool's raw output, but the full message array as constructed). If the temperature is present there and correct, the bug is in the LLM call itself (wrong model, wrong endpoint, prompt override). If it's missing/malformed there, the bug is in how your agent application constructs/attaches the tool result \u2014 that's the fix target.\n\n---\n\nWant to share the code path where you call the tool and construct the follow-up LLM request? That's the exact boundary to inspect, and I can help spot the specific bug once I see how the tool result gets attached to the message history.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1091,
+      "cacheReadInputTokens": 2705,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011455,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2705,
+    "output_tokens": 1091,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1091,
+        "cache_read_input_tokens": 2705,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011455,
+  "duration_ms": 14627
+}

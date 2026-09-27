@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__original__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly diagrams QUERY \u2192 RETRIEVAL \u2192 CONTEXT CONSTRUCTION \u2192 LLM GENERATION \u2192 ANSWER and dedicates Steps 1-3 to isolating each stage with distinct checks (raw chunks vs final prompt vs model behavior).",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before touching retrieval, trace the pipeline' and provides a 'Minimum evidence set to collect before changing anything' table, explicitly deferring architecture changes until evidence is gathered.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The step-by-step method itself is an isolation experiment: checking 'if the answer IS present in retrieved chunks' vs 'if present in final prompt' to isolate which stage is failing, and the evidence table isolates 'Answer present in any chunk?' vs 'Answer present in final prompt?' as separate binary checks.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013044
+}

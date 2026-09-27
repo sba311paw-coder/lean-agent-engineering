@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never questions whether adding a large observability framework is needed given the user already has logging and tests capturing failures and latency; it jumps straight to recommending OpenTelemetry without analyzing what capability gap exists beyond what's already in place.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It says 'Your existing logging/tests aren't wasted \u2014 you just wrap tool-call functions in spans' but doesn't seriously consider whether existing logging/tests could be extended/reused instead of adding a new framework; it defaults to recommending a new large framework anyway.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "No discussion of maintenance burden, new dependencies (opentelemetry-sdk, exporters, collectors, backends like Jaeger/Tempo/Datadog), operational overhead, or version upgrade costs of adopting OTel or the LLM-specific layers mentioned.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 0.16666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009600000000000001
+}

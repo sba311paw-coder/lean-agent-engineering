@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__original__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Step 2 explicitly says 'Reproduce the failure with a minimal case' and step 6 says to re-run the reproduction case; also mentions looking at actual error/log output.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1 'Check the diff first (before anything else)' with git diff/log commands, listed as the very first action.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 3 'Locate the failing boundary' traces flow through LLM \u2192 structured call \u2192 Agent app \u2192 tool \u2192 Tool \u2192 result seams.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Step 5 'Form one hypothesis, test it, fix root cause' explicitly instructs forming a hypothesis before fixing, based on observed divergence from step 4.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008926
+}

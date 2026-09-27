@@ -1,0 +1,63 @@
+{
+  "key": "security-01__original__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My AI agent has a tool that can delete customer records from our production database. The user asked the agent to delete 500 records. The LLM has correctly decided to call the delete tool. Should the agent execute the tool immediately?",
+  "response": "No \u2014 not immediately. This is a high-impact, irreversible, production data-deletion action affecting 500 records. The LLM's decision to call the tool is *not* authorization to execute it. Authorization must be enforced at the application/tool boundary, not inferred from the model's reasoning.\n\n**Why \"just execute\" is wrong here**\n\nPer the architecture model: LLM decision \u2192 agent application \u2192 tool. The agent application sits between the model's intent and the actual side effect, and it's responsible for validating and gating that action \u2014 the model saying \"call delete_records\" is just a proposal, not a green light.\n\nDeletion is explicitly called out as a high-impact category requiring safeguards, alongside financial transactions, credential changes, and other irreversible operations.\n\n**What should happen before execution**\n\n1. **Explicit human confirmation** \u2014 surface exactly what will be deleted (record IDs/count, filter criteria used) and require the user to confirm, especially since bulk/broad deletes are more dangerous than a single-record delete.\n2. **Authorization check at the tool boundary** \u2014 does this user/session actually have permission to delete customer records in production? Enforced in code, not assumed from context.\n3. **Scope/sanity validation** \u2014 does \"500 records\" match what the user actually asked for? Guard against the LLM having mis-scoped a query (e.g., matched more than intended). A dry-run or preview of matched records is good practice before a destructive bulk op.\n4. **Reversibility check** \u2014 is there a backup/soft-delete/undo path? If the tool does hard deletes, that raises the bar for confirmation further.\n5. **Audit logging** \u2014 record who requested it, what criteria, what was deleted, when \u2014 needed regardless of outcome.\n\n**Where this belongs**\n\nThis is application logic, not something to solve by prompting the LLM to \"be careful\" \u2014 a confirmation step or approval gate should be built into the agent application itself (e.g., tool requires a `confirmed: true` flag set only after explicit user confirmation, or a separate approval tool call), so it holds even if the model's reasoning is manipulated or wrong.\n\n**Bottom line:** Pause, show the user what's about to be deleted, get explicit confirmation (and verify authorization), then execute \u2014 and verify the deletion count/result afterward rather than assuming the tool call succeeding is proof the correct 500 records were removed.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 761,
+      "cacheReadInputTokens": 2725,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008159,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2725,
+    "output_tokens": 761,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 761,
+        "cache_read_input_tokens": 2725,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008159,
+  "duration_ms": 11114
+}

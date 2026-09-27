@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "Poor grounding in a RAG agent almost always traces back to one specific point in the pipeline, not \"the LLM being unreliable\" in general. Before adding anything (reranker, bigger model, agentic loop), find *where* grounding breaks.\n\n## Trace the pipeline first\n\n```\nQuery \u2192 Retrieval (vector DB) \u2192 Context assembly \u2192 Prompt \u2192 LLM \u2192 Answer\n```\n\nUngrounded answers come from one of these failure points. Diagnose in this order:\n\n**1. Retrieval itself is bad (most common cause)**\nLog the actual chunks returned for a few failing queries and read them yourself.\n- Are the relevant chunks even in the top-k? If not, this is a retrieval-recall problem, not a generation problem \u2014 no prompt tweak will fix it.\n- Common culprits: chunk size too large/small, chunks split mid-thought, embedding model mismatched to domain (e.g. general embeddings on legal/medical text), stale or duplicate documents in the index, metadata filters silently excluding relevant docs.\n\n**2. Right chunks retrieved, but buried or contradicted by noise**\nIf relevant content is in the top-k but not top-1/2, the model may ignore it or blend it with irrelevant chunks.\n- Try reranking the top-k with a cheap cross-encoder before passing to the LLM \u2014 but only if you've confirmed via logging that recall is fine and precision/ordering is the actual gap.\n- Reduce k. More context isn't better; more irrelevant context increases hallucination.\n\n**3. Context assembled, but prompt doesn't force grounding**\nThis is the cheapest fix and worth checking before anything else. Your system prompt should explicitly:\n- Instruct the model to answer *only* from the provided context.\n- Instruct it to say \"I don't know\" / \"not found in the documents\" when the context doesn't answer the question, instead of filling gaps from parametric knowledge.\n- Require it to cite which chunk/source supports each claim (e.g. `[doc3]`), which makes hallucination visible immediately.\n\n**4. Model ignores good context anyway**\nIf retrieval is verified correct and the prompt already enforces grounding, but the model still drifts:\n- Lower temperature.\n- Add a lightweight post-hoc check: verify that key claims in the answer actually appear in (or are entailed by) the cited chunks. This can be a simple string/overlap check before escalating to another LLM call for verification.\n\n## What I'd avoid adding right away\nDon't jump straight to a reranker, a second verifier LLM, an agent-orchestration framework, or a bigger model. Those add cost, latency, and new failure surfaces. Add them only after logs show precision/ordering is genuinely the gap \u2014 not as a first guess.\n\n## Verification\nWhatever you fix, verify with a small held-out set of Q&A pairs where you know the correct source passage. Measure:\n- Recall@k (is the right chunk retrieved at all)\n- Whether the answer's claims are traceable to a retrieved chunk (grounding rate)\n\nDon't rely on \"the answer reads fine\" as evidence \u2014 check citations against the actual source text.\n\nIf you can share how your chunking/retrieval is set up (chunk size, embedding model, k, whether you log retrieved context), I can help pinpoint which boundary is failing rather than guessing across all four.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1909,
+      "cacheReadInputTokens": 2699,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.019633800000000003,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 811,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2699,
+    "output_tokens": 1909,
+    "output_tokens_details": {
+      "thinking_tokens": 811
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1909,
+        "cache_read_input_tokens": 2699,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.019633800000000003,
+  "duration_ms": 23768
+}

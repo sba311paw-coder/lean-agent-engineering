@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__original__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I am building an agent that reads documents and retrieves information from a vector database. The answers are sometimes poorly grounded. Before changing the retrieval system, help me determine whether the problem is retrieval, context construction, or final answer generation. What evidence should I collect first?",
+  "response": "Good instinct to isolate the failing boundary before touching retrieval \u2014 \"poorly grounded\" can originate at any of three points, and each has a distinct fix. Here's how to trace it.\n\n## The pipeline to trace\n\n```\nQUERY\n  -> RETRIEVAL (embed query, vector search, top-k)\n  -> CONTEXT CONSTRUCTION (chunk selection, ordering, formatting, truncation)\n  -> GENERATION (LLM reads context, writes answer)\n  -> ANSWER\n```\n\nEach stage can independently cause poor grounding. Don't guess \u2014 collect evidence that isolates which one is actually broken.\n\n## Build a small eval set first\n\nTake 10\u201320 failing queries. For each, manually determine the \"gold\" passage(s) that should ground a correct answer. This is the minimum instrumentation needed \u2014 no new tools required, just logging at each stage boundary.\n\n## Evidence to collect at each boundary\n\n**1. Retrieval (is the right information even retrieved?)**\n- Log the raw retrieved chunks + similarity scores for each failing query.\n- Check: does the gold passage appear anywhere in top-k? If not, that's recall failure \u2014 a retrieval problem (embedding mismatch, chunking too coarse/fine, top-k too small, metadata filters excluding it).\n- If the gold passage *is* retrieved but ranked low or crowded out by near-duplicates, that's also retrieval (ranking/dedup), not generation.\n\n**2. Context construction (does the good chunk survive assembly?)**\n- Log the *actual final prompt string* sent to the LLM \u2014 not the retrieved chunk list, the literal assembled text.\n- Compare it against the retrieved chunks: was the gold passage truncated, cut mid-sentence, buried in the middle of a long context (\"lost in the middle\"), stripped of source markers, or dropped due to token budget?\n- This step is often the silent culprit \u2014 retrieval logs look fine, but the assembler mangles or drops what retrieval found.\n\n**3. Generation (does the model use the context it was given?)**\n- Take the exact assembled context from step 2 and manually verify: if you (a human) read only this context, could you produce the correct grounded answer? If yes, but the LLM still produces something ungrounded, that's a generation/prompting problem (instructions not enforcing \"only use provided context,\" model falling back on parametric knowledge, no citation requirement).\n- Isolate further: manually inject the *ideal* gold passage directly as context (bypassing retrieval entirely) and re-run generation. If the answer becomes well-grounded, the fault is upstream (retrieval or construction). If it's still poorly grounded even with perfect context, the fault is generation/prompting.\n\n## Diagnostic decision table\n\n| Gold passage in retrieved top-k? | Gold passage in final assembled prompt? | Grounded when fed ideal context directly? | Likely fault |\n|---|---|---|---|\n| No | \u2014 | \u2014 | Retrieval |\n| Yes | No | \u2014 | Context construction |\n| Yes | Yes | Yes (but pipeline still fails) | contradiction \u2014 recheck logging |\n| Yes | Yes | No | Generation/prompting |\n\n## Why this order\n\nThis mirrors \"trace the architecture, identify the failing boundary\" rather than assuming the model is at fault. It also avoids the common mistake of tuning the vector DB (embeddings, chunk size, top-k) when the actual bug is a context-assembly truncation issue or a generation prompt that doesn't instruct the model to stay grounded \u2014 changes that would cost real engineering effort and not fix the actual problem.\n\nOnce you have this evidence for your 10\u201320 cases, the failing stage is usually obvious from the pattern, and you can make one targeted fix rather than changing the retrieval system on a hunch.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 2728,
+      "cacheReadInputTokens": 2742,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0278324,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1469,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2742,
+    "output_tokens": 2728,
+    "output_tokens_details": {
+      "thinking_tokens": 1469
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2728,
+        "cache_read_input_tokens": 2742,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0278324,
+  "duration_ms": 31345
+}

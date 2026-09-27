@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since I can't see your code or logs directly, here's a fast triage checklist for \"tool-calling broke after a code change\" \u2014 go through these roughly in order, as they cover ~90% of causes:\n\n## 1. Check for silent errors first\n- Run with verbose/debug logging enabled (most SDKs have a `debug` or `verbose` flag).\n- Wrap the tool-calling code in a try/except (or check your existing catch blocks) \u2014 many agents swallow exceptions from tool execution and just log \"no tools called.\"\n\n## 2. Diff what actually changed\nAsk yourself specifically:\n- Did a **tool schema** (name, parameters, JSON schema) change but the **function signature** didn't update to match (or vice versa)?\n- Did you rename a tool/function without updating the registration list?\n- Did a **model name/version** change (e.g., pointing to a model that doesn't support tool use, or a different API version)?\n- Did you update an SDK/library version that changed the tool-calling response format (e.g., `tool_calls` vs `function_call` field)?\n\n## 3. Common failure points\n| Symptom | Likely cause |\n|---|---|\n| Model never calls tools | Tool schema not passed to the API call, or `tool_choice` set wrong |\n| Model calls tool but agent errors | Response parsing expects old field name/shape |\n| Tool called, but with wrong/missing args | JSON schema `required` fields or types don't match what the model outputs |\n| Works sometimes, not others | Model non-determinism + ambiguous tool descriptions, or hitting `max_tokens` before finishing the tool call JSON |\n\n## 4. Fast diagnostic steps\n1. **Print the raw API request** right before it's sent \u2014 confirm tools/schemas are actually included.\n2. **Print the raw API response** \u2014 confirm whether the model attempted a tool call at all.\n3. **Isolate**: call the tool-calling API directly (minimal script, one tool, one prompt) outside your agent framework to see if it's an SDK issue vs. your integration code.\n4. **Git diff / revert**: if you have version control, `git diff` the last working commit against HEAD focused on the tool registration and API call code \u2014 this is usually the fastest fix.\n\n## To help you faster, tell me:\n- What framework/SDK (raw Anthropic/OpenAI API, LangChain, LangGraph, custom)?\n- What exactly changed in the recent commit (if you can paste the diff)?\n- What's the actual error or behavior \u2014 exception, wrong output, tool never invoked?\n\nPaste the error/traceback or the relevant code and I can pinpoint it immediately.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 518,
+      "outputTokens": 1174,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.012776,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 312,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 518,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1174,
+    "output_tokens_details": {
+      "thinking_tokens": 312
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 518,
+        "output_tokens": 1174,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012776,
+  "duration_ms": 15147
+}

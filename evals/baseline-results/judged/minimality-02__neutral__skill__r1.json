@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly assesses the current setup ('a small agent that calls the model, the model picks from two functions, you execute and return results') and asks 'what capability is missing that LangChain would add?', directly evaluating actual complexity vs. requirement.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'don't migrate to LangChain for this' and recommends keeping the direct API call with native tool-calling and a small ~30-50 line loop instead of adding a framework.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete triggers under 'When LangChain (or any framework) would earn its place': many tools with dynamic selection, built-in memory/state across many turns, multi-agent orchestration/complex chains/RAG pipelines, or frequent provider swapping needing a provider-agnostic interface.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010388000000000001
+}

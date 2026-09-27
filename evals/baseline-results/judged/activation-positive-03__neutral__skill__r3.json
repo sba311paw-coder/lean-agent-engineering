@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly diagrams 'QUERY \u2192 RETRIEVAL (vector DB) \u2192 CONTEXT ASSEMBLY \u2192 LLM \u2192 ANSWER' and breaks localization into retrieval, chunking, assembly, and generation failure categories with distinct diagnostic checks for each.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'Before changing anything, check with a handful of real failing examples' and 'Whatever you change, verify with evidence, not vibes: Build a small eval set... Measure... Re-run after each change to confirm improvement rather than assuming it worked.'",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Suggests logging/inspecting top-k chunks in isolation to determine retrieval vs generation failure, and recommends a 'lightweight post-hoc verification step' to isolate whether generated claims are supported by retrieved context, plus advises trying single fixes (e.g., prompt tightening alone) before adding reranker/hybrid search to isolate what actually helps.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012355999999999999
+}

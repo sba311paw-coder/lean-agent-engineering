@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Before jumping to swap the embedding model, it's worth diagnosing where the failure is actually happening' and concludes 'Only after ruling out the above... then embedding model quality is worth examining.'",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly traces the pipeline diagram (Query\u2192Embed\u2192Retrieve\u2192Rerank/Filter\u2192Context assembly\u2192LLM\u2192Answer) and gives step-by-step checks for retrieval, context assembly, and generation stages.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Instructs to 'Pull 5\u201310 failing examples' and 'Print the top-k retrieved chunks for a failing query' before diagnosing, and ends by asking user to share a failing query/answer pair as evidence.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009600000000000001
+}

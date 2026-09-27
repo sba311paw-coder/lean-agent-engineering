@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__original__skill__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I am building a small Python AI agent for my own use. It needs to answer questions, call two existing Python functions when necessary, and return the results to me. I do not need multiple agents, distributed services, or production scale yet. What architecture should I start with?",
+  "response": "# Minimal Architecture for Your Use Case\n\nFor a single-user personal agent with two tools, here's the smallest reliable setup \u2014 no framework, no orchestration layer needed.\n\n## Structure\n\n```\nUSER (you, CLI input)\n   |\n   v\nAGENT APPLICATION (a plain Python script/loop)\n   |\n   v\nLLM (Claude API call with tool definitions)\n   |\n   | structured tool call (JSON: which function + args)\n   v\nAGENT APPLICATION (validates args, dispatches)\n   |\n   v\nYOUR TWO PYTHON FUNCTIONS\n   |\n   | result\n   v\nAGENT APPLICATION (feeds result back to LLM)\n   |\n   v\nLLM (final natural-language answer)\n   |\n   v\nYOU\n```\n\n## Concretely, this means:\n\n1. **One Python script.** A loop that takes your input, sends it to the model with tool definitions attached, checks the response for a tool-call request, and if present, calls the matching local function directly (a simple `if/elif` or dict dispatch is fine for two tools).\n2. **No agent framework** (no LangChain/LangGraph/CrewAI/etc.). At two tools and single-user scale, a framework adds abstraction and dependencies without solving a problem you have.\n3. **No MCP server.** MCP is for exposing tools across processes/clients. You're calling functions in the same process \u2014 just call them.\n4. **No multi-agent setup.** One LLM call loop with tool-calling is sufficient; you don't have specialized sub-tasks that need separation.\n5. **Application, not the LLM, executes the function.** The LLM only *decides* which tool and with what arguments (via structured tool-call output). Your script validates the arguments and actually invokes the function. This keeps the LLM's decision from being treated as automatic authorization \u2014 important even at small scale if either function has any side effect (e.g., writing a file, sending something).\n\n## When to add more\n\n- Add a **retry/error-handling layer** around tool calls if failures are silent or ambiguous \u2014 this is the first real gap most people hit.\n- Add **structured logging** (just print/log tool name + args + result) once you want to debug bad answers \u2014 cheap, high value.\n- Only consider a framework or MCP if you outgrow single-process, single-user use (e.g., multiple clients need the same tools, or tool count grows into the dozens with complex routing).\n\n## Verification for this build\n\nOnce built: test each tool path independently (call with input that should trigger tool 1, tool 2, and neither), and confirm the final answer reflects the actual function output rather than a hallucinated one. That's sufficient rigor for personal-scale use \u2014 no need for integration/e2e suites yet.\n\nDoing without a framework here isn't a shortcut \u2014 it's the correct-sized solution for the problem you described.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 923,
+      "cacheReadInputTokens": 2733,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0097806,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2733,
+    "output_tokens": 923,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 923,
+        "cache_read_input_tokens": 2733,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0097806,
+  "duration_ms": 13117
+}

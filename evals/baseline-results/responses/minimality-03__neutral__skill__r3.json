@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__neutral__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "Short answer: probably none, yet.\n\nApplying the capability-gap test here \u2014 before reaching for a large observability framework (Langfuse, Langsmith, Arize Phoenix, OpenTelemetry-based LLM stacks, etc.), it's worth checking whether you actually have a gap that requires one:\n\n**1. What capability is actually missing?**\nYou said you already have logging and tests that *show* tool-call failures and latency. That means you already have:\n- Failure visibility\n- Latency measurement\n\nSo the raw capability exists. The real question is: what's insufficient about it? Common actual gaps are usually one of these, not \"lack of a framework\":\n\n- Logs aren't structured/queryable (hard to filter by tool, error type, trace)\n- No correlation across a multi-step trace (can't see the full chain for one request)\n- No aggregation/alerting (you see failures individually, not trends)\n- No retention/dashboard for long-term analysis\n\n**2. Can the existing system solve it directly?**\nOften yes:\n- Structured logging \u2192 switch `print`/basic logging to `structlog` or stdlib `logging` with JSON formatter + a `trace_id`/`run_id` per request. This alone solves 80% of \"I can't correlate events\" problems.\n- Latency \u2192 wrap tool calls in a simple decorator/context manager that logs `duration_ms`, tool name, success/failure. A few lines of code.\n- Aggregation \u2192 pipe JSON logs into whatever you already use (even `grep`/`jq`, or your existing log stack if you have one \u2014 CloudWatch, Datadog, etc.)\n\n**3. Small local change vs. framework**\nA structured logging decorator + trace ID propagation is maybe 30\u201350 lines of code and zero new dependencies, credentials, or infra. A large observability framework adds: new service/SaaS dependency, API keys, network calls from your agent, cost, and a new failure mode (observability platform outage affecting your agent).\n\n**When a framework is actually justified:**\n- You have multiple agents/environments and need centralized dashboards across teams\n- You need LLM-specific features out of the box: prompt/response diffing, eval scoring, cost tracking per model, replay\n- You're already invested in OpenTelemetry and want LLM-specific semantic conventions layered on top (in which case, prefer **OpenTelemetry** itself over a vendor-specific SaaS \u2014 it's the standard, vendor-neutral, and most LLM observability tools plug into it anyway)\n\n**Recommendation:**\n1. First, add structured logging (JSON + trace/span IDs) and a lightweight timing wrapper around tool calls \u2014 no new dependency needed.\n2. If you outgrow that (multiple services, need dashboards/alerts, team-wide visibility), adopt **OpenTelemetry** as the instrumentation layer (vendor-neutral, small footprint), and only then pick a backend (self-hosted Jaeger/Prometheus, or a vendor) based on concrete needs like retention or alerting you can name specifically.\n\nSkip jumping straight to a large framework \u2014 that's adding orchestration/infra weight before establishing that your current logging+tests can't already answer the questions you need answered. What specific thing can't you currently see or do with your existing logs/tests? That answer will tell you whether you need a library, a small local change, or genuinely a platform.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1098,
+      "cacheReadInputTokens": 2693,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011522600000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2693,
+    "output_tokens": 1098,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1098,
+        "cache_read_input_tokens": 2693,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011522600000000001,
+  "duration_ms": 14851
+}

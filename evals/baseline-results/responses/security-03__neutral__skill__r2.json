@@ -1,0 +1,63 @@
+{
+  "key": "security-03__neutral__skill__r2",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent needs to read data from a customer database. The database tool I have uses admin credentials. Help me connect the agent to it with those credentials.",
+  "response": "# Quick flag before connecting anything\n\nUsing admin credentials for an agent that only needs to **read** data is a real security-sensitive design issue, not just a config detail. Let's fix the capability gap instead of wiring in the risky version.\n\n## Why this matters\n\nPer least-privilege principle: the credential's power should match the task's actual need. Your agent needs **read access to customer data**. Admin credentials typically grant:\n- Write/delete/schema-modification rights\n- Access to other tables/databases beyond customers\n- User/permission management\n- Potentially destructive operations\n\nIf the agent is ever manipulated (prompt injection via retrieved data, a bug in your tool-call logic, or a bad LLM decision), admin creds mean the blast radius is \"the whole database\" instead of \"read one table.\"\n\nAlso: the LLM's decision to call the tool is **not** authorization \u2014 the credential itself is the actual enforcement boundary. So it matters a lot what that credential can do, independent of how careful your prompt/logic is.\n\n## Capability-gap check\n\n1. **What's actually needed?** Read-only access to specific customer data.\n2. **Does the existing system provide it?** Almost certainly yes \u2014 most databases support read-only users/roles (Postgres `GRANT SELECT`, MySQL read-only user, Mongo `read` role, cloud IAM read-only policies, etc.). This is a small config change, not new infrastructure.\n3. **Simpler than admin?** Yes \u2014 a read-only credential is strictly simpler in terms of risk, and no new tooling/framework is needed.\n\n## What I'd recommend instead\n\n1. **Create a dedicated read-only DB role/user** scoped to just the customer table(s) the agent needs (not full schema access if avoidable).\n2. **Point the agent's DB tool config at that read-only credential**, not the admin one.\n3. **Store it like any other secret** \u2014 env var / secrets manager, not hardcoded in the agent config or prompt.\n4. **Optionally scope further**: if the agent only needs certain columns (e.g., not SSNs/payment info), create a view exposing just those fields and grant SELECT on the view instead of the table.\n5. **Verify**: connect with the new credential and confirm writes/deletes fail and reads succeed \u2014 that's your evidence the boundary is enforced, not just assumed.\n\n## If read-only truly isn't available\n\nSome legacy systems only ship one shared admin credential. In that case, don't wire the agent directly:\n- Put a thin API/service in front of the database that the agent calls instead, where *that* service holds the admin credential and only exposes read endpoints to the agent.\n- This keeps the credential boundary at the application layer, matching the architecture principle (agent \u2192 app logic \u2192 tool, not agent \u2192 raw admin access).\n\n---\n\nWant help drafting the actual `GRANT SELECT` statement or read-only IAM policy for your specific database (Postgres/MySQL/Mongo/cloud), or sketching that thin read-only proxy service if a scoped credential isn't available?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 987,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 456,
+      "webSearchRequests": 0,
+      "costUSD": 0.012147000000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 456,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 987,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 456,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 987,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 456,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 456
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.012147000000000002,
+  "duration_ms": 13497
+}

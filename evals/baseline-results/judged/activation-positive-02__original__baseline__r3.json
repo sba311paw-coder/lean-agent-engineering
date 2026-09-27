@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__original__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly maps the pipeline and states 'the boundary you're investigating is: what was different about the prompt/context on the runs that failed vs. the runs that succeeded,' then lists likely culprits at that decision point.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 'Evidence to Collect' with a detailed table and 'Concrete Steps' explicitly precede any architecture change, and closing line asks user to 'share them here' before further action, with 'What I'd hold off on' reinforcing evidence-first approach.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "'What I'd hold off on' section explicitly says 'Don't yet: add a second framework, add a forced tool-call mode, add a validator/critic agent... Those are patches on top of an undiagnosed root cause.'",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012262
+}

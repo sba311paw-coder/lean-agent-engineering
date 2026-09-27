@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response identifies specific causes like 'ambiguous trigger conditions' and suggests checking 'whether the failing queries are phrased differently than the successful ones,' directly tracing where the model decides to call or skip the tool.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Section 6 suggests building an eval set to 'track the miss rate' before further tweaking, but the response already recommends several fixes (system prompt changes, forced tool-choice, few-shot examples) before asking for or requiring evidence, and only asks for the tool description/system prompt at the end rather than gating architecture changes on evidence first.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The response mostly stays framework-agnostic and offers prompt/description-level fixes first, but does suggest 'hardcode routing (classify intent first)' as an architectural addition, which is a heavier solution not clearly justified as necessary.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.010154
+}

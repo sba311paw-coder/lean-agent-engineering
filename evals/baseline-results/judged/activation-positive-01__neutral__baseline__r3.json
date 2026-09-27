@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response outlines the message flow structure: user message -> assistant tool_call -> tool result message -> final assistant response, tracing the architecture of the agent loop.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It distinguishes LLM behavior (e.g., 'model interprets that as not needing to restate data') from app execution (e.g., 'double-call bug', 'custom parsing after the model response'), but doesn't explicitly frame this as a general LLM-vs-App-execution distinction; it's implicit across multiple points rather than clearly separated.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists multiple distinct failure boundaries: message flow/tool_call_id issues, double-call bug, content format/serialization, system prompt instructions, token limits, streaming truncation, and post-processing filtering.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Provides 'Quick diagnostic steps' (log raw request/response, check parsing) and ends by asking which framework is used before finalizing a fix, but the bulk of the response already prescribes specific fixes for each hypothesis before confirming which applies, rather than investigating first.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.011642
+}

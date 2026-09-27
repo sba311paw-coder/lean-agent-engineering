@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "My honest recommendation: **don't migrate to LangChain for this.** Let me explain why, based on what you've described.\n\n## What you actually have\n\nA small agent that:\n- Calls the model API directly\n- Calls two functions (tools)\n- Returns results\n\nThat's the entire agent loop already implemented. This is not a case of \"missing capability\" \u2014 it's a working system.\n\n## Capability-gap check\n\nBefore adding a framework, the real question is: **what capability is missing that LangChain provides and your current code doesn't?**\n\nCommon reasons people reach for LangChain, and whether they likely apply here:\n\n| Reason | Does it apply to you? |\n|---|---|\n| Need multi-step chains across many prompts | Probably not \u2014 you have 2 functions |\n| Need to swap model providers frequently | Your direct API call already does this fine if abstracted in one place |\n| Need memory/retrieval/vector store integration | Not mentioned |\n| Need built-in agent executor / tool-calling loop | You already wrote this \u2014 it works |\n| \"Building an AI agent\" therefore need a framework | This is the trap \u2014 framework choice should follow requirements, not the label \"agent\" |\n\nIf none of the real reasons apply, migrating adds:\n- A new dependency (and its transitive dependencies \u2014 LangChain pulls in a lot)\n- A new abstraction layer between your code and the model API that you now have to debug through\n- Version churn risk (LangChain's API has changed significantly across versions)\n- Harder debugging: errors now surface through LangChain's abstractions instead of your own straightforward function calls\n\n## What I'd actually do\n\n1. **Keep the direct API call + two functions as-is.** It's simple, testable, and easy to reason about.\n2. If you want cleaner tool-calling structure, use the model provider's **native structured tool-calling** (e.g., OpenAI/Anthropic tool-use schemas) \u2014 you may already be doing this.\n3. If you have a *specific* unmet need (e.g., \"I want to add a vector DB for retrieval\" or \"I need to orchestrate 6+ tools with conditional branching\"), name that need specifically. That's when a framework decision makes sense \u2014 and even then, evaluate whether it's LangChain specifically, or whether a lighter option (or just more of your own code) solves it.\n\n## If you tell me the real driver\n\nIf there's a concrete reason behind \"I'm building an AI agent, therefore LangChain\" \u2014 like you're about to add multiple tools, retrieval, multi-agent orchestration, or need provider-agnostic swapping \u2014 tell me that specifically, and I can help you evaluate whether LangChain (or a lighter alternative) is the right fit and sketch the migration path. But migrating a working 2-function agent to a framework *because* it's now called \"an AI agent\" is added complexity without a demonstrated need.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 912,
+      "cacheReadInputTokens": 2720,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009668,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2720,
+    "output_tokens": 912,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 912,
+        "cache_read_input_tokens": 2720,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009668,
+  "duration_ms": 12819
+}

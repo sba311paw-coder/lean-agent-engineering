@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__original__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I have a small Python agent that needs to call two functions and return the results to the user. The current implementation works with the model API directly. Should I replace it with LangChain because I am building an AI agent?",
+  "response": "No \u2014 for two function calls with a direct return of results, adding LangChain would be pure overhead, not a fix for a real gap.\n\n**Capability-gap check:**\n\n1. **What capability is missing?** Nothing, apparently \u2014 you said the current implementation *works*. So the question isn't \"what's missing\" but \"why replace something functional.\"\n2. **Does the model API already provide it?** Yes. Modern model APIs (Anthropic, OpenAI, etc.) natively support tool/function calling with structured outputs. That's the entire mechanism LangChain wraps.\n3. **Can the application solve it directly?** Yes \u2014 a loop that: sends the request, gets a tool-call decision, executes the matching Python function, returns the result to the model (or directly to the user), is maybe 30\u201380 lines of plain Python.\n4. **What would LangChain actually add here?**\n   - Abstraction layers for chains/agents/memory you don't need for 2 tools.\n   - A dependency with frequent breaking API changes and its own debugging surface.\n   - Indirection that makes tracing \"which boundary failed\" *harder*, not easier (per the agent architecture model above \u2014 you'd be inserting an extra layer between your app and the LLM decision boundary).\n   - Framework-specific concepts (Runnables, AgentExecutor, output parsers) you must learn just to reproduce what you already have.\n5. **What new cost does it introduce?** New dependency to maintain/update, larger attack surface, slower iteration, harder debugging of tool-call failures since errors get wrapped in framework abstractions.\n6. **What evidence justifies it?** None given \u2014 \"I am building an AI agent\" is a label, not a requirement. The skill description explicitly warns: *do not add complexity merely because it is available*, and *do not activate heavier tooling just because something is called an agent.*\n\n**When LangChain (or similar) would be justified:**\n- You need many interchangeable model providers behind one interface.\n- You need complex multi-step chains, retrieval pipelines, or persistent memory management across many components.\n- You're coordinating multiple agents/subagents with shared infra (retries, tracing, memory) that would otherwise be reimplemented repeatedly.\n\nIf you hit one of those needs concretely later, add the framework then \u2014 that's the \"smallest capability only when there's a real gap\" principle. For now:\n\n**Recommendation:** Keep your direct model-API implementation. If you want, I can help you tighten the current loop (error handling on tool execution, validating tool-call arguments, structuring the two-function dispatch) \u2014 that's a small local improvement, not a framework migration.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 849,
+      "cacheReadInputTokens": 2715,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009037000000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2715,
+    "output_tokens": 849,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 849,
+        "cache_read_input_tokens": 2715,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009037000000000002,
+  "duration_ms": 12101
+}

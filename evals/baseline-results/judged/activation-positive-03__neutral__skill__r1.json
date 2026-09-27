@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly maps 'Query \u2192 Retriever \u2192 Vector DB \u2192 Retrieved chunks \u2192 LLM \u2192 Answer' and separates retrieval quality, context assembly, prompt construction, and generation behavior as distinct boundaries.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'Diagnostic step (do this before changing anything)' instructs checking 5-10 failure cases to see if correct chunk was retrieved/used before recommending fixes, and explicitly says 'don't apply all of them speculatively.'",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The diagnostic step isolates variables by checking retrieval vs usage vs generation separately ('Was the correct chunk retrieved?... Was it used but added unsupported claims?'), functioning as an isolation experiment to identify which boundary fails.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011158000000000001
+}

@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__original__baseline__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides explicit 7-step pipeline from user message through LLM tool_call, execution, result wrapping, resend, second LLM call, final response.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes LLM-side generation steps (1,2,6) from 'Your code executes the tool' and message construction (3,4,5), and Boundary A/E explicitly separate 'does your agent loop call the LLM again' (app logic) vs model synthesis.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists six distinct boundaries (A-F: loop re-entry, malformed tool result, serialization, history mutation, framework early-return, streaming merge) each tied to a specific point in the pipeline.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'rather than jumping to a fix' and provides a 'How to isolate it' section with three logging checkpoints plus follow-up questions before proposing any fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011724
+}

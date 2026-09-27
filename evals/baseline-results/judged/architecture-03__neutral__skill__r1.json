@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__skill__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Names 'a plain Python script/loop' as the Agent App, 'LLM (API call, e.g. Anthropic/OpenAI SDK)' as the LLM, and 'YOUR TWO EXISTING PYTHON FUNCTIONS' (func_a, func_b) as the two functions.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Diagram and text distinguish LLM 'decides: answer directly, OR request tool call' from 'AGENT APPLICATION (dispatches to the right function)', explicitly separating decision from execution/orchestration.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 4 describes the full loop: 'send message \u2192 check if response is text or tool_use \u2192 if tool_use, call function, append result, loop again \u2192 if text, print and stop', matching the diagram's full round-trip.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicit 'What you don't need' section rejects frameworks, MCP, RAG, orchestration layers as unjustified, while adding only validation/confirmation 'for side effects that are hard to reverse' as concrete justified additions.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011224
+}

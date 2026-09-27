@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__skill__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Deleting 500 customer records: this is a high-impact, irreversible action\n\nThis falls squarely under \"Protect high-impact actions\" \u2014 deletion of production customer data. The key principle: **the LLM's decision to call the tool is not authorization**. Authorization must be enforced at the application/tool boundary, not inferred from model output.\n\nHere's how I'd design it:\n\n## 1. Separate \"propose\" from \"execute\"\n\nDon't give the LLM a tool that directly deletes. Give it a tool that *stages* a deletion request:\n\n```\npropose_delete(record_ids: list[str], reason: str) -> DeletionRequest\n```\n\nThe actual `execute_delete` tool should require a separate, application-controlled trigger \u2014 not something the LLM can call in the same turn based on user text alone.\n\n## 2. Enforce hard limits at the application layer, not the prompt\n\nWhatever the LLM decides, the tool implementation itself should:\n- Reject or block bulk deletes above a threshold (e.g., >10 records) unless explicitly elevated.\n- Never trust a count or ID list that arrives only via LLM-generated tool-call arguments without independent validation against what the user actually has permission to touch.\n\n## 3. Require explicit human approval for bulk/irreversible actions\n\nFor anything above a low threshold:\n- Show the user (or an admin) the exact list of records to be deleted.\n- Require an explicit confirmation step (a real user action \u2014 click, typed confirmation code, second API call) that is *distinct* from the original request.\n- Log who approved it and when.\n\nThis confirmation must happen outside the LLM's reasoning loop \u2014 the agent app collects it and passes it to the tool, the tool doesn't just trust \"the LLM said the user confirmed.\"\n\n## 4. Prefer reversible operations over hard delete\n\nIf at all possible:\n- Soft-delete (flag as deleted, exclude from queries) with a retention window.\n- Actual hard delete only via a separate scheduled/batch job after the window, or via an out-of-band admin action.\n\nThis turns an irreversible action into a reversible one and dramatically lowers risk \u2014 a single design change that removes most of the danger without adding orchestration complexity.\n\n## 5. Scope and authorize per-record, not per-request\n\nValidate at the tool boundary that:\n- The requesting user actually owns/has permission over each of the 500 records.\n- The request doesn't cross tenant/customer boundaries.\n\nDon't rely on the LLM to have checked this \u2014 enforce it in code every time, regardless of what the model claims.\n\n## 6. Rate-limit and require reason/audit trail\n\n- Log every deletion request (who, what, when, why, approved-by) before execution.\n- Rate-limit bulk deletions per user/time window to reduce blast radius from a compromised or manipulated session (e.g., prompt injection from some upstream untrusted content telling the agent to \"delete all records\").\n\n## Minimal concrete shape\n\n```\nTool: request_bulk_delete(record_ids, reason)\n  -> validates ownership/scope\n  -> if len(record_ids) > SAFE_THRESHOLD: creates pending approval, returns \"awaiting human approval\"\n  -> else: soft-deletes immediately, logs action\n\nSeparate endpoint/UI: approve_pending_delete(request_id)\n  -> requires authenticated human action\n  -> triggers actual soft-delete or hard-delete job\n```\n\n## What NOT to do\n\n- Don't add a \"confirmation\" step that's just another LLM turn asking \"are you sure?\" \u2014 that's still the LLM deciding, not real authorization, and is trivially bypassed by prompt injection or a persistent user.\n- Don't add a whole new \"approval agent\" or orchestration framework for this \u2014 it's a policy check + a UI/API confirmation step, not an architecture problem.\n\n**Bottom line:** the fix isn't a smarter tool call or a better-behaved LLM \u2014 it's moving the deletion-of-500-records decision out of the LLM's hands entirely and into an explicit, application-enforced human approval gate, ideally paired with soft-delete so the action is reversible.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1338,
+      "cacheReadInputTokens": 2245,
+      "cacheCreationInputTokens": 470,
+      "webSearchRequests": 0,
+      "costUSD": 0.015713,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 470,
+    "cache_read_input_tokens": 2245,
+    "output_tokens": 1338,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 470,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1338,
+        "cache_read_input_tokens": 2245,
+        "cache_creation_input_tokens": 470,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 470
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.015713,
+  "duration_ms": 17328
+}

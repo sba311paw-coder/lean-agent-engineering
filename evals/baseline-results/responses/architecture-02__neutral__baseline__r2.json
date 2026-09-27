@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "This is a common issue with tool-calling agents/LLM pipelines. The tool executes correctly, but the model's final response doesn't actually incorporate the tool output. Here's how to debug and fix it systematically:\n\n## Most likely causes (in order of probability)\n\n### 1. Tool result isn't actually being fed back to the model\nThe tool call and the final answer generation may be disconnected. Check that:\n- The tool's return value is appended to the conversation/message history **before** the final generation call\n- You're not accidentally generating the final answer from the *original* messages array (without the tool result appended)\n\n```python\n# Wrong: generating from stale history\nresponse = model.generate(original_messages)\n\n# Right: append tool result first\nmessages.append({\"role\": \"tool\", \"content\": tool_result, \"tool_call_id\": call_id})\nresponse = model.generate(messages)\n```\n\n### 2. Tool result format doesn't match what the API expects\nDifferent APIs (OpenAI, Anthropic, etc.) require specific structures for tool results (e.g., `tool_call_id` matching, correct role like `\"tool\"` vs `\"function\"`). If malformed, some APIs silently ignore it or error gracefully into a generic response.\n\n### 3. Two separate LLM calls, and only one sees the tool output\nIf your pipeline does something like:\n```\nCall 1: decide to use tool \u2192 get tool name/args\nCall 2: generate final answer\n```\nMake sure Call 2's prompt/context **includes** the actual tool output, not just \"a tool was called.\"\n\n### 4. System prompt or answer-generation prompt overrides tool data\nIf there's a separate prompt template for \"final answer\" that doesn't reference `{{tool_output}}`, it may default to generic phrasing regardless of what's available in context.\n\n### 5. Output parsing bug\nIf you're parsing the tool's raw response (e.g., JSON) and something fails silently (wrong key, type mismatch), the extracted value might default to null/empty, causing a generic fallback response.\n\n### 6. Model is not calling the tool result \"correctly\" \u2014 race condition\nIf tool execution is async and the final generation starts before the tool result resolves, the model may generate based on incomplete context.\n\n## How to debug\n\n1. **Log the exact payload sent to the final generation call** \u2014 not just \"tool ran,\" but the full message array/prompt including the tool output. Confirm the temperature value is literally present in that payload.\n2. Check **tool_call_id matching** if using OpenAI/Anthropic tool-calling \u2014 mismatched IDs cause results to be dropped.\n3. If using a framework (LangChain, LlamaIndex, custom agent loop), check the specific \"combine tool result with final answer\" step \u2014 verify it's not truncating or has a bug in template rendering.\n\n---\n\nCould you share more about your setup (which framework/API \u2014 OpenAI function calling, Anthropic tool use, LangChain, custom code, etc.)? That'll help me pinpoint the exact fix rather than general troubleshooting.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 535,
+      "outputTokens": 966,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.01073,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 535,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 966,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 535,
+        "output_tokens": 966,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.01073,
+  "duration_ms": 11634
+}

@@ -1,0 +1,63 @@
+{
+  "key": "minimality-03__original__baseline__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My Python agent already has logging and tests that show me tool-call failures and latency. I am considering adding a large observability framework because I saw it recommended for AI agents. Should I add it?",
+  "response": "Short answer: probably not, at least not yet.\n\n**What you already have covers the fundamentals:**\n- Logging \u2192 tells you *what* happened\n- Tests \u2192 tell you *what should* happen\n- Tool-call failure tracking + latency \u2192 the two metrics that matter most for agent reliability\n\nThat's the core of observability. A \"large observability framework\" mostly adds value when you have problems your current setup can't answer, such as:\n\n1. **Distributed tracing** \u2014 if your agent calls multiple services/sub-agents and you need to see a request's full path across process boundaries\n2. **Correlation across many concurrent sessions** \u2014 if you're running at a scale where grepping logs no longer works\n3. **Aggregated dashboards/alerting across a team** \u2014 if multiple people need shared visibility, not just you debugging locally\n4. **Cost/token tracking at scale** \u2014 if you need to attribute spend across users/features\n5. **Automatic anomaly detection** \u2014 if failure patterns are too subtle to catch with your own tests\n\n**Questions to ask before adding it:**\n- Is there a specific failure mode you can't currently diagnose with logs + tests?\n- Are you running this for just yourself, or serving multiple users/production traffic?\n- Would the framework's setup/maintenance cost (new dependency, config, possibly a hosted service with its own auth/data handling) be less than the pain it removes?\n\nIf you're a single developer iterating on an agent and your current logging/tests already surface failures and latency clearly, adding a heavy framework is likely premature \u2014 it's infrastructure for a scaling problem you may not have yet. The \"recommended for AI agents\" advice is often generic and framework-vendor-driven, not tailored to your actual pain points.\n\nA middle ground: if you want *slightly* more than logs (e.g., structured traces of tool calls with timing, without a heavyweight framework), you could add lightweight structured logging (JSON logs with a trace ID per agent run) or a simple in-process tracer \u2014 much less overhead than a full observability platform, and you can upgrade later if you actually hit scaling/team-visibility problems.\n\nIf you want, tell me more about what's motivating this (scale, team size, specific blind spot you're worried about) and I can give a more concrete recommendation.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 544,
+      "outputTokens": 727,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008358,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 544,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 727,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 544,
+        "output_tokens": 727,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008358,
+  "duration_ms": 10722
+}

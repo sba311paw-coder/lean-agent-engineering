@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__baseline__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Designing a Safe Bulk-Delete Tool for Production Customer Records\n\nBulk deletion of 500 customer records is exactly the kind of high-blast-radius action that should never be a single, unconfirmed LLM tool call. Here's how to architect it:\n\n## 1. Separate \"propose\" from \"execute\"\n\nDon't give the LLM a tool that directly deletes. Instead, split it into two tools/steps:\n\n- **`preview_delete(filters/ids)`** \u2014 returns the count and a sample (e.g., first 20) of records that *would* be deleted, plus a confirmation token.\n- **`confirm_delete(token)`** \u2014 actually performs the deletion, but only if the token is valid and unexpired (e.g., 5 min TTL).\n\nThis forces a \"show me what you're about to do\" step before anything destructive happens, and prevents the LLM from chaining straight to deletion in one shot.\n\n## 2. Require explicit human confirmation for anything above a threshold\n\n- Set a hard threshold (e.g., >10 or >50 records) above which the tool **cannot** execute without out-of-band human approval \u2014 not just \"the user typed yes in chat,\" but a real confirmation step (UI button, second API call with a signed token, Slack approval, etc.).\n- For your 500-record case specifically: that should almost certainly route to a human-approval workflow, not a direct tool call, regardless of how the request was phrased.\n\n## 3. Soft-delete, not hard-delete\n\n- The tool should mark records as `deleted_at = now()` / move them to an archive table rather than `DELETE FROM`. This gives you a recovery window (e.g., 30 days) before a separate, scheduled, non-LLM-triggered job does permanent purging.\n\n## 4. Scope and rate-limit the tool itself\n\n- Enforce a max batch size per call (e.g., 50), independent of what the model requests. If the LLM asks for 500, the tool should refuse and require chunking + confirmation per chunk, or reject outright and escalate.\n- Add per-user/per-session rate limits on destructive calls (e.g., max N deletes per hour) enforced server-side, not by prompting.\n\n## 5. Require unambiguous identifiers, not fuzzy filters\n\n- Don't accept vague filters like \"delete inactive customers\" directly \u2014 require the tool to first resolve filters to a concrete list of IDs via the preview step, then delete only *those exact IDs*. This prevents scope creep between preview and execute (e.g., new records matching the filter shouldn't sneak into the delete).\n\n## 6. Audit everything\n\n- Log: who initiated (user ID/email), what was requested, the preview results, the confirmation, and the final outcome. Immutable audit log, separate from the app DB ideally.\n- Include the model's reasoning/tool-call payload in the log for post-incident review.\n\n## 7. Principle of least privilege at the DB layer\n\n- The service account the tool uses should have permissions scoped so it *cannot* physically hard-delete beyond what's needed (e.g., only UPDATE permission for soft-delete, no DELETE grant at all on that table for the app's runtime role). The purge job runs under a different, more privileged, non-LLM-facing credential.\n\n## 8. Treat prompt content as untrusted for authorization decisions\n\n- The fact that \"a user asked it to delete 500 records\" should never by itself be sufficient authorization. Tool-level authorization checks (role, ownership, quota) must happen in code, independent of what the model decided to do \u2014 the model's judgment is not an access-control mechanism.\n\n---\n\n**Bottom line:** the LLM should never have a tool where \"call this function\" == \"500 records permanently gone.\" Insert a mandatory preview + human-confirmation + soft-delete + batch-cap layer between the model's tool call and any actual destructive database operation.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 545,
+      "outputTokens": 1252,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.01361,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 545,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1252,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 545,
+        "output_tokens": 1252,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.01361,
+  "duration_ms": 16459
+}

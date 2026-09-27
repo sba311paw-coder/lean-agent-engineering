@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "This is a classic non-deterministic tool-calling issue \u2014 the LLM is making a *decision* about whether to call a tool, and that decision isn't backed by any enforcement at the application layer. Before jumping to fixes, let's locate exactly where the boundary is failing.\n\n## Likely root causes (in order of frequency)\n\n**1. The tool call is optional by design, not enforced**\nIf your system prompt says something like \"use the search tool when needed,\" the model is free to judge \"needed\" inconsistently. LLMs will often answer from parametric knowledge when the question *feels* answerable, even if your intent was \"always ground this in the tool.\"\n\n**2. Ambiguous tool description or trigger conditions**\nIf the tool's description doesn't clearly state *when* it must be used vs. when it's optional, the model guesses per-request based on phrasing.\n\n**3. No application-level enforcement**\nIf correctness depends entirely on the LLM's judgment call with no checks afterward, you have no safety net \u2014 the LLM's decision is being treated as the final authority, when it should just be a signal the app can act on.\n\n**4. Context/conversation drift**\nIn multi-turn conversations, earlier turns may bias the model toward \"just answering\" if similar questions were answered directly before (few-shot drift within the session).\n\n**5. Tool-choice setting on the API**\nSome SDKs let you set tool_choice to \"auto\" (default, model decides), \"any\" (must call some tool), or force a specific tool. If you're on \"auto,\" this exact symptom is expected behavior, not a bug.\n\n## Fixes, cheapest first\n\n**A. Force tool use when the domain requires it (application-level, not prompt-level)**\nIf there's a class of questions that must always hit the tool (e.g., anything about live data, prices, internal docs), don't leave that to model judgment. Use `tool_choice: \"required\"` / forced tool selection for that request type, or route those queries programmatically to the tool before the LLM even gets a turn.\n\n**B. Tighten the tool description**\nMake the \"when to use\" condition unambiguous and stated as a rule, not a suggestion \u2014 e.g., \"Always call this tool for any question about X; never answer from memory for X.\" Vague tools get vague usage.\n\n**C. Add a verification/gate step in the agent app**\nAfter the LLM responds, check: did the response contain claims in the tool's domain without a corresponding tool call? If so, reject the response and force a retry with tool_choice forced. This is the \"verifier\" layer \u2014 don't rely on the LLM's one-shot decision as ground truth.\n\n**D. Reduce competing instructions**\nIf your system prompt has many tools and general instructions mixed together, the model can deprioritize a specific tool-use rule. Isolate hard requirements clearly, separate from general guidance.\n\n## What I'd check first\n\nBefore changing anything, I'd want to know:\n- Which tool-choice mode are you using currently (auto/required/specific)?\n- Is this failure correlated with certain phrasings of the question, or does it seem random on identical inputs?\n- Is skipping the tool actually *wrong* every time, or only sometimes (i.e., is the underlying info static enough that the model's answer happens to be correct)?\n\nThat last one matters \u2014 if the tool exists because answers can go stale or be wrong, this is a correctness/reliability bug worth enforcing at the app layer (option A/C). If it's a nice-to-have grounding step and the model's answer is usually fine, you may be able to tolerate some variance rather than adding forced-tool complexity everywhere.\n\nCan you share how the tool is currently invoked (tool_choice setting) and an example of a case where it skipped the tool? That'll tell me whether this is a prompt-tuning fix or needs an enforcement layer added.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1219,
+      "cacheReadInputTokens": 2697,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0127334,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2697,
+    "output_tokens": 1219,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1219,
+        "cache_read_input_tokens": 2697,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0127334,
+  "duration_ms": 16955
+}

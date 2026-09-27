@@ -1,0 +1,63 @@
+{
+  "key": "activation-negative-01__original__baseline__r2",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "What is an LLM?",
+  "response": "**LLM** stands for **Large Language Model** \u2014 a type of artificial intelligence system trained on massive amounts of text data to understand and generate human-like language.\n\n## Key Characteristics\n\n- **Architecture**: Most modern LLMs are built on the *transformer* architecture, which uses a mechanism called \"attention\" to weigh the relevance of different words in a sequence.\n- **Training**: They're trained on huge datasets (books, websites, articles, code, etc.) to learn patterns in language \u2014 grammar, facts, reasoning styles, and even some coding ability.\n- **Scale**: \"Large\" refers to both the size of the training data and the number of parameters (internal weights) \u2014 often billions or even trillions.\n\n## What They Can Do\n\n- Answer questions\n- Write and edit text (essays, emails, code, stories)\n- Summarize or translate content\n- Reason through problems step-by-step\n- Hold conversations\n\n## How They Work (Simplified)\n\nAn LLM predicts the most likely next word (or token) in a sequence, given everything that came before it. By doing this repeatedly, it can generate coherent paragraphs, answer questions, or complete tasks \u2014 even though at its core it's essentially a very sophisticated pattern-matching and prediction system.\n\n## Examples\n\nWell-known LLMs include GPT (OpenAI), Claude (Anthropic \u2014 that's me!), Gemini (Google), and Llama (Meta).\n\n## Limitations\n\n- Can produce plausible-sounding but incorrect information (\"hallucination\")\n- Knowledge is limited to training data cutoff (unless given external tools/search)\n- No true understanding or consciousness \u2014 it's pattern recognition at massive scale, not sentient reasoning\n\nWant me to go deeper into any particular aspect \u2014 like how transformers work, training methods, or how LLMs differ from traditional AI?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 494,
+      "outputTokens": 597,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.006958,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 494,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 597,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 494,
+        "output_tokens": 597,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.006958,
+  "duration_ms": 8127
+}

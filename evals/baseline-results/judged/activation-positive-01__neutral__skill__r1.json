@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response includes a diagram tracing the flow: 'LLM decides to call tool -> AGENT APPLICATION calls tool -> AGENT APPLICATION feeds result back to LLM -> LLM generates final response,' explicitly laying out the architecture.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The response explicitly separates 'AGENT APPLICATION' actions (calling tool, feeding result back) from 'LLM' actions (deciding to call tool, generating final response), and later distinguishes causes like 'application's tool-result handling' vs 'LLM call/response handling.'",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists multiple specific failure boundaries: message not appended, mismatched tool_call_id, malformed/truncated result, loop terminating early, system prompt discouraging restating output.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Provides an 'How to isolate it' section instructing to log the exact payload and check message list before proposing fixes, and ends with 'If you can share the relevant snippet... I can pinpoint the exact line rather than working from these general patterns,' explicitly deferring to investigation before a definitive fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012122
+}

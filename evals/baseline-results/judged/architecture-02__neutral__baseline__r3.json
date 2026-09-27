@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 and 2 discuss checking message/role structure and verifying the tool result is appended to the messages array before the final LLM call, directly addressing the handoff boundary.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The response explicitly instructs: 'Print the exact payload sent to the LLM on the final call (not just your internal logs) and verify the tool output is literally in there,' and later asks the user to 'share the actual message array/payload sent for the final generation step.'",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "Section 4 recommends changing the tool's output format before tracing the boundary: 'Try returning a simple, flat, human-readable string ... instead of raw JSON' \u2014 this is a tool-side change suggested prior to confirming where the failure occurs.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.010024
+}
