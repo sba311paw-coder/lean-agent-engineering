@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "This is an agent-system issue, so let's trace the architecture rather than guess at the model. Using the standard flow:\n\n```\nAGENT APP \u2192 LLM (decides to call tool) \u2192 AGENT APP \u2192 TOOL \u2192 result \u2192 AGENT APP \u2192 LLM \u2192 final response\n```\n\nThe tool works and returns data, so the break is somewhere *after* the tool result and *before/during* the LLM's final synthesis. The most common root causes, in order of likelihood:\n\n**1. Tool result never makes it back into the LLM's context**\nCheck the actual payload sent in the follow-up LLM call. Common bugs:\n- The tool result is logged/stored but not appended to the conversation/messages array before the second LLM call.\n- It's added to the wrong role (e.g., stored as `user` or a raw string instead of the expected `tool`/`function` role with matching `tool_call_id`).\n- The result is truncated, empty-stringified, or JSON-serialized incorrectly (e.g., `[object Object]`).\n\n**2. Tool call ID mismatch**\nIf you're using an API that requires matching `tool_call_id` (OpenAI-style) or `tool_use_id`/`tool_result` (Anthropic-style) between the assistant's tool call and your tool response message, a mismatch causes the model to silently ignore or fail to associate the result.\n\n**3. The agent app stops the loop too early**\nSome agent loops treat \"tool executed successfully\" as task completion and generate a final response without re-invoking the LLM with the tool result at all \u2014 the \"final response\" is actually a fallback/default message, not an LLM-generated one after seeing the data.\n\n**4. Response is generated in parallel/race condition**\nIf tool execution is async and the final response step doesn't await the tool result before calling the LLM again, the LLM synthesizes a response without ever seeing the data.\n\n**5. System prompt or formatting instructions suppress it**\nLess likely given \"doesn't include the result\" (usually a formatting issue would still reference it inaccurately, not omit it entirely), but worth a quick check.\n\n### How to isolate it (smallest test first)\n\n1. **Log the exact messages array** sent to the LLM on the follow-up call. This one check will almost certainly show you which of the above it is \u2014 either the tool result is missing/malformed in that payload, or it's present and correct (in which case the issue is prompt/instruction-based, not plumbing).\n2. If the result is present and well-formed but still ignored, test with a minimal system prompt to rule out instructions telling the model to withhold or reformat away the data.\n\nStart with step 1 \u2014 it's the fastest way to find the actual boundary that's failing before changing any code.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 861,
+      "cacheReadInputTokens": 2784,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0091708,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2784,
+    "output_tokens": 861,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 861,
+        "cache_read_input_tokens": 2784,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0091708,
+  "duration_ms": 11080
+}

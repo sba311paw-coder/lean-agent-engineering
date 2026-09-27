@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response never asks to see the actual failure/error output or reproduce it directly; it only suggests turning on debug logging and asks user to 'paste in... the actual error or observed bad behavior' at the end, deferring reproduction rather than actively reading/reproducing the failure.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'1. Isolate the change (2 min) - git diff or git log -p -1 on the last commit... revert the last edit and confirm tool calls work again.'",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 3 'Fast diagnostic' explicitly traces the chain: 'What tool definitions are actually sent to the model \u2192 What the model's raw tool-call request looks like \u2192 What your handler received and returned.'",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Response lists many possible culprits (schema mismatch, wiring, response format, async issues, auth) but doesn't explicitly narrow to a single testable hypothesis before proposing fixes; it's more a checklist than a hypothesis-driven approach, though it does say 'A mismatch anywhere in that chain tells you exactly where it broke' which gestures toward hypothesis testing.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.010608
+}

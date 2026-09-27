@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "# Debugging inconsistent tool calling\n\nThis is a classic non-obvious agent failure \u2014 same prompt structure, inconsistent behavior. Let's trace the architecture rather than guessing at a fix.\n\n## Locate the boundary first\n\nPer the agent architecture model, the failure happens at one of these points:\n\n```\nAGENT APPLICATION -> LLM (decision) -> AGENT APPLICATION -> TOOL\n```\n\n\"Sometimes skips the tool\" means the **LLM decision step** is inconsistent. That's usually caused by one of a few things upstream of the model, not randomness in the model itself. Check in this order:\n\n### 1. Tool description ambiguity\nIf the tool's description doesn't make it *obviously and exclusively* the right choice for the query pattern, the model will sometimes decide it already \"knows\" the answer and skip it. Compare a case where it skips the tool vs. one where it uses it \u2014 look for wording overlap in the user query that makes \"answer from memory\" look plausible to the model.\n\n**Fix**: Make the tool description state clearly when it must be used (e.g., \"Always use this for current/live/user-specific data; do not answer from memory\"). Vague descriptions are the #1 cause.\n\n### 2. Ambiguous or borderline queries\nCheck whether the failing queries are actually ambiguous about whether a tool is needed (e.g., \"what's the weather\" vs \"what's the weather generally like in April\"). If so, this isn't a bug \u2014 it's the model correctly treating a fuzzy case inconsistently. Compare a clean success case against a clean failure case with the same intent to rule this out.\n\n### 3. System prompt / instructions weak or missing\nIf there's no explicit policy like \"For questions about X, you must call tool Y before answering,\" the model is left to infer necessity each time \u2014 inference is where inconsistency creeps in. Add an explicit, unconditional instruction rather than relying on tool descriptions alone.\n\n### 4. Context/history crowding\nIf earlier turns in the conversation already contain an answer to a similar question (from memory or a prior tool call), the model may pattern-match to \"I already know this\" and skip the call. Check whether failures cluster later in multi-turn conversations.\n\n### 5. Tool availability/exposure bug\nLess likely but check first since it's cheap: confirm the tool is actually present in every request's tool list (not conditionally omitted by some branch in the agent application) at the moments it's skipped. This is an application-layer bug, not a model behavior issue, and is worth ruling out before touching prompts.\n\n## What NOT to do\n\nDon't fix this by \"asking the model to try harder\" or adding vague phrases like \"please use tools when appropriate\" \u2014 that's exactly the ambiguity causing the problem. Also don't assume more capability (a second verification agent, a retry loop) before ruling out 1\u20133 above; that's adding orchestration complexity to solve a prompt-clarity problem.\n\n## Verification\n\nAfter changing the tool description/instructions, don't just eyeball a couple of manual tries. Build a small eval set: 10\u201320 prompts that *should* trigger the tool (including the ones that previously failed), run them, and confirm 100% (or your target rate) call the tool. That's your evidence the fix worked, not a single anecdotal retest.\n\n---\n\nCan you share the tool's description/schema and the system prompt, plus 1\u20132 example queries that succeeded and 1\u20132 that skipped the tool? That will let me pinpoint which of the above is actually happening rather than treating all five as equally likely.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1150,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 451,
+      "webSearchRequests": 0,
+      "costUSD": 0.013773200000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 451,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 1150,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 451,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1150,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 451,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 451
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013773200000000001,
+  "duration_ms": 15350
+}

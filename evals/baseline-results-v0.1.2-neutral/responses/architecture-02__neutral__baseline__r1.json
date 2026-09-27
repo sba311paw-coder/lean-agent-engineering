@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__baseline__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "This is a common issue when building LLM tool-calling pipelines. The tool executes correctly, but the model's final response synthesis isn't actually incorporating the tool output. Here are the most likely causes and fixes, roughly in order of probability:\n\n## 1. Tool result isn't being passed back into the conversation context\nEven though you see it in logs, check that the tool output is actually being appended to the message history that gets sent back to the model for the final answer. A common bug: you log the result but then send the model call with only the original messages, not including a `tool` role message (or `function_response` / equivalent) containing the result.\n\n**Fix:** Confirm the message array sent to the *final* completion call literally contains something like:\n```json\n{\"role\": \"tool\", \"tool_call_id\": \"...\", \"content\": \"{\\\"temperature\\\": 72, \\\"unit\\\": \\\"F\\\"}\"}\n```\n\n## 2. Tool call ID mismatch\nIf your framework matches tool results to tool calls by ID, and the ID doesn't match (e.g., you generated a new one, or it's from a previous turn), the model may discard/ignore the result or the API may silently drop it.\n\n**Fix:** Verify `tool_call_id` in the result exactly matches the `id` from the assistant's tool call request.\n\n## 3. Model generates a response *before* the tool result is appended (race condition)\nIf you're doing async tool execution, sometimes the \"final answer\" generation call fires using a stale copy of the message list captured before the tool result was appended.\n\n**Fix:** Ensure you're passing the updated/latest message array by reference or re-fetching it, not a snapshot taken before the tool ran.\n\n## 4. Two separate response generations, and you're returning the wrong one\nSome frameworks (LangChain, custom agent loops) generate an initial \"planning\" response and a \"final\" response separately. If your code accidentally returns the first draft (before tool results were incorporated) instead of the second call's output, you'd see this exact symptom.\n\n**Fix:** Add a log line printing exactly which response text is returned to the user, and trace it back to which API call produced it.\n\n## 5. System prompt or agent instructions cause the model to prefer general knowledge\nIf the system prompt says something like \"answer using your knowledge,\" the model might deprioritize tool output. Less likely given your symptom, but worth checking.\n\n**Fix:** Explicitly instruct: \"Always use the tool's returned value as the source of truth for weather data; do not use prior knowledge.\"\n\n---\n\n### Quickest way to isolate it\nAdd a log statement right before the final LLM call that dumps the *exact* message payload being sent (not just the tool result on its own). If the tool result is missing or malformed there, you've found the bug \u2014 it's not that the model is \"ignoring\" it, it's that it never received it in the final request.\n\nIf you can share the snippet of code where you append the tool result and call the model for the final answer, I can pinpoint the exact issue.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 534,
+      "outputTokens": 941,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010478,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 534,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 941,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 534,
+        "output_tokens": 941,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010478,
+  "duration_ms": 12726
+}

@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "I can't see your code or environment, so I can't diagnose the exact cause \u2014 but here's a fast, structured way to track it down, since \"worked before, broke after a change\" almost always narrows to a handful of culprits.\n\n## 1. Isolate the change (2 min)\n- `git diff` or `git log -p -1` on the last commit \u2014 even without a repo here, check your own diff/undo history.\n- If you don't have version control, temporarily revert the last edit and confirm tool calls work again. That confirms scope before you dig further.\n\n## 2. Check the most common breakage points\n\n**Schema mismatch**\n- Tool/function definitions (name, params, types) must exactly match what the model is told is available. A renamed parameter, changed type, or added required field without a default is the #1 cause.\n- Validate your JSON schema is well-formed (trailing commas, wrong types, missing `required` array).\n\n**Registration/wiring**\n- Did the tool get registered with the agent/runtime after the change? (e.g., forgot to add it back to a tools list, decorator removed, import path broken silently)\n- Check for typos in tool `name` strings \u2014 the model's call and your handler must match exactly.\n\n**Response format**\n- If you changed how tool results are returned (e.g., stopped returning a string, or changed to a dict without JSON-encoding it), the model may fail to parse or the framework may reject it.\n\n**Async/await or exception swallowing**\n- If the last change added/removed `await`, or wrapped the handler in a try/except that silently swallows errors, the call may be \"succeeding\" but returning nothing.\n\n**Auth/env vars**\n- If the change touched config loading, check that API keys / env vars are still loading before the tool executes.\n\n## 3. Fast diagnostic\n- Turn on verbose/debug logging for the agent framework you're using (most have a `debug=True` or log-level flag) and look at:\n  - What tool definitions are actually sent to the model\n  - What the model's raw tool-call request looks like\n  - What your handler received and returned\n- A mismatch anywhere in that chain tells you exactly where it broke.\n\n## 4. If you want targeted help\nPaste in:\n- The framework/SDK you're using (e.g., LangChain, OpenAI function calling, custom)\n- The diff of the \"recent code change\"\n- The actual error or the observed bad behavior (silent no-op? exception? wrong args?)\n\nThat'll let me give you a specific fix instead of a general checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 517,
+      "outputTokens": 929,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010324,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 133,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 517,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 929,
+    "output_tokens_details": {
+      "thinking_tokens": 133
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 517,
+        "output_tokens": 929,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010324,
+  "duration_ms": 12336
+}

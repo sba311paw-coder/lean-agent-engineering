@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States 'Switching embedding models is a plausible fix, but it's premature without diagnosing where the failure actually happens' and defers recommendation until evidence is gathered.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Lists the RAG pipeline stages (ingestion/chunking, embedding/retrieval, ranking/top-k, context assembly, LLM generation) and instructs checking whether correct answer is present in retrieved chunks to isolate retrieval vs. generation failure.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Instructs to 'Take 5\u201310 failing queries. Log/print what chunks were actually retrieved' and asks for 'concrete failing query examples + what was retrieved vs. expected' before recommending a model.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009282
+}

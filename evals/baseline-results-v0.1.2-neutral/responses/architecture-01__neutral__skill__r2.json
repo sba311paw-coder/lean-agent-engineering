@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks is unlikely to fix this \u2014 wrong tool selection is almost always a design/prompt/architecture issue, not a framework limitation. Before considering a switch, it's worth diagnosing where the failure actually happens.\n\n## Where to look first\n\nTool selection is a decision the LLM makes based on what the agent application gives it. The bug is usually at one of these boundaries:\n\n**1. Tool descriptions are ambiguous or overlapping**\nIf two tools have similar names/descriptions (e.g., `search_docs` vs `search_knowledge_base`), the model can't reliably distinguish intent. Fix: make names and descriptions mutually exclusive, with clear \"use this when X, not when Y\" guidance.\n\n**2. Too many tools exposed at once**\nIf the agent has 15+ tools available in every turn, selection accuracy drops. Fix: reduce the active tool set per context, or group tools and route/filter before the LLM sees them.\n\n**3. Missing or weak parameter schemas**\nIf schemas don't constrain inputs well, the model may pick a tool it can \"fill in easily\" rather than the correct one. Fix: tighten schemas, add enums, required fields.\n\n**4. No examples of correct tool use in the prompt**\nFew-shot examples of correct (and incorrect) tool selection often fix this faster than any framework change.\n\n**5. The application isn't validating the choice**\nIf the agent app blindly executes whatever tool the LLM picks without a sanity check (e.g., \"does this tool apply to this input type?\"), a bad decision becomes a bad action. That validation belongs in your application layer, not the framework.\n\n## Why changing frameworks likely won't help\n\nFrameworks (LangChain, LlamaIndex, custom loops, etc.) don't change tool-selection behavior \u2014 they just orchestrate the same LLM call with the same tool schemas. If your prompt/tool design has the problem above, it'll reproduce in any framework.\n\n## What I'd actually do\n\n1. Log a handful of failure cases \u2014 which tool was picked vs. correct, and what the tool descriptions/inputs looked like at that turn.\n2. Check for overlap or ambiguity in tool descriptions.\n3. Reduce active tool count if it's large.\n4. Add explicit disambiguation guidance or examples.\n5. Add an application-level check before executing high-impact tool calls.\n\nIf you can share the actual tool descriptions/schemas and an example of a wrong choice, I can help pinpoint the exact cause rather than guessing at the framework level.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 830,
+      "cacheReadInputTokens": 2768,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0088576,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2768,
+    "output_tokens": 830,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 830,
+        "cache_read_input_tokens": 2768,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0088576,
+  "duration_ms": 11255
+}

@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Response lists likely root causes and suggests checking 'is the agent application exposing too many/poorly-described tools' but doesn't systematically trace the actual architecture (e.g., how prompts, tool schemas, and framework layers interact) before diagnosing; it jumps to a generic root-cause checklist rather than tracing the user's specific architecture.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Says 'Trace the boundary: is the LLM given ambiguous input, or is the agent application exposing too many/poorly-described tools?' but this is posed as a question to the user rather than identifying a specific first incorrect boundary in their setup.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'Switching frameworks is unlikely to fix this' and 'Framework choice ... doesn't materially change tool-selection accuracy... If you switch frameworks without fixing the description/scoping issue, you'll very likely see the same problem again.'",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009214
+}

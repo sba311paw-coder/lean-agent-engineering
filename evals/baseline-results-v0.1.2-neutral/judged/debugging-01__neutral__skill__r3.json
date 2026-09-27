@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Section 2 tells user to 'Reproduce with the smallest possible input' but the response never actually reads or reproduces the failure itself\u2014no logs/error shown, just instructs the user to do it.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly says 'check the diff first' with `git diff HEAD~1` and lists specific areas to look for in recent changes (schema, prompt, payload, parsing code).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 3 explicitly traces the pipeline: 'LLM decision \u2192 structured tool call \u2192 AGENT APPLICATION \u2192 parses call \u2192 invokes TOOL' with a numbered checklist at each boundary.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists likely 'Common root causes' (section 5) but does not explicitly frame these as a single testable hypothesis to verify before fixing; it moves from checklist to 'Fix and verify' without stating one specific hypothesis first.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.010882
+}

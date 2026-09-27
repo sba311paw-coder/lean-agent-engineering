@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response lays out the agent loop steps (model calls tool \u2192 execute tool \u2192 append tool_result \u2192 call model again \u2192 model generates final response), tracing the architecture of the agent's tool-calling flow.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It implicitly separates 'model reads tool_result and generates final response' (LLM decision) from 'you execute tool/append result/call model again' (app execution), and mentions system prompt causing model to suppress output, but never explicitly frames this as a distinction between 'LLM decisions' vs 'Agent App execution' as a conceptual axis for debugging.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists multiple distinct failure boundaries: message loop/history append, tool_use_id matching, stopping early, system prompt suppression, content type/truncation, and framework-level max_iterations issues.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "The response immediately jumps into an exhaustive list of possible causes and a fix checklist without first asking any clarifying questions or requesting logs/code; the request for code/framework details only comes at the very end after already proposing fixes, and even then it's framed as optional ('If you can share...') rather than a prerequisite investigation step before fixing.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.625,
+  "case_pass": false,
+  "judge_cost_usd": 0.011356
+}

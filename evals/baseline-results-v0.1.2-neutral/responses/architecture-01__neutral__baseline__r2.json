@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks is rarely the fix for this \u2014 tool-selection errors are usually a design/prompt problem, not a framework limitation. Before jumping ship, it's worth understanding *why* your agent picks the wrong tool, since the same issue will likely follow you to a new framework if the root cause isn't addressed.\n\n**Common root causes of wrong tool selection:**\n\n1. **Ambiguous or overlapping tool descriptions** \u2013 if two tools sound similar to the model, it'll guess wrong. Tighten descriptions and make them mutually exclusive.\n2. **Too many tools exposed at once** \u2013 models degrade at tool selection past ~10-15 tools. Consider grouping or dynamically filtering available tools based on context.\n3. **Missing examples in tool descriptions** \u2013 adding a \"use this when X, not when Y\" line often fixes confusion.\n4. **Weak system prompt guidance** \u2013 no explicit decision criteria for when to use which tool.\n5. **Model choice** \u2013 some models are just better at tool-use/function-calling than others, independent of framework.\n\n**If you still want to compare frameworks**, here's roughly how they differ on this specific issue:\n\n- **LangGraph** \u2013 explicit graph control lets you hard-code routing logic instead of relying purely on model judgment, which reduces wrong-tool errors at the cost of more upfront design work.\n- **LlamaIndex agents** \u2013 decent tool abstractions, but same reliance on LLM judgment for selection.\n- **CrewAI / AutoGen** \u2013 multi-agent role separation can help by giving each sub-agent a smaller, focused toolset rather than one agent choosing from a big pool.\n- **OpenAI Assistants API / function calling directly** \u2013 if you're not using a heavy framework at all, sometimes going lower-level with just well-crafted function schemas outperforms framework abstractions, since you have full control over descriptions and validation.\n- **Semantic Kernel** \u2013 similar tradeoffs to LangGraph, strong for planning-heavy scenarios.\n\n**My actual recommendation:** try narrowing your toolset per call (via retrieval or explicit gating) and sharpening tool descriptions first \u2014 this fixes the issue in most frameworks without a migration. If you tell me which framework you're currently on and roughly how many tools + what they do, I can give more targeted suggestions (or tell you honestly if a switch would actually help).",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 517,
+      "outputTokens": 784,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008874,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 517,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 784,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 517,
+        "output_tokens": 784,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.008874,
+  "duration_ms": 10926
+}

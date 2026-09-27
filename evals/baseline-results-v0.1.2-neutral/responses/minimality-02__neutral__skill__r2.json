@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "My honest answer: don't migrate. This is a case where \"building an AI agent\" is being used as the justification for adding a framework, but the framework doesn't add capability you're missing.\n\n**Capability-gap check first:**\n\n1. What does LangChain actually give you that you don't have? It provides abstractions for: chaining prompts, swapping model providers, memory management, retrieval, and standardized tool-calling across many models. It does not give you \"agent-ness\" \u2014 a script that calls a model and dispatches to two functions based on the response *is already an agent* in the architecture-relevant sense.\n2. Does your current setup already provide the capability? Yes \u2014 you call the model directly and call two functions. That's the entire loop: `LLM decision \u2192 agent app \u2192 tool \u2192 result \u2192 LLM/response`. LangChain would just re-express this same loop through its abstractions.\n3. Is there a real gap? Only if you specifically need something LangChain solves: multi-provider portability, complex chains, built-in memory/retrieval, or a large ecosystem of prebuilt tools. Two functions and one model don't need that.\n4. What does adding LangChain cost? A new dependency to track through version churn (LangChain's API changes frequently), an abstraction layer to debug through when something goes wrong, and indirection between your code and the model API call that used to be a single, readable line.\n\n**When migration would actually be justified:**\n\n- You need to support multiple LLM providers behind one interface.\n- You're adding many more tools and want standardized schema/validation for tool-calling.\n- You need conversation memory, retrieval-augmented generation, or multi-step chains with branching.\n- You're integrating with LangGraph for genuine multi-agent orchestration.\n\nIf none of those apply, keep what you have. A direct API call plus explicit function dispatch is easier to debug, test, and reason about than the same logic wrapped in a framework \u2014 and it's easier to secure, since you can see exactly where the tool-call boundary is and enforce authorization there yourself.\n\n**If you do have one of those real needs**, tell me which one specifically and I'll help you design the smallest adequate migration (which might be LangChain, or might just be a small local abstraction that gives you the one thing you need without the rest of the framework).",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 718,
+      "cacheReadInputTokens": 2800,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007743999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2800,
+    "output_tokens": 718,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 718,
+        "cache_read_input_tokens": 2800,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.007743999999999999,
+  "duration_ms": 11230
+}

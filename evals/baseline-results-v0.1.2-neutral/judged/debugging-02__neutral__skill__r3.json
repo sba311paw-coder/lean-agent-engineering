@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"Before touching the embedding model, let's figure out *where* in the pipeline things are actually breaking\" \u2014 explicitly defers switching.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Lists retrieval, chunking, prompt construction, and generation as failure points, and gives a diagnostic step distinguishing retrieval failure from generation failure.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Asks user to inspect retrieved chunks for failing queries and asks for chunking/retrieval config and example query before recommending any change.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008144
+}

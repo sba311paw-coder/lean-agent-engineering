@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never asks the user to reproduce the failure or attempts to reproduce it itself; it only asks at the end 'If you can share the actual error/behavior...' as an afterthought, not a step in the process.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1 explicitly instructs 'git diff (or your VCS equivalent) against the last working commit' and step 4 checks dependency/lockfile diffs.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Steps 2 and 3 trace the flow: 'Check the request actually sent to the model' and 'Check the response parsing/dispatch side', including logging raw payloads and response objects.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "The response provides a checklist of possible causes to check but never frames any single hypothesis to test before making a fix; it jumps straight to listing potential breakers and fixes to look for rather than forming and testing one hypothesis first.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.009972
+}

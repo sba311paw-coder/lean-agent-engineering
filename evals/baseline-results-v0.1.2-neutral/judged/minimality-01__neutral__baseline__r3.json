@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never identifies what capability is actually missing; it assumes an MCP server is needed and jumps straight to implementation details (in-process vs standalone, FastMCP example) without analyzing whether wrapping is even necessary.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "The response treats the existing function only as something to wrap inside MCP tooling ('use your existing function... use it inside the wrapper') rather than considering that the existing function may already fully satisfy the requirement without any MCP layer at all.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "The entire response is built around 'wrapping your existing email function as an MCP server' and provides full MCP code, config, and testing guidance without ever questioning whether MCP is needed just because the user mentioned it as their plan.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.0,
+  "case_pass": false,
+  "judge_cost_usd": 0.01097
+}

@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly organizes into three stages: '1. Retrieval Quality Issues', '2. Context Usage Issues', '3. Generation/Prompting Constraints', tracing distinct boundaries and what happens at each stage (chunking/embedding for retrieval, ordering/filtering for context, prompting/citations for generation).",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Evaluation is only introduced in section 5 ('Before optimizing blindly, measure...') after four sections of prescriptive architectural changes (chunking, hybrid search, reranking, verification layer) were already given, so evidence-gathering is mentioned but not prioritized first.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The closing 'Quick triage question' distinguishes retrieval failure vs generation failure ('the right chunks aren't retrieved' vs 'retrieved but model ignores them') which gestures at an isolation experiment, but it's phrased as a question rather than a concrete proposed experiment (e.g., manually feeding correct context to isolate the generation stage).",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.01786
+}

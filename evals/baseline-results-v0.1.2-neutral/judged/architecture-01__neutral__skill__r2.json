@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response lists the decision boundaries ('Tool selection is a decision the LLM makes based on what the agent application gives it') and enumerates 5 architectural points (tool descriptions, tool count, schemas, prompt examples, validation layer) before any recommendation.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Response gives a list of possible failure points (ambiguous descriptions, too many tools, weak schemas, no examples, no validation) but does not commit to identifying which one is the 'first' incorrect boundary in the causal chain; it defers this to the user via 'If you can share the actual tool descriptions... I can help pinpoint the exact cause.'",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'Switching frameworks is unlikely to fix this' and 'Frameworks... don't change tool-selection behavior,' recommending diagnosis and fixes at the prompt/application level instead of a framework switch.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.009856
+}

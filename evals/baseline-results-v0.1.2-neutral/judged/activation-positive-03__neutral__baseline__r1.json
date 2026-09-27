@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response organizes fixes into 'Retrieval Quality', 'Context Handling', and 'Generation Constraints (Prompting)' sections, and explicitly notes 'Log retrieval + generation separately: ... check whether retrieval failed ... or generation failed', tracing the pipeline stages.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "The response leads with a large list of architectural changes (chunking, embeddings, hybrid search, reranking, query rewriting) before mentioning evaluation. Diagnostic advice ('log retrieval + generation separately', RAGAS scoring) appears only in section 4 and the final suggested first step is 'add a reranker' (an architecture change) listed before running RAGAS to diagnose, so evidence-gathering is not clearly prioritized before changes.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The line 'Log retrieval + generation separately: ... check whether retrieval failed (right chunks weren't fetched) or generation failed (right chunks were fetched but ignored/misused)' gestures at isolating stages, but it's not framed as a concrete experiment (e.g., manually feeding correct context to test generation alone) and is only briefly mentioned at the end.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.018952
+}

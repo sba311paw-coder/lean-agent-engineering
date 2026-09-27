@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explains checking whether tool result is appended to messages array sent to model, discussing the handoff from tool execution to LLM context.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly states: 'Print the exact `messages` array right before the final LLM call \u2014 not your tool logs, but literally what gets sent to the model for the last generation. This is the #1 fastest way to find the bug.'",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "Response leads with a 'Quick fix to try' involving adding a system prompt instruction before confirming the actual boundary issue, and suggests trying a prompt change ('If this fixes it...') prior to fully tracing the message handoff, rather than avoiding changes until tracing is done.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.010082
+}

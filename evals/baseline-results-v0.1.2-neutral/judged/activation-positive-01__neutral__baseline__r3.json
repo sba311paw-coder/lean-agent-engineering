@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response lays out the full message/conversation flow as a numbered loop (steps 1-6), tracing how a user message becomes a tool call, execution, tool_result append, and final generation.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes 'plumbing bug (result never reaches the model)' from 'model behavior issue (result reaches the model but isn't surfaced)', and separately discusses system prompt effects on the LLM (section 5) vs. loop/execution logic (sections 1, 2, 4).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Enumerates distinct failure boundaries: message flow/history append (1), tool_use_id matching (2), content format/schema (3), premature loop termination (4), and prompt-level suppression (5).",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Suggests adding logging (section 6) and ends with clarifying questions about the framework and whether tool_result appears in the payload, but proposes a full list of specific fixes/diagnoses upfront rather than first investigating before proposing solutions.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.010598
+}

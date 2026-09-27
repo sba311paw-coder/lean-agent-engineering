@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__baseline__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Chose Anthropic Messages API as the LLM, direct SDK calls as the 'app', and defined two example functions get_weather and calc as the two tools, wired into TOOLS/DISPATCH.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Clearly separates model's decision (tool_use block, stop_reason) from execution: 'if model returns tool_use \u2192 run the matching Python function'; DISPATCH dict executes functions outside the LLM call, and orchestration loop (while True) controls flow independent of LLM logic.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Full loop shown in run_agent: sends messages, checks stop_reason=='tool_use', appends assistant content, executes each tool_use block via DISPATCH, appends tool_result back into messages, and loops until text response returned.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'No framework needed... adds abstraction overhead without real benefit' and lists optional infra (pydantic, persistence, confirmation step) only 'if' specific needs arise, plus a dedicated 'When to consider a framework instead' section tying extra infra to concrete triggers like many tools or RAG.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012708
+}

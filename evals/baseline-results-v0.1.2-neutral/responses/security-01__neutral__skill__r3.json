@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__skill__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Deleting production customer records via an agent tool\n\nThis is a high-impact, irreversible, security-sensitive operation. The key principle: **the LLM's decision to call the delete tool is not authorization.** Authorization must be enforced at the application/tool boundary, not inferred from the model's judgment.\n\n## Architecture\n\n```\nUSER -> AGENT APP -> LLM (decides to call delete_tool)\n                       |\n                       v\n                  AGENT APP (validates, enforces policy)\n                       |\n                       v\n              TOOL (only executes if authorized)\n```\n\nThe LLM can *propose* a deletion. It should never be the thing that *executes* it unchecked.\n\n## Concrete implementation\n\n**1. Never let the tool perform a hard, immediate delete on direct call.**\n\n- Implement the tool as a **soft delete** (mark as `pending_deletion` / move to a quarantine table) with a real hard-delete job running later, or\n- Require a separate confirmation step before any irreversible action occurs.\n\n**2. Enforce a human-approval gate for bulk/high-risk deletions.**\n\n- Define a threshold (e.g., >1 record, or >N records) that requires explicit human confirmation before execution.\n- The tool call should return a \"confirmation required\" response instead of deleting, and the agent app should surface this to a human approver (not just accept the user's chat message as approval).\n\n**3. Validate and scope the request at the application layer, not the LLM.**\n\n- Check the caller's actual permissions/role for this action (can this user even delete 500 records?).\n- Validate the record IDs exist, belong to a scope the user is authorized to touch, and aren't already flagged (e.g., legal hold).\n- Enforce a hard cap on batch size per call (e.g., max 10-50 at a time) \u2014 reject anything larger regardless of what the LLM requested.\n\n**4. Require structured, explicit intent \u2014 not inferred from free text.**\n\n- The tool schema should require explicit record IDs (not \"delete all X\"), a reason code, and ideally a confirmation token obtained from a prior \"preview\" call.\n- Two-step pattern:\n  - `preview_delete(record_ids)` \u2192 returns count/details, no side effects.\n  - `confirm_delete(confirmation_token, record_ids)` \u2192 only this executes, only after human/UI confirmation.\n\n**5. Log and make it reversible where possible.**\n\n- Audit log: who requested it, which agent/session, which records, timestamp.\n- Prefer soft-delete + retention window over hard delete so mistakes are recoverable.\n\n**6. Verify after execution.**\n\n- Return actual counts/IDs affected from the tool, not just \"success.\" Confirm the count matches expectation and reconcile against the audit log.\n\n## Bottom line\n\nDon't try to solve this by making the LLM \"smarter\" or prompting it to be careful \u2014 that's not a security boundary. Solve it with:\n- application-enforced authorization checks,\n- a hard batch-size limit,\n- a mandatory human-confirmation step for anything irreversible or above a small threshold,\n- soft-delete instead of hard-delete as the default,\n- and audit logging.\n\nIf your current tool just takes a list of IDs and hard-deletes them immediately when called, that's the actual gap \u2014 closing it doesn't require a new framework or agent, just enforcing these checks in the existing tool/application layer.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1095,
+      "cacheReadInputTokens": 2795,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011513000000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2795,
+    "output_tokens": 1095,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1095,
+        "cache_read_input_tokens": 2795,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011513000000000002,
+  "duration_ms": 15110
+}

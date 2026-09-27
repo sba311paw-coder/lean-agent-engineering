@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Before jumping to \"switch embedding models,\" it's worth diagnosing *why* your RAG agent is giving wrong answers\u2014embedding model choice is often not the actual culprit. Let me lay out the diagnostic path and then options.\n\n## First, figure out where the failure is happening\n\nWrong answers in RAG can come from several distinct stages:\n\n1. **Retrieval failure** \u2014 the right chunks aren't being retrieved at all\n2. **Chunking failure** \u2014 content is split badly, losing context\n3. **Ranking failure** \u2014 right chunks retrieved but ranked too low to make the context window\n4. **Generation failure** \u2014 right chunks retrieved, but the LLM ignores/misuses them or hallucinates anyway\n5. **Stale/incorrect index** \u2014 the underlying data is outdated or wrong\n\n**Quick test:** Take 5-10 failing queries, manually inspect what chunks got retrieved (print them out). If the relevant info isn't in the retrieved chunks \u2192 retrieval/embedding problem. If it *is* there but the answer is still wrong \u2192 that's a generation/prompting problem, and swapping embedding models won't help at all.\n\n## If it is a retrieval problem, questions that determine the fix\n\n- What are you using now (e.g., `text-embedding-ada-002`, `text-embedding-3-small`, an open-source model like `all-MiniLM-L6-v2`, `bge-small`, etc.)?\n- What's your chunk size/overlap strategy?\n- Is your data domain-specific (legal, medical, code, multilingual)? General-purpose embeddings often underperform there.\n- Are queries phrased very differently from the source text (vocabulary mismatch)? That's a classic embedding weakness.\n- What's your corpus size and language(s)?\n\n## Common embedding upgrade paths (if it truly is embedding-related)\n\n| Current setup | Consider |\n|---|---|\n| OpenAI `ada-002` | `text-embedding-3-large` or `text-embedding-3-small` (better quality, cheaper) |\n| Generic open-source (MiniLM) | `bge-large-en-v1.5` or `gte-large` (strong on MTEB retrieval benchmarks) |\n| Domain-specific text (legal/medical/code) | Domain-tuned models, or fine-tune a base model on your data |\n| Multilingual corpus | `multilingual-e5-large` or `bge-m3` |\n| Long documents | Models with larger context windows (e.g., `text-embedding-3-large`, `nomic-embed-text`) |\n\nAlso worth checking the **MTEB leaderboard** for retrieval-task rankings rather than picking blind.\n\n## But also consider these non-embedding fixes first, since they're often higher-leverage:\n- **Hybrid search** (BM25 + vector) \u2014 huge improvement for keyword-heavy queries embeddings alone miss\n- **Re-ranking** with a cross-encoder after initial retrieval\n- **Better chunking** (semantic chunking vs. fixed-size)\n- **Query rewriting/expansion** before embedding the query\n\nCan you tell me: what embedding model you're currently using, what your data looks like, and whether the wrong chunks are being retrieved or the right chunks are being answered wrong? That'll let me give a much more targeted recommendation instead of a generic swap.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 513,
+      "outputTokens": 1097,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011996,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 513,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1097,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 513,
+        "output_tokens": 1097,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011996,
+  "duration_ms": 12974
+}

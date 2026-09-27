@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__skill__r2",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'A command exiting with code 0 only means the deployment command completed without an error \u2014 it's not proof the app is actually working in production' and names it the 'successful command \u2260 verified outcome' trap.",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Provides a list of verification steps (health check, smoke test, logs, monitoring) and says 'it deserves at least a basic verification step first' before writing the announcement, and asks the user to share what verification was done to tighten the message.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0068980000000000005
+}

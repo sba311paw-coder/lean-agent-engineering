@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "The response explicitly lists 'where that boundary is failing' with numbered boundaries (ambiguous triggering conditions, competing knowledge, system prompt vs tool description conflict, app-layer enforcement) and instructs to 'Diagnose before fixing' by comparing skip vs. call transcripts.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The 'Diagnose before fixing' section asks to 'Pull a handful of transcripts where it skipped the tool vs. where it called it' before any fix, and the final paragraph offers to help 'if you can share a couple of examples... rather than guessing at all four,' explicitly requesting evidence before prescribing architecture changes.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The 'What I'd avoid' section explicitly says 'Don't jump to a multi-step planner, a router agent, or a separate tool-decision model' and to 'Add that heavier machinery only if' simpler fixes fail, directly discouraging unnecessary frameworks.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013134
+}

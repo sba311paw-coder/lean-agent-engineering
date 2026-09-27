@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__baseline__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "Before diving into code \u2014 for something this small (\"call two functions, return results\"), it's worth pausing on *why* you're moving to LangChain. If the logic is \"always call function A, maybe function B, return output,\" you may not need a full agent framework at all \u2014 you could just use the model's native tool/function-calling API directly (no LangChain) and keep it simple. LangChain adds value when you need things like: a swappable model provider, built-in agent loops (ReAct/tool-calling), memory, retries, tracing (LangSmith), or a large ecosystem of pre-built tools/integrations.\n\nIf you still want to move to LangChain (e.g., for future extensibility or ecosystem tools), here's a clean migration path.\n\n## 1. Map your existing pieces to LangChain concepts\n\n| What you have now | LangChain equivalent |\n|---|---|\n| Direct model API call | `ChatOpenAI`, `ChatAnthropic`, etc. |\n| Your 2 Python functions | `@tool`-decorated functions |\n| Your manual \"call model \u2192 parse \u2192 call function \u2192 return\" loop | An **agent executor** (or just `bind_tools` if you don't need a full loop) |\n\n## 2. Install what you need\n\n```bash\npip install langchain langchain-core langchain-openai   # or langchain-anthropic, etc.\n```\n\n## 3. Turn your two functions into LangChain tools\n\n```python\nfrom langchain_core.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get current weather for a city.\"\"\"\n    return fetch_weather(city)  # your existing logic\n\n@tool\ndef get_stock_price(ticker: str) -> str:\n    \"\"\"Get current stock price for a ticker.\"\"\"\n    return fetch_price(ticker)  # your existing logic\n```\n\nThe docstring matters \u2014 it's what the model sees to decide when to call the tool.\n\n## 4. Decide: lightweight tool-binding vs. full agent loop\n\n**Option A \u2014 Lightweight (closest to what you have now, no agent loop overhead):**\n\n```python\nfrom langchain_openai import ChatOpenAI\n\nllm = ChatOpenAI(model=\"gpt-4o\").bind_tools([get_weather, get_stock_price])\n\nresponse = llm.invoke(\"What's the weather in Paris and the price of AAPL?\")\n\nfor call in response.tool_calls:\n    tool = {\"get_weather\": get_weather, \"get_stock_price\": get_stock_price}[call[\"name\"]]\n    result = tool.invoke(call[\"args\"])\n    print(result)\n```\n\nThis mirrors \"call two functions and return results\" pretty directly \u2014 you get tool-call decisions from the model, then execute them yourself. No hidden loop, easy to debug.\n\n**Option B \u2014 Full agent (model decides, calls tools, loops until done):**\n\nLangChain now recommends **LangGraph** for this rather than the older `AgentExecutor`:\n\n```bash\npip install langgraph\n```\n\n```python\nfrom langgraph.prebuilt import create_react_agent\nfrom langchain_openai import ChatOpenAI\n\nllm = ChatOpenAI(model=\"gpt-4o\")\nagent = create_react_agent(llm, tools=[get_weather, get_stock_price])\n\nresult = agent.invoke({\"messages\": [(\"user\", \"Weather in Paris and AAPL price?\")]})\nprint(result[\"messages\"][-1].content)\n```\n\nUse this if you want the model to autonomously decide how many times/in what order to call tools, handle follow-up reasoning, etc.\n\n## 5. Preserve behavior during migration\n\n- Keep your old direct-API code path temporarily and run both in parallel on the same test inputs to confirm identical outputs.\n- Check error handling: LangChain tools raise differently than raw function calls \u2014 wrap with try/except inside the tool if you need graceful failures.\n- Watch for prompt/formatting differences \u2014 the model may phrase tool-call decisions differently, which can change which tool gets picked for edge-case inputs.\n- If you use streaming, note that `bind_tools` and `create_react_agent` both support `.stream()`, but the event shape differs from raw API streaming.\n\n## 6. Nice-to-haves once migrated\n\n- Add **LangSmith** tracing (`LANGCHAIN_TRACING_V2=true`) to see every tool call/model call \u2014 great for debugging.\n- If tools should always run in a fixed sequence regardless of model choice, consider **LCEL** (`prompt | llm | tool1 | tool2`) instead of an agent, since deterministic pipelines don't need agentic decision-making at all.\n\nIf you tell me which model provider (OpenAI, Anthropic, etc.) and whether the two functions are always both called or conditionally, I can tighten this into an exact drop-in replacement for your current script.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 549,
+      "outputTokens": 2383,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.024928,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 831,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 549,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2383,
+    "output_tokens_details": {
+      "thinking_tokens": 831
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 549,
+        "output_tokens": 2383,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.024928,
+  "duration_ms": 24818
+}

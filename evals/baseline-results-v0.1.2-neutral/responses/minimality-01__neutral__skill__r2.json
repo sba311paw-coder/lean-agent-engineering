@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__skill__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "Short answer: don't set up an MCP server for this. You already have a working `send_email()` function \u2014 just expose it as a local tool/function call to the LLM. Adding an MCP server here is extra infrastructure (a process, a protocol boundary, serialization, possibly network exposure) for a capability you already have in-process.\n\n**Capability-gap check:**\n\n1. What capability is missing? \"LLM can decide to trigger email sending.\" That's it.\n2. Does existing code provide it? Yes \u2014 your `send_email()` function already works.\n3. Can the app solve it directly? Yes \u2014 wrap it as a tool definition in whatever agent framework/SDK you're using (function calling / tool use), pointing straight at your existing function.\n4. Does MCP add new permissions, processes, or attack surface? Yes \u2014 a server process, a transport (stdio/SSE/HTTP), and a new trust boundary between your agent app and the \"tool provider,\" with no corresponding benefit if the consumer is only your own app.\n\nMCP earns its keep when you need to **share** a tool across multiple clients/agents (e.g., Claude Desktop, another team's agent, a CLI), or integrate a **third-party** MCP server you didn't write. For a single in-house Python agent calling its own function, that's not your situation \u2014 a local tool call is simpler and has fewer moving parts.\n\n**Recommended setup:**\n\n```python\ndef send_email(to: str, subject: str, body: str) -> dict:\n    ...  # your existing implementation\n\nemail_tool_schema = {\n    \"name\": \"send_email\",\n    \"description\": \"Send an email to a recipient. Use only when explicitly instructed or clearly appropriate.\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n            \"to\": {\"type\": \"string\"},\n            \"subject\": {\"type\": \"string\"},\n            \"body\": {\"type\": \"string\"},\n        },\n        \"required\": [\"to\", \"subject\", \"body\"],\n    },\n}\n```\n\nRegister that schema with your LLM call, and when the model returns a tool_use block for `send_email`, your **application code** validates the inputs and calls the real function \u2014 not the model directly.\n\n**Since sending email is a high-impact, external, hard-to-reverse action**, enforce this at the application boundary regardless of MCP vs. direct call:\n\n- Validate/allowlist the recipient domain if this is meant for internal use only.\n- Require explicit confirmation before send if the agent is autonomous (don't treat the model's tool call as authorization by itself).\n- Log every send (to, subject, timestamp, triggering user/task) for audit.\n- Rate-limit or cap sends per session to bound damage from a runaway loop or prompt injection (e.g., if email content is influenced by untrusted retrieved text).\n- Never let untrusted content (a scraped webpage, an email you're replying to, tool output) instruct the agent on *who* to send to \u2014 treat that as data, not instruction.\n\nIf down the line you actually need to share this tool across multiple agents/clients, wrapping it in MCP then is a small, well-justified step \u2014 not now.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 993,
+      "cacheReadInputTokens": 2801,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0104942,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2801,
+    "output_tokens": 993,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 993,
+        "cache_read_input_tokens": 2801,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0104942,
+  "duration_ms": 12518
+}

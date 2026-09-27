@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__baseline__r3",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'exit code 0 confirms the deployment *command* ran without errors \u2014 it doesn't guarantee the app is actually healthy in production'",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Suggests doing 'a quick smoke test / health check' and recommends holding off saying 'working in production' until verified via health endpoint, logs, or manual smoke test, and offers to help draft a verification checklist",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0037740000000000004
+}

@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "# RAG Giving Wrong Answers: Is It Really the Embedding Model?\n\nBefore switching embedding models, it's worth diagnosing *where* the failure is happening \u2014 embedding model swaps are often not the actual fix. Let me walk through this systematically.\n\n## First: Diagnose the Failure Type\n\n\"Wrong answers\" from RAG can come from several distinct failure points:\n\n| Failure Point | Symptom | Fix |\n|---|---|---|\n| **Retrieval failure** | Right chunks never get retrieved | Better embeddings, chunking, or hybrid search |\n| **Chunking failure** | Relevant info retrieved but split/fragmented | Adjust chunk size/overlap, semantic chunking |\n| **Ranking failure** | Right chunks retrieved but ranked low | Add a reranker |\n| **Generation failure** | Right chunks retrieved, but LLM ignores/misreads them | Better prompt, or context ordering |\n| **Stale/bad index** | Docs updated but index wasn't re-embedded | Re-index, not re-embed |\n\n**Quick test:** Manually inspect what chunks are being retrieved for a failing query. If the correct answer *is* in the retrieved context and the LLM still gets it wrong, the embedding model isn't your problem \u2014 it's a prompting/generation issue.\n\n## If It Is Retrieval\n\nCommon causes before blaming the model:\n- **Chunk size mismatch** \u2014 chunks too large (dilutes relevance) or too small (loses context)\n- **No hybrid search** \u2014 pure dense retrieval misses exact keyword/entity matches (adding BM25 often helps more than swapping embeddings)\n- **No reranker** \u2014 a cross-encoder reranker (e.g., cohere-rerank, bge-reranker) on top of your current embeddings often fixes more than a model swap\n- **Domain mismatch** \u2014 general-purpose embeddings underperform on specialized/technical/legal/medical text\n\n## If You Do Need a Better Embedding Model\n\nA few solid options as of late 2025/2026 (verify current benchmarks, as this space moves fast):\n- **General purpose, strong quality:** `text-embedding-3-large` (OpenAI), Voyage AI's models, Cohere `embed-v3`\n- **Open-source, strong on MTEB:** BGE-large/BGE-M3, GTE-large, Nomic Embed\n- **Domain-specific:** consider fine-tuning or a domain-tuned model if your corpus is specialized (legal, medical, code)\n\nCheck the current **MTEB leaderboard** for up-to-date rankings on retrieval-specific benchmarks, since general leaderboard rank \u2260 retrieval performance.\n\n## My Suggestion\n\nRather than jumping to a model swap, could you share:\n1. An example query + what the correct answer should be + what your system actually returned\n2. Whether the right info was in the retrieved chunks at all\n\nThat'll tell us if this is actually an embedding problem or something else entirely \u2014 and save you a re-indexing cycle that might not fix anything.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 513,
+      "outputTokens": 1013,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011156,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 513,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1013,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 513,
+        "output_tokens": 1013,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011156,
+  "duration_ms": 12595
+}

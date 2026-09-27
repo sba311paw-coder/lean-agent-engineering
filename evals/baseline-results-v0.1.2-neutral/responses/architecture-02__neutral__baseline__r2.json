@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "This is a common issue with tool-calling LLM pipelines. The tool executes correctly, but the final answer generation step isn't actually incorporating the tool's output. Here's a systematic way to debug and fix it:\n\n## Most likely causes\n\n**1. Tool result isn't being appended to the conversation/message history**\nThe most common bug: you call the tool, log the result, but never actually add it back into the messages array sent to the model for the final generation step.\n\nCheck that your flow looks like this:\n```\nmessages = [user_msg]\nresponse = llm(messages, tools=[weather_tool])\nif response.tool_calls:\n    tool_result = call_weather_tool(...)  # you see this in logs\n    messages.append(response)  # the assistant's tool call message\n    messages.append({role: \"tool\", tool_call_id: ..., content: tool_result})  # <-- often forgotten\n    final = llm(messages)  # now generate final answer\n```\nIf that second append is missing, the model never sees the result \u2014 it's just in your logs, not in context.\n\n**2. Wrong `tool_call_id` / mismatched role formatting**\nIf the tool response message doesn't reference the correct `tool_call_id` (OpenAI-style) or isn't formatted the way your provider expects, the model may silently disregard it or the API may reject/ignore that turn.\n\n**3. Tool output isn't stringified/serialized properly**\nIf you're passing a raw dict/object instead of a JSON string (or expected format), some SDKs will silently fail to include it or the model treats it as malformed.\n\n**4. You're calling a *new* completion without prior context**\nIf your \"final answer\" step spins up a fresh call with just the tool output and no system/user context, the model may not know it's supposed to use it as the answer to the original question \u2014 it might just summarize generically.\n\n**5. System prompt discourages tool reliance**\nIf your system prompt has generic fallback instructions like \"answer helpfully\" without explicit instruction like \"always use tool results when available and cite the exact values,\" the model may hedge instead of quoting the number.\n\n## How to isolate it\n\n1. **Print the exact `messages` array right before the final LLM call** \u2014 not your tool logs, but literally what gets sent to the model for the last generation. This is the #1 fastest way to find the bug.\n2. Confirm the tool message has the temperature value verbatim in it.\n3. Confirm `tool_call_id` matches between the assistant's tool call and your tool response message.\n4. Add an explicit instruction: *\"You must use the tool result above to answer. State the exact temperature returned.\"*\n\n## Quick fix to try\n\nAdd this to your system/instruction prompt as a sanity check:\n```\nWhen a tool has returned a result, you must base your answer on that exact result. Do not generalize or omit specific values returned by tools.\n```\nIf this fixes it, the issue is prompting/emphasis. If it doesn't fix it, the issue is almost certainly #1 or #2 above \u2014 the result isn't actually reaching the model's context.\n\n---\n\nIf you can share your framework (LangChain, raw OpenAI SDK, Anthropic SDK, etc.) and the code for the tool-call handling loop, I can pinpoint the exact line causing this.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 534,
+      "outputTokens": 1034,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011408,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 534,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1034,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 534,
+        "output_tokens": 1034,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011408,
+  "duration_ms": 13242
+}

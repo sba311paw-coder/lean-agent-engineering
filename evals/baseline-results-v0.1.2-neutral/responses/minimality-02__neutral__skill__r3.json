@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "My honest recommendation: don't migrate. Let me explain why, based on what you've described.\n\n## Capability-gap check first\n\nA \"small agent that calls two functions and returns the results, using the model API directly\" \u2014 what capability is actually missing here? You haven't described a problem (no mention of needing multi-step planning, memory, retries, streaming, multiple chained chains, provider-swapping, etc.). \"Since I'm building an AI agent\" isn't a capability gap \u2014 it's a label. LangChain is a framework, and per the simplify-first ordering, a framework is step 6 out of 7 \u2014 above only \"add another orchestration layer.\" You're currently at step 3 (direct API + native function calling), which is the most reliable, debuggable tier for this kind of workload.\n\n## What LangChain would actually cost you here\n\n- **New dependency surface**: LangChain has frequent breaking changes across versions, a large transitive dependency tree, and its own abstractions (Tools, AgentExecutor, output parsers) to learn and maintain.\n- **Indirection**: Your two function calls today go straight from LLM decision \u2192 your code \u2192 tool \u2192 result. Wrapping that in LangChain's agent executor adds a layer between the LLM's tool-call decision and your actual function execution, which is exactly the kind of extra boundary that makes debugging tool-calling failures harder later (per the agent architecture model above \u2014 every added layer is another place data/control flow can silently break).\n- **No new capability**: Modern model APIs (OpenAI, Anthropic, etc.) already support native structured tool/function calling directly. That's the same mechanism LangChain uses under the hood \u2014 you'd be re-wrapping something you already have.\n\n## When migrating would be justified\n\nIf you actually need one of these, that's a real capability gap worth solving \u2014 but check whether you need the whole framework or just the specific piece:\n\n- **Many tools with dynamic selection/chaining** \u2014 you can still just extend your own dispatch loop.\n- **Built-in retries, streaming, memory/conversation state** \u2014 often a few lines of code, not a framework.\n- **Multi-agent orchestration** \u2014 this is the one case where a framework (LangChain, or something lighter) starts to pay for itself.\n- **Provider abstraction** (swap OpenAI/Anthropic/etc. without rewriting) \u2014 a thin adapter you write yourself is usually simpler than adopting LangChain's abstraction layer.\n\n## What I'd actually suggest\n\n1. Keep the direct API call + your two functions.\n2. If you want cleaner structure, add a small local dispatch layer: LLM returns a tool call \u2192 your code validates it \u2192 executes the matching function \u2192 feeds result back. That's ~30-50 lines, no new dependency.\n3. Only reach for LangChain (or a lighter alternative) when you hit a concrete wall \u2014 e.g., \"I need 15 tools with conditional routing\" or \"I need persistent multi-turn memory across sessions\" \u2014 and at that point, re-evaluate against the smallest tool that solves *that specific* problem rather than the largest framework available.\n\nIf you can tell me what's actually motivating the move (a specific pain point, not just \"building an agent\"), I can help you evaluate whether LangChain \u2014 or something smaller \u2014 is the right fit for that specific gap.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1053,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 474,
+      "webSearchRequests": 0,
+      "costUSD": 0.0128952,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 474,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 1053,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 474,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1053,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 474,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 474
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0128952,
+  "duration_ms": 14608
+}

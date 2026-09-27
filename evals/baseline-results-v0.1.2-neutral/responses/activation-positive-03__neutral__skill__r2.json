@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving grounding in a RAG pipeline\n\nPoor grounding usually traces to one of a few boundaries in the pipeline: retrieval quality, context assembly, or the LLM's use of that context. Rather than adding new tools, it's worth diagnosing which boundary is actually failing first.\n\n## 1. Diagnose before fixing\n\nTrace the flow: **query \u2192 retrieval \u2192 chunks \u2192 prompt \u2192 LLM answer**.\n\nPull a handful of failure cases and check:\n- Did retrieval return the *right* chunks at all? (Log top-k results and inspect manually.)\n- If the right chunks were retrieved, did the prompt actually include them clearly?\n- If included clearly, did the model ignore them or hallucinate anyway?\n\nThis tells you whether it's a **retrieval problem**, a **context/prompt problem**, or a **generation problem** \u2014 each has a different fix, and guessing without this leads to adding complexity in the wrong place.\n\n## 2. Retrieval-side fixes (most common root cause)\n\n- **Chunking**: too large \u2192 dilutes relevance; too small \u2192 loses context. Try semantic or structure-aware chunking (by heading/paragraph) instead of fixed-size, and include overlap.\n- **Embedding/query mismatch**: if queries are short and documents are long, consider query expansion or hypothetical-document embeddings (HyDE) \u2014 but only if you've confirmed retrieval, not generation, is the failure point.\n- **Hybrid search**: combine vector similarity with keyword/BM25 search \u2014 cheap to add if your vector DB or search layer already supports it, and often fixes cases pure embeddings miss (exact terms, IDs, names).\n- **Re-ranking**: add a lightweight re-ranker (cross-encoder) over the top-k candidates before passing to the LLM. Only add this if plain retrieval is demonstrably returning relevant-but-misranked chunks.\n- **k too low/high**: tune the number of retrieved chunks empirically rather than guessing.\n\n## 3. Context assembly fixes\n\n- **Cite sources in the prompt** (e.g., number each chunk) and instruct the model to answer only from numbered sources and cite which one(s) it used. This makes hallucination visible and auditable.\n- **Explicit instruction**: \"If the answer is not in the provided context, say you don't know\" \u2014 simple, often underused, and free.\n- **Deduplicate/filter** low-relevance chunks before sending to the model; don't just dump everything above a fixed count.\n\n## 4. Generation-side fixes\n\n- **Lower temperature** for factual QA tasks.\n- **Force citation format** in output and post-hoc verify: check that cited chunk IDs actually exist and contain the claimed content (a simple string/overlap check, no extra service needed).\n- **Add a grounding check step**: after generation, verify the answer's claims appear in the retrieved context (this can be a simple substring/entailment check rather than a new agent or model call, unless volume justifies it).\n\n## 5. Verification\n\nWhatever you change, verify with a **held-out set of Q&A pairs with known correct source passages** \u2014 measure retrieval recall (did the right chunk come back?) and answer faithfulness (does the answer only state what's in the context?) before and after the change. Don't rely on eyeballing a few chat responses as proof.\n\n## What I'd avoid\n\nDon't reach for a bigger framework, additional agent, or new reranking service until you've confirmed via the trace in step 1 that plain retrieval tuning and prompt-level grounding instructions aren't sufficient. Most grounding issues are fixed by chunking, retrieval recall, and explicit \"answer only from context\" instructions \u2014 not by adding orchestration layers.\n\nIf you can share where in the pipeline (retrieval vs. prompt vs. output) the failures cluster, I can give more targeted suggestions.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1270,
+      "cacheReadInputTokens": 2779,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013259800000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2779,
+    "output_tokens": 1270,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1270,
+        "cache_read_input_tokens": 2779,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.013259800000000002,
+  "duration_ms": 16648
+}

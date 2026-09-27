@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly frames the answer around 'What exact capability is missing?' and asks if the gap is aggregation, tracing, cost tracking, etc., rather than assuming a framework is needed.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'the capability you need... already exists' via logging/tests, and lists specific reuse options: structured logging + JSON formatter, time.perf_counter() for latency, existing cloud log sinks (CloudWatch, GCP Logging).",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Notes a large framework is 'a new dependency, often a new service/credential/network call, and ongoing maintenance,' and contrasts smaller options (OpenTelemetry, self-hosted Langfuse) as lighter-weight alternatives with less lock-in.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009558
+}

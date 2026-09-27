@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "# RAG Wrong Answers: It's Probably Not the Embedding Model\n\nBefore switching embedding models, I'd want more context \u2014 \"wrong answers\" in a RAG system can stem from many failure points, and embedding quality is often not the actual bottleneck. Let me give you a diagnostic approach plus model options.\n\n## First, diagnose where the failure actually is\n\nRAG has multiple stages, and each fails differently:\n\n| Stage | Symptom | Fix |\n|---|---|---|\n| **Retrieval** | Right chunks aren't in top-k at all | Better embeddings, better chunking, hybrid search |\n| **Ranking** | Right chunks retrieved but ranked low | Add a reranker (e.g., Cohere rerank, cross-encoder) |\n| **Chunking** | Chunks split mid-context, losing meaning | Adjust chunk size/overlap, use semantic chunking |\n| **Generation** | Right context retrieved but LLM ignores/misuses it | Prompt engineering, better generation model |\n| **Query mismatch** | User query phrased differently than doc content | Query rewriting, HyDE, multi-query expansion |\n\n**Quick test:** Log the retrieved chunks for a few failing queries and check manually \u2014 are the relevant chunks even in there? If yes, it's not an embedding problem.\n\n## If it IS a retrieval/embedding problem, options to consider:\n\n**General-purpose, strong performers:**\n- **OpenAI `text-embedding-3-large`** \u2014 solid default, good multilingual support\n- **Voyage AI (`voyage-3`, `voyage-3-large`)** \u2014 frequently top MTEB leaderboard, has domain-specific variants (code, finance, law)\n- **Cohere `embed-v4`** \u2014 good multilingual, integrates well with their reranker\n\n**Open-source / self-hosted:**\n- **BAAI `bge-large-en-v1.5`** or **`bge-m3`** (multilingual, multi-granularity)\n- **`gte-large`** (Alibaba) \u2014 strong on MTEB, permissive license\n\n**Domain-specific:** if your docs are code, legal, medical, or finance, a domain-tuned model (e.g., Voyage's `voyage-code-2`, `voyage-law-2`) often beats generic ones significantly.\n\n## Before switching, cheaper wins to try:\n1. **Add a reranker** \u2014 often fixes \"wrong answer\" issues cheaper than swapping embeddings entirely\n2. **Tune chunk size/overlap** \u2014 bad chunking causes more RAG failures than bad embeddings\n3. **Hybrid search** (BM25 + vector) \u2014 catches keyword-exact matches embeddings miss\n\n---\n\nCan you share a concrete failing example (query + what was retrieved + what the answer should've been)? That would tell us pretty quickly whether this is a retrieval, ranking, or generation problem \u2014 and which fix actually applies.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 513,
+      "outputTokens": 965,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010676000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 513,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 965,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 513,
+        "output_tokens": 965,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010676000000000001,
+  "duration_ms": 10962
+}

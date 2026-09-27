@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving Grounding in a RAG Agent\n\nPoor grounding usually traces back to one of a few boundaries in the pipeline. Rather than jumping to a bigger model or a new framework, work through these in order \u2014 they're roughly ordered from cheapest/most-likely to most involved.\n\n## 1. Diagnose first: where does it actually break?\n\nPull 10\u201320 bad answers and classify each one:\n\n- **Retrieval failure** \u2014 the right chunk was never retrieved (query/embedding mismatch, bad chunking, wrong top-k).\n- **Context failure** \u2014 the right chunk *was* retrieved, but the LLM ignored it or was overwhelmed by noise from irrelevant chunks.\n- **Synthesis failure** \u2014 the LLM had good context but still generated unsupported claims (hallucination despite grounding).\n- **Prompt failure** \u2014 the model was never actually instructed to stick to the provided context.\n\nThis matters because the fix is different for each. Don't apply a generic \"add reranking\" or \"fine-tune\" fix without knowing which boundary is failing.\n\n## 2. Most common root causes, cheapest fix first\n\n**Chunking**\n- Chunks too large \u2192 dilutes relevance signal, buries the answer in noise.\n- Chunks too small \u2192 loses context, splits facts across boundaries.\n- Fix: chunk by semantic unit (section/paragraph), not fixed token count. Add a small overlap.\n\n**Retrieval quality**\n- Check if embedding similarity actually surfaces the right chunk for known queries (build a small eval set of Q&A pairs with known source docs).\n- Add metadata filtering (date, doc type, source) if the corpus is heterogeneous \u2014 cheaper and more reliable than trying to fix it purely with embeddings.\n- Add a reranker (e.g., cross-encoder) only if retrieval@k shows the right chunk is *in* the candidate set but not ranked highly. Don't add one speculatively.\n\n**Prompt construction**\n- Explicitly instruct the model to answer only from provided context and to say \"I don't know\" / \"not in the provided documents\" if it isn't there.\n- Cite chunk IDs/sources inline \u2014 this alone reduces hallucination because it forces the model to justify each claim against something concrete.\n- Put retrieved context close to the instruction, not buried far above it in a long prompt.\n\n**Too much or irrelevant context**\n- If you're stuffing in 15+ chunks \"just in case,\" relevance drops. Tighten top-k, or filter by a relevance score threshold before passing chunks to the LLM.\n\n## 3. Add verification, not just better generation\n\nGrounding is a claim about the *output*, so verify it as output, not just trust that a good prompt produced it:\n\n- **Cheap check**: does every factual sentence in the answer map to a phrase/fact present in the retrieved context? A simple substring/entailment check (or a second cheap LLM call asking \"is this claim supported by this context, yes/no\") catches a lot.\n- **Attribution**: require the agent to cite which chunk supports each claim. If it can't cite one, that's a signal the claim is unsupported \u2014 either strip it or flag it for the user.\n\nThis is the biggest lever for \"poorly grounded\" specifically \u2014 most RAG grounding problems are caught by asking the system to prove its work, not by making the generation step smarter.\n\n## 4. What I'd avoid unless you have evidence for it\n\n- Don't add a second agent/orchestration layer to \"double-check\" answers before confirming the bug is in synthesis, not retrieval \u2014 that's solving the wrong problem with more moving parts.\n- Don't switch vector DBs or embedding models before verifying retrieval@k is actually the bottleneck.\n- Don't fine-tune before prompt-level fixes (context instructions, citation requirements) have been tried \u2014 they're free and often solve 80% of grounding issues.\n\n## What would help me help you more\n\nIf you share:\n- A couple of examples of a bad answer + what was actually retrieved,\n- Your chunking strategy and top-k value,\n- Your current system prompt for the generation step,\n\nI can point to the specific boundary that's failing rather than guessing at generic fixes.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1362,
+      "cacheReadInputTokens": 2779,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.014179800000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2779,
+    "output_tokens": 1362,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1362,
+        "cache_read_input_tokens": 2779,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.014179800000000001,
+  "duration_ms": 18299
+}

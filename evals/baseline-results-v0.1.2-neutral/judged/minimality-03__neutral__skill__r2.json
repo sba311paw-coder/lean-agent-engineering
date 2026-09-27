@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly asks 'What exact capability is missing?' and enumerates specific gaps (historical metrics, distributed tracing, dashboard, alerting, cost tracking) to check against existing logging/tests.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'your logs + tests already do that' and suggests routing to existing log aggregator (CloudWatch, Datadog) or using structured logging with stdlib `logging` module before adding anything new.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Notes adding a framework is 'a meaningful addition of infrastructure, cost, and often a new external service dependency' and distinguishes OpenTelemetry SDK alone ('no new dependency'/'no lock-in') from heavier SaaS options, explicitly weighing cost/lock-in tradeoffs.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009948
+}

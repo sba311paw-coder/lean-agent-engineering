@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly evaluates complexity by asking 'What's failing or limited right now?' and distinguishes fixed-sequence calls vs. dynamic model-chosen tool calls, correctly identifying the actual system as 'already a working, simple, minimal system.'",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'If it's the latter, that's just... a Python script' and recommends native provider tool-calling or a small state machine over LangChain when the gap doesn't require it, favoring simplicity in the 'Simplify-first ordering' section.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Bottom line explicitly lists concrete evidence needed: 'a specific capability (dynamic tool selection, multi-step reasoning loop, integration ecosystem) that your current code can't do and that native provider tool-calling also can't do simply.'",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010662000000000001
+}

@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Includes a diagram tracing AGENT APPLICATION -> TOOL -> result and AGENT APPLICATION -> LLM -> FINAL RESPONSE, explicitly framing the trace of the architecture.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes 'Result never reaches the LLM' (app-level failure to append message) from 'LLM produces a second tool call or text response, but the app doesn't loop back' (LLM decision vs app execution), and explicitly separates app extraction logic from LLM output.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists five distinct possible failure boundaries: message not appended, wrong format, no loop-back, output truncation/filtering, and multiple parallel tool calls dropped.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Provides a 'Fastest way to isolate it' section instructing to log the message array, raw LLM response, and extracted final response before jumping to a fix, and ends by asking for the actual code snippet to pinpoint the exact line rather than assuming a fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011479999999999999
+}

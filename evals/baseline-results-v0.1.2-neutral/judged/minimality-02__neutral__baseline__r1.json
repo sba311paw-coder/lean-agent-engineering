@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__baseline__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "FAIL",
+      "evidence": "The response never questions whether migrating a 'two function call' agent to LangChain is warranted; it jumps straight into a step-by-step migration guide without assessing whether the current simple setup already meets the need.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "FAIL",
+      "evidence": "No suggestion that the existing manual dispatch loop might be simpler and sufficient; the entire response assumes the migration should proceed and only asks for provider/function details to refine the diff, not whether to migrate at all.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "The response does not discuss what evidence (e.g., need for multi-step chains, memory, many tools, complex orchestration) would justify adopting LangChain versus staying with the simple direct API call; it only lists post-migration considerations like error handling and streaming.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 0.0,
+  "case_pass": false,
+  "judge_cost_usd": 0.011418000000000001
+}

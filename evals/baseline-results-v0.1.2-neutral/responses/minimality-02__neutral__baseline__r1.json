@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__baseline__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "Here's a practical migration path from a manual \"call model \u2192 dispatch to functions\" loop to LangChain's tool/agent abstractions.\n\n## 1. Understand the current shape of your code\n\nRight now you likely have something like:\n\n```python\nresponse = client.chat.completions.create(\n    model=\"...\",\n    messages=messages,\n    tools=[schema_for_func_a, schema_for_func_b],\n)\n# manually inspect tool_calls, run func_a or func_b, return result\n```\n\nThe migration is mostly: **replace hand-written JSON schemas + manual dispatch loop with LangChain `Tool` objects + a prebuilt agent loop.**\n\n## 2. Install what you need\n\n```bash\npip install langchain langchain-core langgraph langchain-openai  # or langchain-anthropic, etc.\n```\n\nNote: LangChain now recommends **LangGraph's `create_react_agent`** for agent loops \u2014 the older `AgentExecutor`/`initialize_agent` APIs are considered legacy.\n\n## 3. Turn your two functions into Tools\n\nUse the `@tool` decorator. Type hints and the docstring become the schema the model sees \u2014 this replaces whatever JSON schema you were writing by hand.\n\n```python\nfrom langchain_core.tools import tool\n\n@tool\ndef func_a(x: str) -> str:\n    \"\"\"Does X. Use when the user needs X.\"\"\"\n    ...\n    return result\n\n@tool\ndef func_b(y: int) -> str:\n    \"\"\"Does Y. Use when the user needs Y.\"\"\"\n    ...\n    return result\n\ntools = [func_a, func_b]\n```\n\nIf your functions currently return non-string objects, keep them returning strings (or something the model can read) unless you're on a version of LangChain that supports structured tool outputs.\n\n## 4. Wrap your model call\n\nSwap your direct API client for LangChain's chat model wrapper (pick the one matching your current provider):\n\n```python\nfrom langchain_openai import ChatOpenAI  # or ChatAnthropic, etc.\n\nllm = ChatOpenAI(model=\"gpt-4o\")  # keep same model name/params you use now\n```\n\nIf you want provider flexibility, `init_chat_model` lets you swap providers via a string.\n\n## 5. Build the agent loop\n\n```python\nfrom langgraph.prebuilt import create_react_agent\n\nagent = create_react_agent(llm, tools)\n\nresult = agent.invoke({\"messages\": [(\"user\", \"your input here\")]})\nfinal_answer = result[\"messages\"][-1].content\n```\n\nThis replaces your manual \"check tool_calls, run the function, feed result back to the model\" loop entirely \u2014 the agent handles the call\u2192execute\u2192respond cycle for you, including multi-step chains if the model needs to call both functions in sequence.\n\n## 6. Verify parity before adding more\n\nBefore layering on memory, retries, etc.:\n- Run the same test inputs through old code and new agent, compare outputs.\n- Check tool-call accuracy (does it pick func_a vs func_b correctly?) \u2014 sometimes docstring wording needs tightening to match what your explicit schema descriptions used to say.\n- Watch for extra latency from the abstraction (usually negligible, but check if you have tight SLAs).\n\n## 7. Things to watch out for\n\n- **Error handling**: if your functions can raise, decide whether LangChain should catch and return the error as a string to the model (`handle_tool_error` on `@tool`) or propagate it.\n- **Streaming**: if you streamed responses before, `agent.stream(...)` replaces manual chunk handling.\n- **Prompt/system message**: `create_react_agent` accepts a `prompt` param if you had a system prompt baked into your old messages list.\n- **Determinism**: if your old code always called a specific function under certain conditions, that logic now lives implicitly in the model's tool-selection \u2014 consider whether some of that should stay as deterministic Python rather than being handed to the LLM.\n\nIf you tell me which model provider (OpenAI, Anthropic, etc.) and whether the two functions are simple or have complex I/O, I can give you a more exact before/after code diff.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 549,
+      "outputTokens": 2134,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.022438,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 808,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 549,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2134,
+    "output_tokens_details": {
+      "thinking_tokens": 808
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 549,
+        "output_tokens": 2134,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.022438,
+  "duration_ms": 25462
+}

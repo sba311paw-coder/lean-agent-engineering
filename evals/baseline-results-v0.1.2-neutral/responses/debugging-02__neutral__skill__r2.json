@@ -1,0 +1,63 @@
+{
+  "key": "debugging-02__neutral__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models isn't necessarily the right fix here \u2014 \"wrong answers\" in a RAG system can originate from several different points in the pipeline, and embedding quality is only one of them. Jumping straight to a model swap risks adding cost/migration work without addressing the actual root cause.\n\nBefore picking a model, it's worth localizing where the failure actually happens:\n\n**1. Retrieval failure vs. generation failure**\nLog the retrieved chunks for a few failing queries and inspect them manually:\n- If the retrieved chunks are irrelevant or missing the right content \u2192 retrieval problem (could be embeddings, but also chunking/indexing).\n- If the retrieved chunks *do* contain the right info but the LLM still answers wrong \u2192 this is a generation/prompt problem, not embeddings. Changing the embedding model won't help at all.\n\n**2. If it is retrieval \u2014 check cheaper causes first**\nEmbedding model is usually not the first suspect. More common root causes, roughly in order of likelihood:\n- **Chunking strategy** \u2014 chunks too large/small, splitting mid-sentence, losing context. This is the #1 cause of bad RAG retrieval in practice.\n- **Metadata/filtering bugs** \u2014 wrong document set being searched, stale index, filters excluding correct docs.\n- **Top-k too low** \u2014 correct chunk retrieved but ranked below cutoff.\n- **Query mismatch** \u2014 user's phrasing is semantically distant from how the doc is written (this *is* an embedding-relevance issue, but reranking often fixes it more cheaply than switching models).\n- **Stale/incomplete index** \u2014 docs updated but not re-embedded/re-indexed.\n\n**3. Only if embeddings are confirmed as the bottleneck**\nIf you've verified retrieval quality is genuinely poor (e.g., near-duplicate or clearly relevant chunks not surfacing in top-k even with reasonable chunking and k), then model choice matters. At that point the right pick depends on your constraints (language, domain, cost, latency, self-hosted vs. API) \u2014 not something I can call generically without knowing your setup.\n\n**What I'd need to actually recommend a model:**\n- What embedding model you're using now\n- Domain (general text, code, legal, multilingual, etc.)\n- A few example failing queries + what got retrieved vs. what should have\n\nCan you share a couple of concrete failing examples (query + retrieved chunks + expected answer)? That'll show whether this is a retrieval or generation issue, and if retrieval, whether it's chunking or embeddings \u2014 before we spend effort on a migration that might not fix anything.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 856,
+      "cacheReadInputTokens": 2764,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009116800000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2764,
+    "output_tokens": 856,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 856,
+        "cache_read_input_tokens": 2764,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.009116800000000001,
+  "duration_ms": 11029
+}

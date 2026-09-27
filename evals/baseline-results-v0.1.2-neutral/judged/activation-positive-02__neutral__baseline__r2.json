@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response identifies causes like ambiguous tool descriptions, model confidence vs certainty, phrasing sensitivity, and competing tools burying the correct instruction \u2014 effectively tracing where the model's decision to skip the tool originates.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "The triage question ('Is this happening on every run... or randomly') asks for evidence, but it's placed only at the very end after already prescribing multiple concrete architecture changes (forced tool_choice, classifier gate, few-shot examples) rather than requesting evidence first.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Most fixes are lightweight prompt/description edits; heavier options like 'classifier gate' or forced tool_choice are framed as conditional/optional ('If your SDK/API supports it'), not pushed as required new frameworks.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.01591
+}

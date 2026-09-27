@@ -1,0 +1,63 @@
+{
+  "key": "minimality-01__neutral__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "# Skip the MCP server here\n\nYou already have a working `send_email()` function in your app. Standing up an MCP server to wrap it is adding a whole new process, protocol layer, and transport (stdio/HTTP) just to call a function you can already call directly.\n\n**Capability-gap check:**\n1. What's missing? \"Let the LLM trigger an email send.\"\n2. Does the app already provide it? Yes \u2014 you have the function.\n3. Can the application solve it directly? Yes \u2014 expose it as a local tool/function call to the LLM (e.g., Anthropic tool use / function calling).\n4. Does an MCP server add anything real here? Only if you need to share this tool across multiple *separate* agent processes/hosts, or expose it to third-party MCP clients you don't control. Otherwise it's pure overhead: another server to run, secure, and keep in sync with your email credentials.\n\nMCP earns its keep when the tool needs to be reused across independent clients/hosts. A single Python agent calling its own function is not that case.\n\n## Recommended setup\n\n1. **Define the tool schema** (name, description, params: `to`, `subject`, `body`, etc.) and pass it to the LLM in your `tools` list.\n2. **On a tool-call response**, your agent application \u2014 not the LLM \u2014 invokes your existing `send_email()` function directly. In-process function call, no network hop, no new server.\n3. **Enforce authorization at the application boundary**, not via the LLM's decision:\n   - Validate/allowlist recipient domains if this is user-facing.\n   - Rate-limit or cap sends per session.\n   - Log every send attempt with what was requested and why.\n   - If the agent could act on untrusted input (e.g., email content it read from a webpage or another email), treat that content as data \u2014 don't let instructions embedded in it drive who the email gets sent to or trigger unreviewed sends.\n4. **High-impact action safeguard:** sending email is external and hard to undo. Decide up front whether you want:\n   - Full autonomy (fine for low-stakes, e.g., notifying yourself), or\n   - A confirm-before-send step (safer if it emails other people or acts on scraped/retrieved content).\n5. **Verify**, don't just trust a clean return code \u2014 check the underlying provider's response (e.g., SES/SendGrid message ID or delivery status) before telling the user/agent the email was sent.\n\n## When MCP would actually make sense\n\n- You want the same email tool available to multiple different agents/hosts (e.g., a Claude Desktop instance *and* your Python agent *and* a teammate's agent), and you don't want to duplicate the integration.\n- You want to expose the tool outside your own codebase via a standard protocol.\n\nIf neither applies, a direct function-calling tool is the smaller, more reliable, easier-to-secure solution \u2014 same LLM-driven behavior, one less moving part.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 933,
+      "cacheReadInputTokens": 2801,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0098942,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2801,
+    "output_tokens": 933,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 933,
+        "cache_read_input_tokens": 2801,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0098942,
+  "duration_ms": 13527
+}

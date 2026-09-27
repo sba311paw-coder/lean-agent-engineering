@@ -1,0 +1,63 @@
+{
+  "key": "debugging-01__neutral__baseline__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since I can't see your code or logs, here's a fast, structured way to track this down. Tool-calling integrations break for a fairly small set of common reasons \u2014 work through these roughly in order of likelihood:\n\n## 1. Check the tool schema first (most common culprit)\n- Did the recent change alter a function/tool **name, parameter names, types, or required fields**?\n- Compare the JSON schema you're sending now vs. before the change (diff it if you have version history).\n- Malformed JSON Schema (e.g., missing `type`, invalid `enum`, nested objects without `properties`) will silently cause the model to stop calling tools or the API to reject the request.\n\n## 2. Check how you're parsing the response\n- Did the change touch the code that reads `tool_calls` / `tool_use` blocks from the response?\n- Log the **raw response object** before any parsing logic runs. Confirm the model *is* still returning tool-use blocks \u2014 if so, your parsing/handling code broke, not the model call itself.\n\n## 3. Check the request payload\n- Log the exact request body being sent (tools array, tool_choice, messages).\n- Verify `tools` list isn't empty/malformed and `tool_choice` (if set) is `\"auto\"`, `\"any\"`, or the correct tool name.\n\n## 4. Check the message history / conversation state\n- If your change touched message construction, verify tool results are being fed back in the correct format (matching `tool_call_id` / `tool_use_id`), in the right role, and in sequence. A mismatch here often causes the *next* turn to fail silently or error out.\n\n## 5. Isolate with a minimal repro\n- Strip down to one tool, one simple prompt that should trigger it, and run it in isolation (bypassing your app's abstraction layers). This tells you if the issue is in your integration code vs. the tool/schema itself.\n\n## 6. Check dependency/SDK version\n- If the \"recent change\" included a dependency bump (SDK, framework, agent library), check that changelog for breaking changes to tool-calling APIs \u2014 this is extremely common.\n\n## 7. Enable verbose/debug logging\n- Turn on request/response logging at the HTTP level if your SDK supports it, so you see exactly what's sent/received, not just what your app logic reports.\n\n---\n\nIf you paste the actual error message, the tool schema, or the diff of the recent change, I can pinpoint the fix directly instead of you working through the whole checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 517,
+      "outputTokens": 933,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010364,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 143,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 517,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 933,
+    "output_tokens_details": {
+      "thinking_tokens": 143
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 517,
+        "output_tokens": 933,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010364,
+  "duration_ms": 12633
+}

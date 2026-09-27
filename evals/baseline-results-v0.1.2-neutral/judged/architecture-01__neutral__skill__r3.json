@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response lists generic causes of wrong tool choice (ambiguous descriptions, too many tools, missing context, no validation, weak prompts) but doesn't trace the user's specific agent architecture step-by-step; it's a general checklist rather than an actual trace of a given system.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It gestures at 'the boundary between the LLM's decision and the application's tool-dispatch logic' and suggests logging failures to find 'the pattern,' but never pinpoints a single first incorrect boundary \u2014 it offers multiple possible causes without narrowing to one specific point of failure.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicit statement: 'Switching frameworks probably won't fix this' and 'None of these are solved by changing frameworks' with a dedicated section 'What to check first (no framework change needed)', only conceding a framework change 'if your current setup lacks basic tool-calling infrastructure.'",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009926
+}

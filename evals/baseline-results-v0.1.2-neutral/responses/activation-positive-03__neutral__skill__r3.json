@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-03__neutral__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving Grounding in RAG Systems\n\nThis is a classic RAG (retrieval-augmented generation) grounding problem. It usually stems from a failure at one of a few boundaries: **retrieval quality**, **context assembly**, or **generation discipline**. Before adding new tools/rerankers/frameworks, trace which boundary is actually failing.\n\n## 1. Diagnose first \u2014 don't guess\n\nPull 10-20 examples of poorly-grounded answers and classify each:\n\n- **Retrieval failure** \u2014 the right chunks never made it into context (bad embeddings, bad chunking, query mismatch).\n- **Context failure** \u2014 right chunks retrieved, but buried, truncated, or contradicted by noise (too many chunks, poor ordering, chunk boundaries cut mid-thought).\n- **Generation failure** \u2014 right chunks are in context, but the model ignored them, blended them with parametric knowledge, or over-generalized.\n\nThe fix is different for each, so this classification is the single highest-leverage step.\n\n## 2. If it's a retrieval failure\n\n- **Chunking**: check chunk size and overlap. Chunks that split ideas mid-sentence or mix unrelated content hurt retrieval precision. Semantic/structure-aware chunking (by heading, paragraph) usually beats fixed-size splitting.\n- **Embedding/query mismatch**: user questions are often phrased differently than document text. Try query rewriting/expansion, or hypothetical document embeddings (HyDE).\n- **Metadata filtering**: if documents have dates, sources, or categories, use metadata filters before/alongside vector search to cut noise.\n- **Hybrid search**: combine vector similarity with keyword/BM25 search \u2014 pure embedding search often misses exact terms, numbers, names.\n- **k too low or too high**: too few chunks misses relevant content; too many drowns the model in irrelevant text.\n\n## 3. If it's a context-assembly failure\n\n- **Reranking**: add a cross-encoder reranker after initial retrieval to reorder by actual relevance \u2014 often the single biggest grounding improvement for the least complexity.\n- **Chunk provenance**: attach source metadata (doc id, section, page) to each chunk so the model can cite it.\n- **Order matters**: put the most relevant chunks near the end of context (closer to the question), since models attend more to recent tokens.\n- **Deduplicate**: near-duplicate chunks waste context budget and can dilute grounding.\n\n## 4. If it's a generation failure\n\nThis is where most \"grounding\" fixes actually belong, and it's the cheapest to try first:\n\n- **Prompt discipline**: explicitly instruct the model to answer *only* from provided context, and to say \"I don't know\" or \"not found in the provided documents\" when the answer isn't there. Vague instructions like \"use the context\" are weak; be explicit and give a fallback behavior.\n- **Require citations**: ask the model to cite the specific chunk/source for each claim. This alone forces more grounded generation and gives you a cheap verification signal \u2014 if it can't cite, it's likely hallucinating.\n- **Separate context from instructions**: make sure retrieved content is clearly delimited (e.g., XML tags or headers) so the model doesn't confuse document content with instructions \u2014 this also protects against prompt injection from retrieved text (treat retrieved documents as untrusted data).\n- **Lower temperature** for factual QA tasks.\n\n## 5. Verify improvements, don't just ship them\n\nBefore claiming this is fixed:\n- Build a small eval set (20-50 Q&A pairs with known-correct grounding sources).\n- Score with a **faithfulness/groundedness metric** \u2014 does every claim in the answer trace back to retrieved context? (Can be done with a simple LLM-as-judge rubric, or libraries like RAGAS if you already have eval infra.)\n- Track this metric before/after each change so you know what actually helped versus what just felt better.\n\n## What to avoid\n\n- Don't jump straight to fine-tuning or adding new agents/orchestration layers \u2014 grounding problems are almost always retrieval, chunking, or prompt issues, not model capability issues.\n- Don't add a reranker, hybrid search, *and* prompt changes all at once \u2014 you won't know what fixed it, and you'll carry unnecessary complexity if only one was needed.\n\n---\n\nDo you want to dig into which failure mode (retrieval vs. context vs. generation) your specific case looks like? If you can share a couple of example queries/answers, I can help narrow it down before recommending a specific fix.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1500,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 453,
+      "webSearchRequests": 0,
+      "costUSD": 0.0172812,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 453,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 1500,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 453,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1500,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 453,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 453
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0172812,
+  "duration_ms": 18869
+}

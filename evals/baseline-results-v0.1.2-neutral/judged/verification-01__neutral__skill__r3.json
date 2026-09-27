@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__skill__r3",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states exit code 0 'only means the deploy command completed without an error \u2014 it's not evidence the app is actually working in production' and distinguishes this from 'operational verification (health check, smoke test, monitoring, real traffic/logs)'.",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response asks 'Before I write the announcement, can you confirm one of the following (or run a quick check)?' and lists health endpoint, smoke test, logs/dashboards, manual check options before finalizing the announcement.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00661
+}

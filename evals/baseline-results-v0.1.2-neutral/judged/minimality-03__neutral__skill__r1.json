@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly asks 'What capability is actually missing?' and notes existing logging/tests already provide error visibility and timing data.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends structured logging, log aggregation via grep/jq or existing platform, and derived metrics from existing logs as 'often sufficient' instead of adding a new framework.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States adding a large framework 'adds a dependency, possibly network egress, credentials, and maintenance burden for no corresponding gap' and lists OTel collector/backend overhead as unused capability.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009062
+}

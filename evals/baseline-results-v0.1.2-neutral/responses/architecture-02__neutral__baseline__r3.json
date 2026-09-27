@@ -1,0 +1,63 @@
+{
+  "key": "architecture-02__neutral__baseline__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "# Debugging: Tool Returns Correct Data But Final Answer Ignores It\n\nThis is a common issue in LLM agent/tool-calling pipelines. Since I can't see your actual code, here are the most likely causes, roughly ordered by probability:\n\n## 1. Tool result isn't being fed back into the conversation history\n\nThe most common culprit. Check that after calling the tool, you're actually appending the tool's output as a message in the conversation before making the final call to the model.\n\n```python\n# Wrong: result computed but never added to messages\nresult = call_weather_tool(location)\nprint(result)  # only in logs\nfinal = llm.chat(messages)  # missing the tool result!\n\n# Right:\nresult = call_weather_tool(location)\nmessages.append({\n    \"role\": \"tool\",\n    \"tool_call_id\": tool_call.id,\n    \"content\": str(result)\n})\nfinal = llm.chat(messages)\n```\n\n## 2. Wrong `tool_call_id` / role mismatch\n\nIf you're using OpenAI/Anthropic-style tool calling, the tool response message **must** reference the correct `tool_call_id` (or `tool_use_id` for Claude) matching the original request. If it's mismatched or missing, some APIs silently ignore it or the model treats it as unrelated context.\n\n## 3. System prompt discourages tool use or overrides it\n\nIf your system prompt says something like \"always give a helpful general answer\" or has strong instructions that conflict with \"use the tool result,\" the model may deprioritize the actual data. Try adding an explicit instruction like:\n\n> \"Always base your answer on the tool result if one is provided. Do not give a generic answer when tool data exists.\"\n\n## 4. Tool output format issue\n\nIf the tool returns a raw object/dict instead of a string, some frameworks fail to serialize it properly into the message, resulting in an empty or malformed content field that the model can't parse. Explicitly `str()` or `json.dumps()` the result.\n\n## 5. Streaming or async race condition\n\nIf you're using async tool execution, verify you're actually `await`-ing the tool call and not sending the final prompt before the result resolves.\n\n## 6. Model is short-circuiting due to a cached/parallel response\n\nSome frameworks (LangChain, LlamaIndex, custom orchestrators) have a bug where the \"final answer\" step runs in parallel with tool execution rather than after it, especially in ReAct-style loops. Check your loop control logic to confirm strict ordering: tool call \u2192 tool result \u2192 final generation.\n\n---\n\n**To help me narrow it down further**, could you share:\n- What framework/SDK you're using (LangChain, raw OpenAI/Anthropic function calling, a custom loop, etc.)?\n- A snippet of the code where you call the tool and generate the final answer?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 534,
+      "outputTokens": 896,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010027999999999999,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 534,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 896,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 534,
+        "output_tokens": 896,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010027999999999999,
+  "duration_ms": 11293
+}

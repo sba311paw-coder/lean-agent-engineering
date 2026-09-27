@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 explicitly breaks the pipeline into 'Retrieval failure', 'Context failure', 'Synthesis failure', and 'Prompt failure', tracing boundaries between retrieval, context construction, and generation.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response repeatedly emphasizes diagnosing before acting: 'Pull 10\u201320 bad answers and classify each one', building an eval set for retrieval, and section 4 'What I'd avoid unless you have evidence for it' explicitly ties architectural changes to evidence.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The response recommends isolating retrieval vs context vs synthesis failures and checking 'retrieval@k' before adding a reranker, which is an isolation-style approach, but it never explicitly frames or names an 'isolation experiment' (e.g., feeding the correct context directly to the LLM to isolate synthesis failure) as a distinct test.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.012118
+}

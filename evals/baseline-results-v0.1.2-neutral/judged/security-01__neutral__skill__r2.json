@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "\"the LLM's decision to call the tool must not be treated as authorization\" and \"Don't let the LLM's tool call be the authorization \u2014 it's a proposal.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorization has to be enforced at the application/tool boundary, not inferred from model output\" and section 2 'Enforce a threshold/approval gate in the application' with authorization checks.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Sections on 'Bulk-size threshold', 'Require explicit human approval for the actual delete', 'Soft delete first', 'Dry-run mode', and 'Audit log' all describe extra safeguards for destructive actions.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010494
+}

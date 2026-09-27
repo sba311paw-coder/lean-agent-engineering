@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "# Debugging: Tool Returns Data But Agent Ignores It\n\nThis is a common issue with tool-calling agents. Since I can't see your actual code, here's a systematic checklist to find the cause, ordered by likelihood:\n\n## 1. Check the tool result message format\nThe tool's output needs to be fed back into the conversation with the correct role/structure so the model sees it before generating a final answer. Common mistakes:\n\n- **Missing the tool result round-trip**: You call the tool, get data back, but never append it to the message history before calling the model again.\n- **Wrong message role**: Tool results usually need a specific role like `\"tool\"` (OpenAI) or a `tool_result` content block (Anthropic), not `\"user\"` or `\"assistant\"`.\n- **Missing `tool_call_id` / `tool_use_id`**: Most APIs require the result to reference the exact ID of the tool call it's responding to. If mismatched, the model may silently disregard it.\n\n**Anthropic example:**\n```python\nmessages.append({\n    \"role\": \"user\",\n    \"content\": [{\n        \"type\": \"tool_result\",\n        \"tool_use_id\": tool_call.id,  # must match\n        \"content\": str(weather_data)\n    }]\n})\n```\n\n## 2. Confirm you're making a second model call\nA frequent bug: the agent calls the tool, logs/prints the result, but the loop doesn't send it back to the LLM for a follow-up completion \u2014 it just returns the *first* response (which only contained the tool call, no text).\n\nCheck your loop looks like:\n```\n1. Call model \u2192 model requests tool\n2. Execute tool \u2192 get result\n3. Append result to messages\n4. Call model AGAIN with updated messages  \u2190 often forgotten\n5. Return this second response to user\n```\n\n## 3. Check for silent serialization failures\nIf the weather data is a complex object (dict, DataFrame, custom class), make sure it's converted to a string/JSON before insertion. Some SDKs fail silently or truncate on non-serializable content.\n\n```python\ncontent = json.dumps(weather_data)  # don't pass raw objects\n```\n\n## 4. Check `max_tokens` / truncation\nIf the tool result is large and your `max_tokens` is low, the model might generate an empty or cut-off response before reaching the synthesis step.\n\n## 5. Check system prompt / instructions\nIf your system prompt says something like \"only respond with tool calls\" or lacks instruction to summarize tool output, some models default to terse or empty replies. Try explicitly instructing: *\"After receiving tool results, always summarize them in your final response to the user.\"*\n\n## 6. Framework-specific gotchas\nIf you're using LangChain, LlamaIndex, CrewAI, etc., there are often known issues:\n- **LangChain agents**: intermediate steps not being passed to `agent_executor` correctly, or `return_intermediate_steps=True` not surfaced in final output.\n- **Streaming agents**: the final text stream may be intercepted before the tool synthesis chunk is sent.\n\n---\n\n**To help debug further, could you share:**\n- Which framework/SDK you're using (raw API, LangChain, OpenAI Assistants, LlamaIndex, etc.)?\n- A snippet of your tool-call handling loop?\n\nThat'll let me pinpoint the exact fix rather than a general checklist.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 533,
+      "outputTokens": 1081,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011876000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 533,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1081,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 533,
+        "output_tokens": 1081,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011876000000000001,
+  "duration_ms": 12554
+}

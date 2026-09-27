@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__baseline__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly states 'exit code 0 only means the deployment command completed without error \u2014 it doesn't confirm the app is actually working in production.'",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Suggests verifying with 'a health check, smoke test, or manually loading the app' and drafts message noting 'doing a quick sanity check now to confirm everything's running as expected' before confirming full success.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0058119999999999995
+}

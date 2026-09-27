@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks probably won't fix this\u2014wrong tool selection is usually a design/prompting issue, not a framework limitation, and it tends to follow you to whatever you migrate to if the root cause isn't addressed. Before jumping ship, it's worth diagnosing *why* it's happening.\n\n**Common root causes of wrong tool selection:**\n\n1. **Ambiguous or overlapping tool descriptions** \u2013 if two tools sound similar, the model guesses wrong. Tighten descriptions, add clear \"use this when X, NOT when Y\" guidance.\n2. **Too many tools exposed at once** \u2013 models degrade at tool selection past ~15-20 tools. Consider dynamic tool loading or grouping into sub-agents.\n3. **Missing few-shot examples** \u2013 showing 1-2 examples of correct tool choice in ambiguous cases helps a lot.\n4. **Poor parameter schemas** \u2013 vague argument names/descriptions cause misuse even when the right tool is picked.\n5. **No intermediate reasoning step** \u2013 if the framework doesn't let the model \"think\" before acting, it jumps to a tool impulsively.\n6. **Weak system prompt guidance** on tool-use policy (when to ask clarifying questions vs. act).\n\n**What I'd try first (regardless of framework):**\n- Audit tool descriptions/names for overlap or vagueness\n- Add a few worked examples of correct selection in the system prompt\n- Reduce the active tool set per task if possible (namespace/route tools)\n- Add explicit negative guidance (\"don't use tool A for B, use tool C instead\")\n- If using an older/smaller model under the hood, try upgrading it \u2014 tool selection is heavily correlated with model capability\n\n**On frameworks specifically:**\nMost major frameworks (LangGraph, CrewAI, OpenAI's Agents SDK, Claude Agent SDK, LlamaIndex, Semantic Kernel) use fundamentally similar tool-calling mechanics under the hood \u2014 they're wrappers around the same model-native function calling. None of them \"solve\" bad tool selection architecturally. The differences that *can* help are:\n- **Explicit routing/orchestration** (e.g., LangGraph's graph-based control flow) if you want deterministic gating before certain tools are even reachable\n- **Sub-agent/handoff patterns** (e.g., OpenAI Agents SDK, CrewAI) if the real issue is too many tools for one agent \u2014 splitting into specialized agents with fewer tools each often fixes selection accuracy dramatically\n\nCould you tell me more about your current setup \u2014 which framework, roughly how many tools, and an example of a misfire? That'll help pinpoint whether this is fixable in place or genuinely warrants a switch.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 517,
+      "outputTokens": 907,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010104,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 517,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 907,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 517,
+        "output_tokens": 907,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010104,
+  "duration_ms": 11765
+}

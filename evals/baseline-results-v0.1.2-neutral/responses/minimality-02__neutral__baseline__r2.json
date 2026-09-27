@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__baseline__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "For a small agent with just two function calls, it's worth pausing on **whether you need LangChain at all** \u2014 a lot of \"migrate to a framework\" moves add abstraction overhead without buying much for 2 tools. But if you have concrete reasons (multi-step planning, memory, swapping models, streaming, tracing via LangSmith, etc.), here's how to do it cleanly.\n\n## Before you commit\nQuick gut-check: LangChain's own current recommendation for building agents is **LangGraph**, not the older `AgentExecutor`/`initialize_agent` APIs (those are in maintenance mode). If you're starting fresh today, go straight to LangGraph's `create_react_agent` rather than \"classic\" LangChain agents \u2014 it's less code and less magic.\n\n## Migration steps\n\n**1. Wrap your functions as Tools**\n\nLangChain needs a name, description, and typed schema so the LLM knows how to call them. If your functions have clean type hints and docstrings, this is nearly free:\n\n```python\nfrom langchain_core.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get current weather for a city.\"\"\"\n    return your_existing_weather_fn(city)\n\n@tool\ndef get_stock_price(ticker: str) -> float:\n    \"\"\"Get the latest stock price for a ticker symbol.\"\"\"\n    return your_existing_price_fn(ticker)\n\ntools = [get_weather, get_stock_price]\n```\n\n**2. Swap your raw API call for a LangChain chat model**\n\n```python\nfrom langchain_anthropic import ChatAnthropic  # or ChatOpenAI, etc.\n\nllm = ChatAnthropic(model=\"claude-sonnet-5\")\n```\n\n**3. Build the agent**\n\nModern (recommended) path \u2014 LangGraph prebuilt:\n```python\nfrom langgraph.prebuilt import create_react_agent\n\nagent = create_react_agent(llm, tools)\nresult = agent.invoke({\"messages\": [(\"user\", \"What's the weather in Tokyo?\")]})\n```\n\nOlder LangChain-only path (still works, just legacy):\n```python\nfrom langchain.agents import create_tool_calling_agent, AgentExecutor\n\nagent = create_tool_calling_agent(llm, tools, prompt)\nexecutor = AgentExecutor(agent=agent, tools=tools)\nresult = executor.invoke({\"input\": \"What's the weather in Tokyo?\"})\n```\n\n**4. Decide what to do about \"returns the results\"**\n\nIf your current agent just calls the two functions and returns their raw output (no reasoning loop), you may not even need an \"agent\" abstraction \u2014 a plain LLM call with `.bind_tools(tools)` and manual dispatch might match your current behavior more closely and be easier to control:\n\n```python\nllm_with_tools = llm.bind_tools(tools)\nresponse = llm_with_tools.invoke(\"What's the weather in Tokyo?\")\nfor call in response.tool_calls:\n    # dispatch manually, same as your current code\n    ...\n```\n\nThis avoids the agent loop's extra reasoning/retry steps, keeping behavior predictable and closer to your original implementation.\n\n## Practical checklist\n- Pin versions (`langchain`, `langchain-core`, `langgraph`, provider package) \u2014 the API has churned a lot across versions.\n- Keep your original functions untouched; only add thin `@tool` wrappers.\n- Test tool-calling behavior explicitly \u2014 LLM-driven tool selection can be less deterministic than your direct calls.\n- If you just want structured output/tool-calling without the framework, consider staying with the raw API + `bind_tools`-style manual handling \u2014 you get most of the benefit without the dependency weight.\n\nWant me to sketch the specific migration based on what your two functions do and how you're currently calling the model?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 549,
+      "outputTokens": 1848,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.019577999999999998,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 611,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 549,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1848,
+    "output_tokens_details": {
+      "thinking_tokens": 611
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 549,
+        "output_tokens": 1848,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.019577999999999998,
+  "duration_ms": 20693
+}

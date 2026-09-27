@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides a diagram tracing TOOL \u2192 AGENT APPLICATION \u2192 LLM and walks through the flow step by step.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Distinguishes 'application bug' (result never appended to message history) vs 'prompt/formatting issue' where model sees data but omits it, e.g. section 5 on system prompt causing intentional omission vs section 1/4 on app-level append failures.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists multiple specific failure boundaries: message not appended, tool-result format/ID mismatch, truncation/serialization, orchestration loop returning early, stale message list, system prompt suppression.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly says 'Let's trace it rather than guess' and proposes a 'Fastest isolation test' to log the raw payload before proposing a fix, and asks for code before pinpointing exact fix.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010448
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly examines what's described ('two functions, direct API') and asks 'what capability is actually missing here', noting no mention of multi-step planning, memory, retries, etc.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Concludes 'don't migrate', recommends keeping direct API call plus a small ~30-50 line local dispatch layer instead of adopting LangChain.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete justifying evidence: 'Many tools with dynamic selection/chaining', 'Built-in retries, streaming, memory/conversation state', 'Multi-agent orchestration', 'Provider abstraction', and examples like 'I need 15 tools with conditional routing' or 'persistent multi-turn memory across sessions'.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01038
+}

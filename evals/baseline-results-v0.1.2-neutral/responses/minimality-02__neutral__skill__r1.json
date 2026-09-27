@@ -1,0 +1,63 @@
+{
+  "key": "minimality-02__neutral__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "Before migrating, it's worth checking whether the migration is actually solving a problem you have.\n\n**Capability-gap check first:**\n\nA small agent that calls two functions and returns results, using the model API directly, is already a working, simple, minimal system. \"I'm building an AI agent\" isn't itself a reason to add a framework \u2014 the question is: what capability is missing today that LangChain would provide?\n\nConcretely, ask:\n\n1. **What's failing or limited right now?** Do you need multi-step planning, memory across turns, retries/streaming, swappable model providers, retrieval, or a graph of conditional steps? If the answer is \"nothing, it works,\" that's a signal to not migrate.\n2. **Do you need the two function calls to be dynamically chosen by the model**, or are they always both called in a fixed sequence? If it's the latter, that's just... a Python script. LangChain adds abstraction (chains, tool schemas, output parsers, callback plumbing) without adding capability in that case.\n3. **Is direct API control (latency, error handling, exact prompt/response shape) something you rely on?** LangChain wraps that in more layers, which can make debugging tool-call failures harder, not easier.\n\n**Simplify-first ordering suggests:**\n\n- If you just need the model to *decide which of the two functions to call* (real tool-calling), most model providers (OpenAI, Anthropic, etc.) support native structured tool calling directly \u2014 no framework needed. That's a small local change, not a new dependency.\n- If you need orchestration across many steps/agents/retries, LangGraph (or a small state machine you write yourself) is a lighter, more explicit choice than the full LangChain chain abstraction.\n- Only reach for LangChain itself if you specifically need its ecosystem (many prebuilt integrations, retrievers, vector store adapters, etc.) and that need is concrete, not speculative.\n\n**If you decide you do have a real gap and want to proceed, the migration should be incremental, not a rewrite:**\n\n1. Keep your two functions as plain Python functions \u2014 don't restructure them yet.\n2. Wrap them as LangChain tools (`@tool` decorator or `Tool.from_function`) with clear name/description/schema. This is additive, not a rewrite of your logic.\n3. Replace only the model-call layer with LangChain's chat model wrapper for your provider, bound to those tools.\n4. Add an agent executor (or LangGraph node) only if you need multi-step tool-calling loops \u2014 if it's always exactly two fixed calls, you may not need an \"agent\" abstraction at all, just structured tool-calling in one request/response cycle.\n5. Run your existing test cases against the new path before removing the old direct-API code, so you can compare outputs (verification, not just \"it runs\").\n6. Only delete the old implementation once the new one is verified equivalent.\n\n**Bottom line:** if your current script reliably does what you need, migrating to LangChain adds a dependency, an abstraction layer, and maintenance surface for no functional gain. I'd only recommend it if you can name a specific capability (dynamic tool selection, multi-step reasoning loop, integration ecosystem) that your current code can't do and that native provider tool-calling also can't do simply. What's the actual limitation you're hitting?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1066,
+      "cacheReadInputTokens": 2800,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011224000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2800,
+    "output_tokens": 1066,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1066,
+        "cache_read_input_tokens": 2800,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011224000000000001,
+  "duration_ms": 14802
+}

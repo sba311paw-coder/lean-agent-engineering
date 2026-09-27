@@ -1,0 +1,63 @@
+{
+  "key": "activation-positive-02__neutral__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "This is a classic agent-architecture issue: the LLM is making an inconsistent decision at the \"should I call a tool?\" boundary, and nothing outside the LLM is enforcing that decision. Let's trace it rather than jump to a fix.\n\n## Locate the actual boundary that's failing\n\nReferring back to the architecture:\n\n```\nUSER -> AGENT APPLICATION -> LLM (decides: answer or call tool) -> AGENT APPLICATION -> TOOL\n```\n\n\"Sometimes skips the tool\" means the LLM's decision is inconsistent \u2014 but before assuming it's a prompting problem, check whether the application is even in a position to catch it:\n\n1. **Is there any check that a tool call happened before returning to the user?** If the agent application just passes through whatever the LLM produces, there's no enforcement \u2014 the LLM's judgment is the only gate. That's the root architectural gap in most cases like this.\n2. **Is the tool's purpose ambiguous relative to the LLM's own knowledge?** If the model \"knows\" a plausible answer (e.g., a fact, a date, a config value), it will often trust its own knowledge over invoking a tool, especially if the tool isn't clearly framed as authoritative.\n3. **Is the tool description written as optional/one-of-many, rather than mandatory for a class of queries?**\n\n## Likely root causes, in order of how often they're the actual cause\n\n- **Tool description doesn't state when it's required**, only what it does. Models default to their own knowledge unless told explicitly that certain query types must go through the tool.\n- **No application-level enforcement** \u2014 the agent trusts the LLM's decision as if it were authorization, but a decision to skip a tool isn't verified anywhere.\n- **The user prompt/system prompt has competing guidance** (e.g., \"be concise and helpful\" nudges toward answering directly rather than pausing to call a tool).\n- **The tool is one of many similar tools**, and the model picks a \"close enough\" mental shortcut instead.\n\n## Fixes, smallest first\n\n1. **Sharpen the tool description** to state the condition, not just the capability:\n   > \"Always call this tool for [X category of question]. Do not answer from prior knowledge, even if you believe you know the answer, because this data changes and your knowledge may be stale/incomplete.\"\n   This alone fixes most cases of inconsistent tool use \u2014 it's the smallest change and should be tried first.\n\n2. **Add a system-prompt rule for the specific task category**, e.g.: \"For questions about [domain], you must retrieve current data via `tool_name` before answering. Do not rely on internal knowledge for this domain.\"\n\n3. **If correctness is high-stakes, don't stop at prompting \u2014 enforce it in the application layer.** This is the real fix if step 1\u20132 don't fully close the gap: the agent application checks, before returning a final response, whether the response falls into the tool-required category and whether a tool call was actually made in that turn. If not, force a retry or block the response. This moves the control from \"LLM decision\" to \"verified authorization,\" which matches the core principle: an LLM's decision is not itself authorization.\n\n4. **Only if this is a systemic pattern across many tools**, consider structured output / forced tool choice (many APIs support `tool_choice: required` or similar) for the specific query types where a tool is mandatory \u2014 but scope it narrowly, don't force tool use globally or you'll get spurious calls on unrelated queries.\n\n## What I would not do\n\n- Don't add a new orchestration layer, a router agent, or a second LLM call to \"double-check\" tool usage as a first move \u2014 that's the top of the complexity ladder and unwarranted until you've verified the description/prompt fix isn't sufficient.\n- Don't just increase temperature down or add \"please always use the tool\" pleading language repeated everywhere \u2014 vague repetition doesn't fix an unclear rule.\n\n## How to verify the fix\n\nSince this is nondeterministic (LLM-driven) behavior, verify with a small **eval set**, not a single manual test:\n- Collect ~15\u201320 real prompts that should trigger the tool.\n- Run them before and after your change.\n- Confirm the tool-call rate goes to consistently 100% (or your required threshold) for that category, and that unrelated prompts still don't spuriously trigger it.\n\nThat gives you actual evidence instead of an anecdotal \"seems better now.\"\n\n**Question to narrow this down:** what's the tool for (e.g., live data lookup, calculation, internal DB), and do you already have a system prompt telling it when to use the tool, or purely relying on the tool's schema description?",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1496,
+      "cacheReadInputTokens": 2777,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0155194,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2777,
+    "output_tokens": 1496,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1496,
+        "cache_read_input_tokens": 2777,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.0155194,
+  "duration_ms": 20036
+}

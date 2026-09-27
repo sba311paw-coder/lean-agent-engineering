@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States failure boundary is 'between AGENT APPLICATION \u2192 LLM (final response)' and instructs to trace what happens after the tool returns.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Advises to 'Log \u2014 or print \u2014 the exact message array/payload you send to the LLM for the final completion call, right before you call it. Not the tool's raw output, the literal request body.'",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly says 'Since the tool output is correct in logs, don't touch the tool' and frames fix only after isolating the boundary.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009094000000000001
+}

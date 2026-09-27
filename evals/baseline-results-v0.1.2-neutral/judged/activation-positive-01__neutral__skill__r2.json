@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Provides explicit flow diagram: 'AGENT APP \u2192 LLM (decides to call tool) \u2192 AGENT APP \u2192 TOOL \u2192 result \u2192 AGENT APP \u2192 LLM \u2192 final response' and localizes the break to after tool result/before final synthesis.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Separates LLM decision-making ('LLM decides to call tool', 'LLM synthesizes a response without ever seeing the data') from Agent App execution ('agent app stops the loop too early', 'tool result never makes it back into the LLM's context') as distinct failure categories.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists 5 distinct failure boundaries: context passing bug, tool_call_id mismatch, premature loop termination, async race condition, and system prompt suppression.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Explicitly recommends investigation before fixing: 'Log the exact messages array sent to the LLM... Start with step 1 \u2014 it's the fastest way to find the actual boundary that's failing before changing any code.'",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010526
+}

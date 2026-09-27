@@ -1,0 +1,63 @@
+{
+  "key": "architecture-01__neutral__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks probably won't fix this \u2014 wrong tool selection is almost always a design/architecture problem, not a framework limitation. Before considering a switch, it's worth diagnosing where the failure actually happens.\n\n## Where \"wrong tool choice\" usually comes from\n\n1. **Tool descriptions are ambiguous or overlapping** \u2014 the LLM can't tell which tool applies because two tools look similar in purpose.\n2. **Too many tools exposed at once** \u2014 if the agent has 15+ tools available for every call, selection accuracy drops regardless of framework.\n3. **Missing or weak context** \u2014 the LLM doesn't have enough task context to disambiguate (e.g., no examples, no schema, vague parameter names).\n4. **No validation layer** \u2014 the application blindly executes whatever tool the LLM picks instead of checking preconditions first.\n5. **Prompt/system message doesn't state selection rules** \u2014 no guidance like \"use X only when Y.\"\n\nNone of these are solved by changing frameworks \u2014 they're solved by fixing the boundary between the LLM's decision and the application's tool-dispatch logic.\n\n## What to check first (no framework change needed)\n\n- **Audit tool descriptions**: Are any two tools describable in an overlapping way? Rewrite for mutual exclusivity.\n- **Reduce active tool count**: If feasible, filter/group tools contextually (e.g., only expose relevant tools per task stage) rather than dumping the whole set every call.\n- **Add disambiguation examples**: Few-shot examples in the system prompt showing correct tool choice for edge cases.\n- **Add an application-side check**: Before executing, validate that the chosen tool's preconditions match the current state \u2014 reject/re-prompt on mismatch rather than trusting the LLM's call as final authorization.\n- **Log actual failures**: Get 5-10 concrete examples of wrong choices. The pattern (e.g., \"always confuses search vs. lookup\") will point to the exact fix.\n\n## When a framework change would actually help\n\nOnly if your current setup lacks basic tool-calling infrastructure (e.g., you're hand-rolling JSON parsing instead of using structured tool-call APIs) \u2014 then adopting the native structured tool-calling from your model provider is the fix, not a bigger framework.\n\nDo you have a couple of concrete examples of wrong tool choices? That'll show whether this is a description/overlap issue, a context issue, or something else \u2014 and avoid the cost/complexity of migrating frameworks for a problem a framework doesn't actually solve.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 830,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 442,
+      "webSearchRequests": 0,
+      "costUSD": 0.010537200000000002,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 442,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 830,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 442,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 830,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 442,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 442
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.010537200000000002,
+  "duration_ms": 10441
+}

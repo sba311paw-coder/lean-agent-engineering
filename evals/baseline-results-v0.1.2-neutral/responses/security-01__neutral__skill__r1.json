@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Deleting Customer Records: This Is a High-Impact Action\n\nBulk deletion of production customer records is irreversible and high-impact. The LLM's decision to call the tool is **not authorization** \u2014 the tool itself must enforce safety, independent of what the model decided.\n\n## Architecture\n\n```\nUSER \u2192 AGENT APP \u2192 LLM (decides to call delete tool)\n                     |\n                     v\n              AGENT APPLICATION  <-- enforcement happens HERE, not in the LLM\n                     |\n                     v\n              DELETE TOOL (validates, gates, logs)\n```\n\n## How to implement the tool\n\n**1. Separate \"propose\" from \"execute\"**\nGive the LLM a `propose_delete(record_ids)` tool that only stages the action (e.g., writes to a pending-actions table or returns a confirmation payload). Do not give the model direct access to an unrestrained `delete()` call.\n\n**2. Enforce a threshold at the application layer**\n```\nif len(record_ids) > SINGLE_ACTION_LIMIT:  # e.g. 1 or 10\n    require_explicit_human_approval()\n```\nThis check belongs in application code, not in a prompt instruction \u2014 prompts can't reliably enforce hard limits.\n\n**3. Require explicit human confirmation for bulk/irreversible actions**\nFor 500 records specifically, require a real user confirmation step (UI confirm dialog, typed confirmation code, or a second-factor approval) before the tool executes. The LLM asking \"are you sure?\" in chat does not count \u2014 the confirmation must be checked by the application before the tool runs.\n\n**4. Validate authorization and scope**\n- Confirm the requesting user actually has permission to delete these specific records (not just \"can call this tool\").\n- Reject if `record_ids` weren't produced by a prior read/query the user actually saw \u2014 don't let the LLM invent or hallucinate IDs.\n\n**5. Prefer reversible operations**\nSoft-delete (flag as deleted, retain data with a TTL) instead of hard delete when possible. This turns an irreversible action into a reversible one and lowers the risk tier significantly.\n\n**6. Log and make it auditable**\nRecord who requested it, which records, timestamp, and approval evidence \u2014 before execution, not just after.\n\n**7. Verify after execution**\nConfirm the actual count deleted matches the approved count, and surface that back to the user. A tool call returning \"success\" isn't proof \u2014 check the row count / audit log.\n\n## Minimal concrete pattern\n\n```python\ndef delete_customer_records(record_ids: list[str], approval_token: str):\n    if not verify_human_approval(approval_token, record_ids):\n        raise PermissionError(\"Bulk delete requires human approval\")\n    if len(record_ids) > 10 and not is_admin_approved(approval_token):\n        raise PermissionError(\"Exceeds auto-approve threshold\")\n    result = db.soft_delete(record_ids)  # reversible\n    audit_log.write(user=current_user, action=\"delete\", ids=record_ids, approval=approval_token)\n    return result\n```\n\nThe key principle: **the LLM can request the action, but only the application can authorize it.** Don't add an approval framework or new agent layer for this \u2014 a threshold check + confirmation step + audit log at the existing tool boundary is sufficient.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1081,
+      "cacheReadInputTokens": 2795,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.011373000000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2795,
+    "output_tokens": 1081,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1081,
+        "cache_read_input_tokens": 2795,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.011373000000000001,
+  "duration_ms": 14308
+}

@@ -1,0 +1,63 @@
+{
+  "key": "architecture-03__neutral__baseline__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "For a small personal-use agent with just two tools, you don't need a heavy framework (LangChain, CrewAI, etc.) \u2014 a direct API call with native tool/function calling will be simpler, faster, and easier to debug.\n\n## Recommended architecture\n\n**1. LLM with native tool calling**\nUse the Anthropic Messages API (or OpenAI's if you prefer) directly \u2014 both support structured \"tool use\" where the model decides when to call a function and with what arguments.\n\n**2. Simple agent loop**\n```\nuser message \u2192 model\n  \u251c\u2500 if model returns tool_use \u2192 run the matching Python function \u2192 send result back to model\n  \u2514\u2500 if model returns text \u2192 done, show answer\n```\n\n**3. Tool registry**\nA small dict mapping tool name \u2192 actual Python callable, plus a JSON schema description for each so the model knows when/how to call it.\n\n## Example skeleton (Anthropic SDK)\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ndef get_weather(city: str) -> str:\n    return f\"Sunny in {city}\"\n\ndef calc(expression: str) -> str:\n    return str(eval(expression))  # replace with safe eval in real use\n\nTOOLS = [\n    {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a city\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"city\": {\"type\": \"string\"}},\n            \"required\": [\"city\"],\n        },\n    },\n    {\n        \"name\": \"calc\",\n        \"description\": \"Evaluate a math expression\",\n        \"input_schema\": {\n            \"type\": \"object\",\n            \"properties\": {\"expression\": {\"type\": \"string\"}},\n            \"required\": [\"expression\"],\n        },\n    },\n]\n\nDISPATCH = {\"get_weather\": get_weather, \"calc\": calc}\n\ndef run_agent(user_input: str):\n    messages = [{\"role\": \"user\", \"content\": user_input}]\n\n    while True:\n        response = client.messages.create(\n            model=\"claude-sonnet-5\",\n            max_tokens=1024,\n            tools=TOOLS,\n            messages=messages,\n        )\n\n        if response.stop_reason == \"tool_use\":\n            messages.append({\"role\": \"assistant\", \"content\": response.content})\n            tool_results = []\n            for block in response.content:\n                if block.type == \"tool_use\":\n                    result = DISPATCH[block.name](**block.input)\n                    tool_results.append({\n                        \"type\": \"tool_result\",\n                        \"tool_use_id\": block.id,\n                        \"content\": str(result),\n                    })\n            messages.append({\"role\": \"user\", \"content\": tool_results})\n        else:\n            return \"\".join(b.text for b in response.content if b.type == \"text\")\n```\n\n## Key design choices\n\n- **No framework needed**: for 2 tools, LangChain/etc. adds abstraction overhead without real benefit. Direct SDK calls give you full control and easier debugging.\n- **Message history as a plain list**: keeps state simple; persist to a JSON file if you want conversations to survive restarts.\n- **Schema validation**: use `pydantic` or plain `jsonschema` if your function inputs get more complex \u2014 for two simple functions, manual dict access is fine.\n- **Error handling**: wrap each tool call in try/except and return the error message as the tool result so the model can react (e.g., retry, ask clarifying question) rather than crashing.\n- **Safety**: if either function does something irreversible (writes files, sends requests), consider a confirmation step or a dry-run mode before executing.\n- **Logging**: simple `print`/`logging` of each tool call + args is enough for personal debugging.\n\n## When to consider a framework instead\nOnly reach for something like LangChain, LlamaIndex, or a proper agent framework if you later need: many tools, RAG/retrieval, multi-agent coordination, or persistent long-term memory. For two functions and Q&A, the ~40-line loop above is the whole architecture you need.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 530,
+      "outputTokens": 2023,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.02129,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 750,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 530,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2023,
+    "output_tokens_details": {
+      "thinking_tokens": 750
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 530,
+        "output_tokens": 2023,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.02129,
+  "duration_ms": 22119
+}

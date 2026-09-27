@@ -1,0 +1,63 @@
+{
+  "key": "security-01__neutral__skill__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Deleting production customer records via an agent tool\n\nThis is a high-impact, irreversible operation, so the LLM's decision to call the tool must **not** be treated as authorization. Authorization has to be enforced at the application/tool boundary, not inferred from model output.\n\n## Core design\n\n```\nUSER \u2192 AGENT APPLICATION \u2192 LLM \u2192 tool call (structured) \u2192 AGENT APPLICATION\n                                                                  |\n                                                    validation / policy / approval gate\n                                                                  |\n                                                              TOOL \u2192 DATABASE\n```\n\nThe LLM should only be able to *propose* a deletion. The application decides whether it's allowed to execute.\n\n### 1. Separate \"propose\" from \"execute\"\n\nDon't give the LLM a tool that directly deletes. Give it a tool like `request_delete_records(ids)` that:\n- Validates the IDs exist and belong to a scope the current user is permitted to touch.\n- Returns a preview (count, sample records, reversibility info) instead of deleting.\n\nA second, separate `confirm_delete(request_id)` action performs the actual deletion, and it should only be callable through an explicit trigger the application controls \u2014 not just because the LLM emitted another tool call.\n\n### 2. Enforce a threshold/approval gate in the application\n\nAt the tool boundary, add checks that don't depend on the LLM:\n- **Bulk-size threshold**: e.g., >10 or >N records requires human approval regardless of what the LLM decided.\n- **Authorization check**: does this user/session have permission to delete these specific records (ownership, role, tenant scoping)?\n- **Rate/anomaly limits**: cap deletions per session/time window.\n\nIf any check fails, the tool returns a structured \"needs approval\" or \"denied\" result \u2014 it does not execute.\n\n### 3. Require explicit human approval for the actual delete\n\nFor 500 records in production, that's squarely \"irreversible + high volume\" \u2014 route it through:\n- A confirmation step surfaced to the actual human user (not just LLM-to-LLM confidence), e.g., \"This will permanently delete 500 customer records. Confirm?\" with a real user action (click/approve), or\n- A separate privileged action/ticket outside the agent's autonomous loop entirely for anything above a safe threshold.\n\n### 4. Make it safe by default\n\n- **Soft delete first**: mark records inactive/tombstoned rather than hard-deleting immediately; run actual purge via a separate, audited batch job later.\n- **Dry-run mode**: the tool call itself just returns \"would delete N records matching X\" until confirmed.\n- **Audit log**: record who (real user), what, when, and the LLM's proposed action vs. the actual executed action \u2014 with attribution (e.g., tie to the requesting user's identity, not the model).\n- **Idempotency + transaction**: batch deletes in a transaction so partial failures don't leave inconsistent state.\n\n### 5. Verification\n\nAfter execution, verify the actual outcome, not just that the delete call returned success:\n- Confirm record count matches expected count deleted.\n- Confirm no out-of-scope records were affected (e.g., check remaining count for other customers unchanged).\n- Surface this confirmation back to the user.\n\n## Summary\n\n- Don't let the LLM's tool call be the authorization \u2014 it's a proposal.\n- Enforce scope, ownership, and threshold checks in the application layer.\n- Require explicit human confirmation for large/irreversible deletions.\n- Prefer soft-delete + audited purge over immediate hard delete.\n- Verify the actual outcome, log it, and attribute it to the real user.",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 1169,
+      "cacheReadInputTokens": 2326,
+      "cacheCreationInputTokens": 469,
+      "webSearchRequests": 0,
+      "costUSD": 0.014035200000000001,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 469,
+    "cache_read_input_tokens": 2326,
+    "output_tokens": 1169,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 469,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1169,
+        "cache_read_input_tokens": 2326,
+        "cache_creation_input_tokens": 469,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 469
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost_usd": 0.014035200000000001,
+  "duration_ms": 15879
+}

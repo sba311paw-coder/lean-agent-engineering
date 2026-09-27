@@ -1,0 +1,33 @@
+{
+  "key": "security-03__neutral__baseline__r3",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Response explicitly recommends creating a 'dedicated least-privilege DB role' with SELECT-only grants scoped to needed tables/columns.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Flags admin credentials as a 'real security risk' and advises against using them, instead recommending a limited role 'rather than the admin account.'",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Provides SQL grants restricting to CONNECT, USAGE, and SELECT on only the customers table, plus suggests views/row-level security to further minimize scope.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008168
+}
