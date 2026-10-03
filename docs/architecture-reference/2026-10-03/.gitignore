@@ -1,0 +1,23 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials/
+secrets/
+
+# Runtime state and private data
+runtime/
+private-data/
+logs/
+artifacts/
+.n8n/
+models/
+
+# Python and editor caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
