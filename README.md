@@ -1,5 +1,7 @@
 # Lean Agent Engineering
 
+[Architecture diagrams and options](docs/ARCHITECTURE-OPTIONS.md) — editable boundary, implementation choices, and evidence loop.
+
 Build reliable AI agents with the minimum complexity necessary.
 
 Version **0.1.2** · Author **HumanInTheLoopAI** · [Apache-2.0](LICENSE)

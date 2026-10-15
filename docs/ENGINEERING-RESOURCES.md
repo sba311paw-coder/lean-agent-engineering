@@ -2,6 +2,8 @@
 
 Updated 10-15-2026. This is a documentation addendum, not a skill release or an executable runtime.
 
+See [architecture diagrams and options](ARCHITECTURE-OPTIONS.md) for the application/model/tool boundary, optional paths, and evidence loop.
+
 A concrete anticipated future use can justify building a bounded optional capability before a current failure occurs. Describe the use, alternatives, prerequisites, maintenance, activation policy, and verification. Simplicity remains a design preference, not a ban on useful future functionality. Credentials, paid usage, external data, and production authority are separate decisions.
 
 ## Ordered engineering backlog
