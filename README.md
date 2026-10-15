@@ -10,6 +10,8 @@ authorization boundaries, and verify outcomes before claiming completion.
 
 ## Use the skill
 
+For the current source-linked engineering backlog, evaluation/tracing contracts, and future capability policy, see [Engineering resources and future capabilities](docs/ENGINEERING-RESOURCES.md), updated 10-15-2026. This documentation addendum does not change skill version 0.1.2 or its historical evaluation evidence.
+
 Place this folder, named `lean-agent-engineering`, in a skill directory
 supported by your agent client. Follow that client's discovery or reload
 instructions. The entry point is [SKILL.md](SKILL.md).
