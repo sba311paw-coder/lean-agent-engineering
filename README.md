@@ -139,7 +139,16 @@ What the results show:
   difference between the two with-skill runs (89% vs. 80%) is within
   run-to-run noise. Across both runs, the skill roughly doubles the
   full-pass rate on neutral prompts.
-- **0.1.3 recheck:** after 0.1.3 added two worked examples, a rerun of the neutral and educational prompts gave 78% full pass (0.96 mean) with the skill and 31% (0.78) without ([neutral](evals/baseline-results-v0.1.3-neutral/summary.md), [educational](evals/baseline-results-v0.1.3-negatives/summary.md)). The with-skill mean matches 0.1.2, and the no-skill run moved by 0.10 on its own, so the examples made no measurable difference.
+- **0.1.3 recheck:** after 0.1.3 added two worked examples, a rerun of
+  the neutral and educational prompts gave 78% full pass (0.96 mean)
+  with the skill and 31% (0.78) without
+  ([neutral](evals/baseline-results-v0.1.3-neutral/summary.md),
+  [educational](evals/baseline-results-v0.1.3-negatives/summary.md)).
+  The `sonnet` alias now resolved to `claude-sonnet-5-5` (0.1.2 used
+  `claude-sonnet-5`), so the model changed as well as the skill. The
+  with-skill mean matches 0.1.2, so the examples made no measurable
+  difference; the no-skill shift of 0.10 reflects run-to-run noise and
+  the model change.
 
 Limits: the same model family answers and grades. The neutral prompts were
 written with the criteria in view, and several invite the tempting wrong
