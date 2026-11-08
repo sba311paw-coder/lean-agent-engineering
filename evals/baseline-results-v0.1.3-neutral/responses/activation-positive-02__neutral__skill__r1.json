@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-02__neutral__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "Intermittent tool skipping is usually a decision-boundary problem, not a random model flaw. Find where the decision goes wrong before changing anything.\n\n## 1. Reproduce and capture evidence\nLog the full request for a failing run and a passing run: system prompt, tool definitions, message history, and the model's raw response. Compare them. Look for differences in phrasing, history length, or which tools were offered. Also check the `tool_choice` setting and whether the model had its own answer available (e.g., a question it knows the answer to).\n\n## 2. Likely causes, cheapest fix first\n\n1. **Vague tool description.** If the description doesn't say *when* to use the tool, the model will judge it unnecessary whenever it feels confident. Rewrite it as: \"Use this for X. Always use it instead of answering from memory when the question involves Y.\" Include what the tool returns and what it's authoritative for.\n\n2. **Underspecified system prompt.** State the rule explicitly: \"For questions about [domain], you must call `tool_name` and base your answer only on its result. Never answer from prior knowledge.\" Explicit conditions work better than general encouragement.\n\n3. **Tool choice isn't enforced.** If a call is *always* required for a class of requests, don't rely on the prompt. Use the API's forced tool choice (e.g., `tool_choice` set to a specific tool, or \"any\") for that route. Or have the application route those requests so the tool runs first, and pass the result to the model.\n\n4. **Overlapping or ambiguous tools.** If two tools could plausibly apply, or the question looks answerable without either, behavior will vary. Narrow the descriptions and remove tools not needed for the task.\n\n5. **Context problems.** Long histories, earlier turns where the model answered without the tool, or stale tool results in context can all teach it to skip the call. Check whether failures correlate with conversation length or position.\n\n6. **Sampling variance.** Lower the temperature to reduce flip-flopping, though this only masks a weak prompt or description.\n\n## 3. Add an application-level check\nDon't depend on the model to decide this every time. If a response for a given request type contains no tool call, the application can detect that, then either retry with the tool forced or reject the answer. That puts the guarantee in code, where it can be enforced, rather than in the model's judgment.\n\n## 4. Verify\nBuild a small set of test prompts (roughly 20\u201350) that should trigger the tool, including the ones that failed. Run each several times and measure the tool-call rate before and after each change. Change one thing at a time. A single successful run doesn't show the problem is fixed, since the failure is intermittent.\n\nIf you share the tool definition, the relevant part of your system prompt, and one failing and one passing trace, I can point to which of these is most likely the cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 984,
+      "cacheReadInputTokens": 3300,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010174000000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 78,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3300,
+    "output_tokens": 984,
+    "output_tokens_details": {
+      "thinking_tokens": 78
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 984,
+        "cache_read_input_tokens": 3300,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010174000000000002,
+  "duration_ms": 9798
+}

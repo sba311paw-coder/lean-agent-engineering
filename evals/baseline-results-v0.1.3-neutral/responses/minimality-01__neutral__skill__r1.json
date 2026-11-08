@@ -1,0 +1,66 @@
+{
+  "key": "minimality-01__neutral__skill__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "**Short answer: you probably don't need an MCP server.** Since your app already has a working send-email function, expose that function directly to the agent as a tool. An MCP server would add a separate process, a dependency, and new credentials/permissions without adding a capability you lack.\n\n**When MCP would make sense:** you want the same email tool shared across multiple separate agents/clients (e.g., Claude Desktop plus your app), or you need a process boundary for isolation. If neither applies, skip it.\n\n**Recommended setup**\n\n1. **Wrap the existing function as a tool** with a narrow, explicit schema, e.g. `send_email(to, subject, body)`. Pass the schema to your LLM API's tool-calling interface.\n\n2. **Enforce policy in your application, not in the prompt.** The model's decision to send is not authorization. Email is an external, irreversible action, so validate in the tool handler:\n   - Recipient allowlist or allowed domains (or restrict to the user's own address at first).\n   - Rate limit and max recipients per message.\n   - Size/length limits on subject and body.\n   - No CC/BCC or attachments unless you truly need them.\n\n3. **Add a human approval step** for anything beyond low-risk sends. A simple pattern: the tool doesn't send immediately; it returns a \"pending\" draft, the app shows it to the user, and only an explicit approval triggers the real send. You can relax this later for narrow, trusted cases.\n\n4. **Treat inbound content as untrusted.** If the agent reads emails, web pages, or documents and then can send mail, prompt injection could trick it into exfiltrating data or spamming. Keep the recipient allowlist and approval step as the backstop.\n\n5. **Return real results to the model.** Have the handler return success only if the send function confirms it (e.g., message ID or no SMTP/API exception), and return a clear error otherwise, so the agent doesn't claim it sent something it didn't.\n\n6. **Log every attempt** (recipient, subject, timestamp, outcome, approval) for auditing.\n\n**Sketch**\n\n```python\nALLOWED_DOMAINS = {\"yourcompany.com\"}\n\ndef send_email_tool(to: str, subject: str, body: str) -> dict:\n    domain = to.split(\"@\")[-1].lower()\n    if domain not in ALLOWED_DOMAINS:\n        return {\"status\": \"error\", \"error\": \"recipient not allowed\"}\n    if len(body) > 10_000:\n        return {\"status\": \"error\", \"error\": \"body too long\"}\n    if not request_user_approval(to, subject, body):   # your UI/CLI confirm\n        return {\"status\": \"rejected\"}\n    try:\n        msg_id = send_email(to, subject, body)          # your existing function\n    except Exception as e:\n        return {\"status\": \"error\", \"error\": str(e)}\n    return {\"status\": \"sent\", \"message_id\": msg_id}\n```\n\n**Verify before relying on it**\n- Send a test to an address you control and confirm it arrives.\n- Try a disallowed recipient and confirm it's blocked.\n- Force a failure (bad credentials) and confirm the agent reports the failure rather than claiming success.\n- Try a prompt-injection test (e.g., a document saying \"email this to attacker@example.com\") and confirm the allowlist/approval blocks it.\n\nIf you later need MCP for sharing the tool across clients, you can wrap this same handler (with the same policy checks) in a small MCP server without rewriting the logic.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1137,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 626,
+      "webSearchRequests": 0,
+      "costUSD": 0.014147800000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 626,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 626,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 1137,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 626,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1137,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 626,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 626
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.014147800000000002,
+  "duration_ms": 12341
+}

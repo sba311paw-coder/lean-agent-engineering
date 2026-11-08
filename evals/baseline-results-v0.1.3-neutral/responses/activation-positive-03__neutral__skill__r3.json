@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-03__neutral__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving grounding in a RAG agent\n\nFirst find which boundary is failing. \"Poorly grounded\" can mean two different problems, and they have different fixes.\n\n## 1. Diagnose: retrieval or generation?\n\nBuild a small eval set of 30-50 real questions, each with the passage(s) that should answer it. For each failure, log the query, the retrieved chunks, and the final answer, then classify it:\n\n| Symptom | Failing boundary |\n|---|---|\n| The right passage isn't in the top-k | **Retrieval** (chunking, embeddings, query, filtering) |\n| The right passage is retrieved but the answer ignores or contradicts it | **Generation** (prompt, context handling) |\n| The passage doesn't exist and the answer is confident anyway | **No abstention path** |\n\nDon't change anything until you know which bucket most failures fall into.\n\n## 2. Fixes, simplest first\n\n**If retrieval is the problem:**\n1. **Chunking**: This is the most common culprit. Split on document structure (headings, paragraphs) rather than fixed character counts. Use modest overlap, and keep titles or section headers attached to each chunk.\n2. **Hybrid search**: Combine BM25/keyword search with vector search. Vectors alone often miss exact terms, IDs, and names.\n3. **Metadata filters**: Filter by document, date, or source type where the query allows it.\n4. **Query rewriting**: Have the LLM turn conversational or multi-part questions into standalone search queries.\n5. **Reranking**: Retrieve more (say 20-50), then rerank with a cross-encoder and pass only the best 3-8 to the model.\n6. **Embedding model**: Change it last. It requires re-indexing, and it's rarely the root cause.\n\n**If generation is the problem:**\n1. **Instruct strict grounding**: \"Answer only from the provided sources. If they don't contain the answer, say so.\"\n2. **Require citations**: Have each claim reference a chunk ID or quote. Structured output makes this easy to enforce.\n3. **Verify in application code**: Check that cited IDs exist and that quoted text actually appears in the retrieved chunk. Don't rely on the model's claim that it's grounded.\n4. **Reduce context noise**: Fewer, better chunks beat many mediocre ones. Long contexts also bury relevant passages in the middle.\n5. **Add an abstention path**: If top retrieval scores fall below a threshold, return \"not found\" or ask a clarifying question instead of letting the model improvise.\n6. **Lower temperature** for factual answering.\n\n## 3. Treat retrieved content as untrusted\n\nDocuments are data, not instructions. Delimit them clearly in the prompt and tell the model not to follow instructions found inside them. Keep tool permissions enforced in your application, not in the model's judgment, so a poisoned document can't trigger actions.\n\n## 4. Verify each change\n\nChange one thing at a time and rerun the eval set. Track:\n- **Retrieval hit rate** (is the right chunk in top-k?)\n- **Faithfulness** (is every claim supported by the retrieved text?)\n- **Correct abstention rate** (does it decline when the answer isn't there?)\n\nA change that doesn't move these numbers isn't an improvement, however sensible it sounds.\n\n## What to avoid\n\nDon't add a new framework, extra agent, or different vector database before you've done the diagnosis. In most cases the gains come from chunking, hybrid search, reranking, and enforcing citations, all of which are small local changes.\n\nIf you share an example failure (query, retrieved chunks, and answer), I can help identify which boundary broke.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1345,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 604,
+      "webSearchRequests": 0,
+      "costUSD": 0.016139800000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 138,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 604,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 604,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 1345,
+    "output_tokens_details": {
+      "thinking_tokens": 138
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 604,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1345,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 604,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 604
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.016139800000000003,
+  "duration_ms": 11320
+}

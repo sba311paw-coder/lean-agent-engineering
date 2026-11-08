@@ -1,0 +1,66 @@
+{
+  "key": "debugging-01__neutral__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since I can't see your code, here is the fastest path to the root cause: find the first boundary that went wrong, then look at what the recent change touched.\n\n**1. Isolate the change (2 min)**\n- Run `git diff` or `git log -p` on the last change, or revert it temporarily. If the integration works again, the bug is in that diff.\n- Look first at anything touching tool schemas, tool names, message formatting, the model or SDK version, or response parsing.\n\n**2. Log the raw data at each boundary**\nTrace the flow: app \u2192 LLM request \u2192 model's tool call \u2192 app validation \u2192 tool execution \u2192 result \u2192 back to the LLM. Log the raw payload at each step and find the first wrong one:\n\n| Symptom | Likely failing boundary |\n|---|---|\n| Model never calls the tool | Tool definitions missing or malformed in the request (schema, name, `tools` param dropped), or `tool_choice` changed |\n| Model calls it with wrong or missing args | Schema or description changed, or a required field was renamed |\n| API error after the tool runs | Tool result message malformed: wrong `tool_use_id` or `tool_call_id`, wrong role or content shape, or the assistant tool-call message not preserved in history |\n| Tool call arrives but nothing executes | Dispatcher: name mismatch, a parsing change, or a stop-reason check (`tool_use` vs `end_turn`) |\n| Tool runs but the agent reports a wrong outcome | The app treats any return as success, or an exception is swallowed |\n\n**3. Common causes of \"worked, then a small change broke it\"**\n- A tool name or schema changed in one place but not in the dispatcher.\n- A JSON-parse step was changed or removed, so args are a string instead of an object, or the reverse.\n- The conversation history is rebuilt without the assistant's tool-call turn, so the result has nothing to match.\n- Multiple tool calls in one turn are handled as if there were only one.\n- An SDK or model upgrade changed the response shape.\n- An error from the tool is now swallowed, so you only see the downstream symptom.\n\n**4. Test one hypothesis**\nWrite a minimal script that sends one request with a single tool and a known prompt, and check each step. If that works, add pieces back from your real setup until it breaks.\n\n**5. Verify the fix**\nRerun the original task end to end, then force a failure, such as a tool that raises an error, and confirm the agent reports it rather than claiming success.\n\nIf you paste the exact error or log line, the diff of the change, and the tool definition plus the code that handles the tool result, I can point to the specific line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 942,
+      "cacheReadInputTokens": 3291,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0097531,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 92,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3291,
+    "output_tokens": 942,
+    "output_tokens_details": {
+      "thinking_tokens": 92
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 942,
+        "cache_read_input_tokens": 3291,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0097531,
+  "duration_ms": 9025
+}

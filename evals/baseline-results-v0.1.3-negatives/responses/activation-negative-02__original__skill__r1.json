@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-02__original__skill__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "Tool calling (also called function calling) is a way for an AI model to request that an external action be performed, instead of only producing text.\n\n**The basic idea**\n\nA language model can only generate text on its own. It can't check the weather, query a database, or send an email. Tool calling bridges that gap: the model is told which tools exist, and when one is useful, it outputs a structured request to use it.\n\n**How it works**\n\n1. **Tools are described to the model.** Each tool has a name, a description, and a schema for its inputs (e.g., `get_weather(city: string)`).\n2. **The user asks something.** For example: \"What's the weather in Paris?\"\n3. **The model decides a tool is needed** and emits a structured call, typically JSON, such as `{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}`.\n4. **The application runs the tool.** The model doesn't execute anything itself. The surrounding program receives the request, runs the real function or API, and gets a result.\n5. **The result goes back to the model.** The application passes the output (e.g., \"18\u00b0C, cloudy\") into the conversation.\n6. **The model writes the final answer** using that result: \"It's 18\u00b0C and cloudy in Paris.\"\n\nThis loop can repeat several times, with the model chaining multiple tool calls before it answers.\n\n**Key points**\n\n- The model only *proposes* the call. Your application is what actually executes it, which is where validation and permission checks belong.\n- It lets models access live data (search, databases, APIs), perform actions (create tickets, write files), and do precise work (calculators, code execution) that they're unreliable at doing in plain text.\n- It's the foundation of AI agents: an agent is essentially a model calling tools in a loop to accomplish a goal.\n\n**Common examples**\n\nWeb search, running code, reading or writing files, querying a database, calling a calendar or email API.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 598,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 574,
+      "webSearchRequests": 0,
+      "costUSD": 0.0085498,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 574,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 574,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 598,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 574,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 598,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 574,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 574
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0085498,
+  "duration_ms": 7547
+}

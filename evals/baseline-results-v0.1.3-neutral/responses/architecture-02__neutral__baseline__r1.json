@@ -1,0 +1,66 @@
+{
+  "key": "architecture-02__neutral__baseline__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "The usual cause is that the tool output is logged but never makes it into the messages for the follow-up model call. Check these in order.\n\n## 1. Is the result sent back correctly?\n\nWith the Anthropic Messages API, the next request must contain three things in order:\n\n1. The original user message\n2. The assistant message containing the `tool_use` block, appended unchanged\n3. A user message containing a `tool_result` block whose `tool_use_id` matches\n\n```python\nmessages = [{\"role\": \"user\", \"content\": \"What's the weather in Paris?\"}]\n\nwhile True:\n    resp = client.messages.create(\n        model=MODEL, max_tokens=1024, tools=tools, messages=messages\n    )\n\n    if resp.stop_reason != \"tool_use\":\n        break  # the final answer is in resp, not in an earlier response\n\n    # keep the assistant turn, including the tool_use blocks\n    messages.append({\"role\": \"assistant\", \"content\": resp.content})\n\n    tool_results = []\n    for block in resp.content:\n        if block.type == \"tool_use\":\n            result = get_weather(**block.input)\n            tool_results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": block.id,\n                \"content\": json.dumps(result),  # a string or content blocks\n            })\n\n    messages.append({\"role\": \"user\", \"content\": tool_results})\n\nfinal_text = \"\".join(b.text for b in resp.content if b.type == \"text\")\n```\n\n## 2. Common mistakes\n\n- **Reading the wrong response.** You return the text from the first response (the \"Let me check the weather...\" preamble) instead of the response after the tool result.\n- **Dropping the assistant's `tool_use` turn.** Without it, the result has nothing to attach to, or the call errors.\n- **Making a fresh call without history.** The second request only has the original question, so the model answers generically.\n- **Sending the result in the wrong role or format.** Examples are a system message, a plain string, or a mismatched `tool_use_id`. In LangChain or similar frameworks, the equivalent is a `ToolMessage` with the right `tool_call_id`.\n- **Bad serialization.** The content is `None`, an object repr like `<Response ...>`, a coroutine you forgot to `await`, or an empty string. Log the exact `content` you put in the `tool_result`, not just the tool's return value.\n- **History trimming or summarization** that removes the tool messages before the final call.\n- **Conflicting system prompt**, such as \"keep answers general\" or \"don't reveal specific data\".\n- **Unclear payload.** A large nested JSON with ambiguous keys can get glossed over. Return something simple like `{\"city\": \"Paris\", \"temperature_c\": 18, \"conditions\": \"cloudy\"}`.\n\n## 3. Debug step\n\nRight before the second API call, print the full `messages` list. You should see the `tool_use` block followed by a `tool_result` containing the temperature. If it's missing or malformed, that's your bug. If it's there and the model still ignores it, tighten the system prompt, for example: \"Use the tool results to answer, and state the exact values returned.\"\n\nIf it's still failing, share the code that builds the follow-up request, along with the printed `messages`, and which SDK or framework you're using. I can pinpoint the problem from that.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1489,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 682,
+      "webSearchRequests": 0,
+      "costUSD": 0.017622000000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 429,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 682,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 682,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1489,
+    "output_tokens_details": {
+      "thinking_tokens": 429
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 682,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1489,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 682,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 682
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.017622000000000002,
+  "duration_ms": 12504
+}

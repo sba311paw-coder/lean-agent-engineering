@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "Inconsistent tool use usually comes from the model judging that it doesn't need the tool. These fixes are roughly in order of impact:\n\n**1. Fix the tool descriptions**\n- Say *when* to use the tool, not just what it does. For example: \"Use this for any question about current order status. Never answer order questions from memory.\"\n- Name the situations where the model is likely to skip it, such as facts that feel familiar, or questions it thinks it already knows the answer to.\n- Make the tool name and parameter descriptions unambiguous. Overlapping tools make the model hedge and answer directly.\n\n**2. Add explicit instructions to the system prompt**\n- State the rule plainly: \"For X, Y, and Z, you must call `search_docs` before answering. Don't rely on prior knowledge, because it may be outdated or wrong.\"\n- Explain *why* the tool is needed (fresh data, private data, authoritative source). Models follow rules better when they know the reason.\n- Avoid vague guidance like \"use tools when helpful,\" which invites the model to decide it isn't helpful.\n\n**3. Force tool use through the API when appropriate**\n- Most APIs have a `tool_choice` setting. With Anthropic's API, `{\"type\": \"any\"}` forces some tool call, and `{\"type\": \"tool\", \"name\": \"...\"}` forces a specific one.\n- You can force the call on the first turn, then switch back to `auto` for later turns.\n- Note that forcing a tool call can conflict with extended thinking in some configurations, so check the docs for your model.\n\n**4. Use a routing or gating step**\n- If certain query types always need a tool, classify the query first (with a cheap model or rules) and then run the tool yourself or force the call.\n- For critical flows, run retrieval deterministically and put the results in the prompt rather than relying on the model to ask for them.\n\n**5. Add few-shot examples**\n- Include 2\u20133 examples in the prompt where the correct behavior is to call the tool, especially for borderline cases where the model currently skips it.\n\n**6. Validate and retry**\n- Check whether the response used a tool when it should have. If not, retry with a nudge or a forced `tool_choice`.\n- Where it matters, add a check that the final answer is grounded in tool output, for example by requiring citations to tool results.\n\n**7. Reduce competing options**\n- Fewer, clearer tools work better. If you have many, consider narrowing which ones are exposed per request.\n- Make sure the tool's output is useful and not error-prone. If a tool failed or returned junk earlier in the conversation, the model may learn to avoid it.\n\n**How to debug it**\nLog the cases where it skips the tool and look for patterns, such as phrasing, topic, or conversation length. Skips on questions that seem \"common knowledge\" point to description and prompt fixes (1\u20132). Random skips even on clear-cut queries point to forcing `tool_choice` or adding a gating step (3\u20134).\n\nIf you tell me which framework or API you're using and share a tool description plus an example of a skipped call, I can suggest specific wording changes.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1035,
+      "cacheReadInputTokens": 674,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010421399999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 34,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 674,
+    "output_tokens": 1035,
+    "output_tokens_details": {
+      "thinking_tokens": 34
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1035,
+        "cache_read_input_tokens": 674,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010421399999999999,
+  "duration_ms": 13076
+}

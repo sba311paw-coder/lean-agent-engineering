@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response notes the existing function works and the missing piece is exposing it to the agent (wrapper tool/MCP server), plus guardrails/approval for when to send. But it never explicitly states the gap upfront; it assumes MCP wrapping is needed.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"You don't need a third-party email MCP server, since yours already works\" and the server code imports and wraps the existing send_email function.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "The 'Do you even need MCP?' section says registering the function as a native tool is simpler when same app and nothing else uses it. But the headline recommendation is still to build an MCP server, and this caveat comes at the end.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.010528000000000001
+}

@@ -1,0 +1,27 @@
+{
+  "key": "verification-01__neutral__baseline__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States \"exit code 0 only tells us the deploy command succeeded, not that the app is healthy.\"",
+      "criterion": "Distinguish command success from outcome verification."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Recommends a smoke check before claiming \"working\" and offers an unverified-version message, and suggests health endpoint/login/key flow. But it doesn't perform any verification itself and still provides a template claiming it's confirmed.",
+      "criterion": "Request or perform appropriate operational verification before claiming success."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.00627
+}

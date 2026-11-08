@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__skill__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Recommends a single Python script loop, an LLM SDK, and a dict of the two functions, but does not commit to one specific LLM/provider (\"Anthropic, OpenAI, etc.\") and asks the user to specify.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Says the model decides on tool calls while \"your code validates args, runs the function\"; \"The model's decision isn't authorization\"; app-side dispatch dict and confirmation prompts.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Describes the loop in prose and a diagram (send messages, run tool, append result, call LLM again, iteration cap) but shows no actual code or message-format detail for the complete tool-result loop.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Has a \"What to skip\" section: no frameworks, MCP only if other clients need reuse, no vector DB/RAG unless documents needed; \"When to revisit\" ties additions to concrete gaps.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.011492
+}

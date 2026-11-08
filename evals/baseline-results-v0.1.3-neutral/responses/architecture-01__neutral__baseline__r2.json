@@ -1,0 +1,66 @@
+{
+  "key": "architecture-01__neutral__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks probably won't fix this. Wrong tool selection is usually caused by the model, the tool definitions, or the prompt, and those carry over to any framework. I'd try the following first, roughly in order of payoff.\n\n**1. Improve tool descriptions and schemas**\n- Say what each tool does, when to use it, and when *not* to use it.\n- Make overlapping tools clearly distinct, or merge them.\n- Use precise parameter names, types, and enums, with short examples in the descriptions.\n- Prefer a few well-scoped tools over many similar ones.\n\n**2. Reduce the choice set**\n- Accuracy drops as the number of tools grows. Past roughly 10-20, consider routing: a first step picks a category, then only that category's tools are exposed.\n- Load tools dynamically based on the task or conversation state.\n\n**3. Improve the prompt**\n- Add guidance on tool selection, such as \"use X for Y, never Z for Y\".\n- Add a few examples of correct and incorrect selections for the cases that go wrong.\n- Have the model state briefly why it's choosing a tool before calling it, or add a planning step.\n\n**4. Use a stronger model or better settings**\n- Tool-use quality varies a lot between models. Upgrading the model often helps more than changing frameworks.\n- Lower the temperature for tool-calling steps.\n\n**5. Add guardrails**\n- Validate tool calls before executing them and return clear error messages so the model can self-correct.\n- Use `tool_choice` (forced or restricted tools) for steps where only one tool makes sense.\n- Add human confirmation for risky tools.\n\n**6. Measure it**\n- Log the failing cases and build a small eval set of (input, expected tool) pairs. That shows whether a change actually helps, and whether the errors cluster around specific tools, which usually points to a description problem.\n\n**When switching might help**\nA framework matters if it's hiding or mangling your tool definitions, adding its own prompt that interferes, or making it hard to see what the model is receiving. In that case, calling the model API directly with a simple loop, or using a thinner framework, can make debugging easier. Otherwise, the major frameworks (LangGraph, OpenAI Agents SDK, Claude Agent SDK, etc.) all rely on the same underlying model behavior.\n\nIf you tell me which framework and model you're using, how many tools you have, and an example of a wrong choice, I can give more specific advice.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 803,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 665,
+      "webSearchRequests": 0,
+      "costUSD": 0.010694000000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 665,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 665,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 803,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 665,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 803,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 665,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 665
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010694000000000002,
+  "duration_ms": 7579
+}

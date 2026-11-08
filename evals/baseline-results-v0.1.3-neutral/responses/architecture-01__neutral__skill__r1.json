@@ -1,0 +1,66 @@
+{
+  "key": "architecture-01__neutral__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Probably none. Switching frameworks rarely fixes wrong tool choice, because the cause is usually in what the model is shown, not in the framework. A new framework would add migration cost and leave the problem in place.\n\n**Check these first, most likely cause first:**\n\n1. **Tool descriptions.** Vague or overlapping descriptions are the most common cause. Say what each tool does, when to use it, and when *not* to use it, and make the differences between similar tools explicit.\n2. **Too many tools.** Selection accuracy drops as the list grows. Give each task or step only the tools it needs, or split the work into stages with small tool sets.\n3. **Overlapping tools.** If two tools could plausibly do the same job, merge them or remove one.\n4. **Parameter schemas.** Unclear names, missing enums, or loose types lead to bad calls that look like wrong-tool choices. Tighten them.\n5. **Tool results and errors.** Confusing or unhelpful outputs can send the model down the wrong path on the next step. Return clear, actionable errors.\n6. **Model capability.** A stronger model, or one with better tool-use training, often helps more than a framework change.\n7. **Application-level guardrails.** Validate calls before executing them. For high-impact tools (delete, send, pay), enforce permissions and require approval in your application code, since the model's choice is not authorization.\n\n**How to find the failing boundary:**\n\n- Log the full request the model sees (system prompt, tool definitions, history) and its structured tool call for each failure.\n- Collect 10-20 cases where it chose wrong, and note the pattern: same two tools confused? Only late in long conversations? Only with ambiguous user phrasing?\n- Turn those cases into a small eval set. Change one thing at a time (description, tool count, model) and rerun it, so you can see whether it actually improved.\n\n**When a framework change is justified:** only if you find a specific capability you lack, such as tool routing or filtering per step, structured workflow control, or built-in tracing, and you can't reasonably build it yourself. Even then, a small local change, like a routing step that selects the tool subset before the main call, usually beats adopting a framework.\n\nIf you tell me which framework and model you use, how many tools you have, and an example of a wrong choice, I can help pinpoint the cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 845,
+      "cacheReadInputTokens": 3291,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008783100000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 91,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3291,
+    "output_tokens": 845,
+    "output_tokens_details": {
+      "thinking_tokens": 91
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 845,
+        "cache_read_input_tokens": 3291,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.008783100000000002,
+  "duration_ms": 8164
+}

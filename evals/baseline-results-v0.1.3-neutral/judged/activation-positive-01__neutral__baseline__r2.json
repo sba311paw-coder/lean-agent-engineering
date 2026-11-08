@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Lays out the loop: model call, stop_reason tool_use, run tool, append assistant and tool_result messages, call model again, extract final text. Also covers framework layers and streaming.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'The model's first response only says it wants to call a tool... You have to run the tool, append the result, and call the model again.' Model requests, app executes.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists distinct failure points: missing second call, reading wrong response, malformed tool_result/id/async, step limits, streaming loss, model ignoring or empty result.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Gives a 'Quick debugging step' to log messages and asks for framework/loop code, but mostly lists causes and a code fix up front rather than investigating first.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.010844
+}

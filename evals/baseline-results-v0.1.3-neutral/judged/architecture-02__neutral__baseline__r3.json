@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Items 1-4 focus on the tool-result handoff: appending assistant tool_use and user tool_result messages, matching tool_use_id, serialization, and returning the right response.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Fastest way to diagnose: print the exact `messages` array right before the second API call\" and check whether the tool_result with the temperature is there.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "It never suggests modifying the tool and puts prompt changes as a last resort, with the diagnostic step for the boundary. But the diagnostic is placed at the end rather than first, and it doesn't explicitly say to trace before changing anything.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.010334
+}

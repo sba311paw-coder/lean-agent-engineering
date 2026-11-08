@@ -1,0 +1,66 @@
+{
+  "key": "architecture-03__neutral__skill__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "# Recommended: a single loop, no framework\n\nFor one user, two existing functions, and Q&A, you need only an LLM SDK with native tool calling and about 50 lines of glue.\n\n## Architecture\n\n```\nUser input\n   |\n   v\nYour Python script (the loop)\n   |\n   v\nLLM (via provider SDK, with the 2 tool schemas)\n   |-- plain answer --> print it, done\n   |-- tool call -----> your code validates args, runs the function,\n                        appends the result, calls the LLM again\n```\n\nThe loop is: send messages, and if the response contains a tool call, run it and append the result. Otherwise return the text. Cap the loop at around 5-10 iterations so it can't run away.\n\n## Tools\n\n- **LLM SDK:** the official Python SDK for whichever provider you use (Anthropic, OpenAI, etc.). Tool calling is built in.\n- **Tool schemas:** a JSON schema per function (name, description, parameters). Write them by hand for two functions.\n- **Dispatch:** a plain dict mapping tool name to function, e.g. `TOOLS = {\"fn_a\": fn_a, \"fn_b\": fn_b}`.\n- **Optional:** `pydantic` to validate tool arguments, if your functions take non-trivial inputs.\n\n## What to skip\n\n- **LangChain, LlamaIndex, CrewAI, etc.:** they add dependencies and abstraction for a problem a loop solves.\n- **MCP server:** only worthwhile if you want other clients to reuse these functions. Your functions are already in Python and in-process.\n- **Multi-agent or orchestration layers:** there's nothing to orchestrate.\n- **Vector DB or RAG:** only add if you need answers from a document collection, which you haven't mentioned.\n\n## Practical guardrails (cheap and worth it)\n\n1. **Validate at the application boundary.** Check the tool name is in your dict and the arguments match expected types before calling. The model's decision isn't authorization.\n2. **Consider side effects.** If either function writes, deletes, sends, or spends, add a confirmation prompt before running it. Read-only functions can run freely.\n3. **Return errors as tool results.** Catch exceptions and send the message back to the model rather than crashing.\n4. **Treat tool output as data.** If a function returns text from files or the web, don't let it act as instructions.\n\n## Verify\n\n- Ask a question that needs no tool and confirm a direct answer.\n- Ask one that needs each function, and check the result matches calling the function directly.\n- Force a failure (bad argument, raised exception) and confirm the agent reports it instead of claiming success.\n\n## When to revisit\n\nAdd a framework only if you hit a real gap, such as needing persistent memory, streaming UI, or many tools. Until then, the plain loop is easier to debug, since you can see every boundary.\n\nIf you tell me what the two functions do (especially whether they have side effects) and which provider you use, I can sketch the loop and schemas.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1074,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 606,
+      "webSearchRequests": 0,
+      "costUSD": 0.013437800000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 91,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 606,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 606,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 1074,
+    "output_tokens_details": {
+      "thinking_tokens": 91
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 606,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1074,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 606,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 606
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.013437800000000003,
+  "duration_ms": 9144
+}

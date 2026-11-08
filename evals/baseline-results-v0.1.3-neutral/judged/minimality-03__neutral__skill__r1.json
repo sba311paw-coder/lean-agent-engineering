@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Says \"You already capture the two things you named... no capability gap that a large framework would close\" and offers questions like \"What question can you not answer today?\" to identify real gaps.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends \"Improve what you have\" first with structured JSON logs queryable via jq, and escalates only minimally (OTel SDK alone, then LLM tracing tools) if a real gap exists.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States a large platform \"would add a service, dependencies, credentials, possible data egress of prompts and tool payloads, cost, and maintenance.\"",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008516
+}

@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Traces the flow across hops: tool return \u2192 application \u2192 second model call with assistant tool-call and tool-result messages \u2192 model's use of it \u2192 final output returned to the user.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Separates application responsibilities (must make a second model call, append the tool_result with matching id, return the last message) from model behavior (step 3: received it but ignored it due to prompt/payload shape).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Enumerates distinct failure boundaries: tool wrapper returning empty/unawaited, app not appending result to messages, id mismatch/serialization, model ignoring data, and output handling dropping the final text/streaming.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Trace the data across each boundary and find the first place the weather result disappears\", gives logging and printing the messages array as diagnosis, and asks for the loop code before pointing to an exact line. Fixes are tied to the diagnosed location.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010386
+}

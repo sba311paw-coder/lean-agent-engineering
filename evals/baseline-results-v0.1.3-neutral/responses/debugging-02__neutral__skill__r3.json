@@ -1,0 +1,66 @@
+{
+  "key": "debugging-02__neutral__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Don't switch embedding models yet. \"Wrong answers\" in a RAG system often have nothing to do with the embedding model, and swapping it forces a full re-index. First find which stage is failing.\n\n**1. Take 10-20 bad answers and check the retrieved chunks for each:**\n\n| What you see | Failing boundary | Likely fix |\n|---|---|---|\n| The right passage is **not** in the top-k | Retrieval | Chunking, top-k, query rewriting, hybrid (BM25 + vector) search, metadata filters, reranker, and only then the embedding model |\n| The right passage **is** retrieved but the answer is still wrong | Generation | Prompt, context ordering or overload, missing \"say I don't know\" instruction, model choice |\n| The right passage is retrieved but truncated or split mid-fact | Chunking or ingestion | Chunk size or overlap, parsing of PDFs and tables |\n| The source docs are stale or missing the answer | Data | Re-ingest, or fix the source |\n\n**2. Only if retrieval is the problem, test the embedding model with evidence.** Build a small eval set of 30-50 real questions, each labeled with the chunk(s) that contain the answer. Measure recall@k (and MRR) on your current setup. Then re-embed a sample with 2-3 candidates and compare. That tells you whether a switch helps on your data, which public leaderboards can't.\n\n**Candidates worth testing, if the eval points at the embedder:**\n- Hosted: OpenAI `text-embedding-3-large`, Cohere Embed, Voyage AI (the latter is often strong for code and domain-specific text).\n- Open-weight, self-hosted: BGE, E5, or the Qwen3-Embedding family.\n\nChoose based on your language(s), domain (legal, code, medical), and document length. Check current MTEB results and pricing, since the rankings change often.\n\n**Cheaper changes to try before re-embedding:**\n- Add a reranker on top of the top 20-50 results.\n- Add hybrid search, which helps a lot with IDs, names, and acronyms that embeddings handle poorly.\n- Fix chunking.\n\nIf you share a failing example (the question, the retrieved chunks, and the answer you got), I can tell you which stage is breaking. Also tell me your current embedding model, chunk size, and top-k.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1130,
+      "cacheReadInputTokens": 3287,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0116327,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 354,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3287,
+    "output_tokens": 1130,
+    "output_tokens_details": {
+      "thinking_tokens": 354
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1130,
+        "cache_read_input_tokens": 3287,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0116327,
+  "duration_ms": 12237
+}

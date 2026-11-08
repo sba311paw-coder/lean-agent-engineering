@@ -65,15 +65,17 @@ Document editions are separate from skill versions.
 
 | Document | Edition/version | Created here | Last updated | Status |
 |---|---|---|---|---|
-| [Canonical skill](SKILL.md) | 0.1.3 | 2026-09-12 | 2026-11-08 | Current; 0.1.3 adds two worked examples; not re-evaluated |
+| [Canonical skill](SKILL.md) | 0.1.3 | 2026-09-12 | 2026-11-08 | Current; 0.1.3 adds two worked examples; rechecked 2026-11-08, no measurable change |
 | [18-case evaluation JSON](evals/evals.json) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Historical baseline |
 | [Minimal-agent example](examples/minimal-agent.md) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Current; unchanged |
 | [README](README.md) | Skill 0.1.3 | 2026-09-12 | 2026-11-08 | Current |
-| [Baseline script](evals/baseline_cli.py) | Skill 0.1.1 and 0.1.2 runs | 2026-09-26 | 2026-09-26 | Current |
+| [Baseline script](evals/baseline_cli.py) | Skill 0.1.1, 0.1.2 and 0.1.3 runs | 2026-09-26 | 2026-09-26 | Current |
 | [Neutral prompts](evals/neutral-prompts.json) | Skill 0.1.1 run | 2026-09-26 | 2026-09-26 | Current |
 | [Baseline results](evals/baseline-results/summary.md) | Skill 0.1.1 | 2026-09-26 | 2026-09-26 | Current |
 | [0.1.2 educational-case recheck](evals/baseline-results-v0.1.2-negatives/summary.md) | Skill 0.1.2 | 2026-09-27 | 2026-09-27 | Current |
 | [0.1.2 neutral-prompt recheck](evals/baseline-results-v0.1.2-neutral/summary.md) | Skill 0.1.2 | 2026-09-27 | 2026-09-27 | Current |
+| [0.1.3 educational-case recheck](evals/baseline-results-v0.1.3-negatives/summary.md) | Skill 0.1.3 | 2026-11-08 | 2026-11-08 | Current |
+| [0.1.3 neutral-prompt recheck](evals/baseline-results-v0.1.3-neutral/summary.md) | Skill 0.1.3 | 2026-11-08 | 2026-11-08 | Current |
 | [Gate 2 review](evals/gate-2-robustness-safety.md) | Gate 2 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
 | [Gate 3 review](evals/gate-3-portability-consistency.md) | Gate 3 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
 | [Gate 4 evaluation record](evals/gate-4-production-reliability.md) | Gate 4 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
@@ -137,13 +139,14 @@ What the results show:
   difference between the two with-skill runs (89% vs. 80%) is within
   run-to-run noise. Across both runs, the skill roughly doubles the
   full-pass rate on neutral prompts.
+- **0.1.3 recheck:** after 0.1.3 added two worked examples, a rerun of the neutral and educational prompts gave 78% full pass (0.96 mean) with the skill and 31% (0.78) without ([neutral](evals/baseline-results-v0.1.3-neutral/summary.md), [educational](evals/baseline-results-v0.1.3-negatives/summary.md)). The with-skill mean matches 0.1.2, and the no-skill run moved by 0.10 on its own, so the examples made no measurable difference.
 
 Limits: the same model family answers and grades. The neutral prompts were
 written with the criteria in view, and several invite the tempting wrong
 move on purpose. Three rounds is a small sample. The skill is given as a
 system prompt, so automatic skill discovery is not tested. The main
-comparison used 0.1.1; 0.1.2 was re-tested on the neutral and educational
-prompts, but not on the original prompts.
+comparison used 0.1.1; 0.1.2 and 0.1.3 were re-tested on the neutral and
+educational prompts, but not on the original prompts.
 
 To reproduce, with the Claude Code CLI logged in (about 400 calls against
 your plan's usage): run `python3 evals/baseline_cli.py --smoke` to check

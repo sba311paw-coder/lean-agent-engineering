@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Opens by explaining the model judges it can answer without the tool, and section 6 says to log failing cases and look for patterns (phrasing, topics). But it doesn't explicitly trace where the decision boundary falls (which queries trigger vs skip) before prescribing fixes.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Section 6 recommends logging failures and building a 20-50 query eval set to measure tool-call rate, 'otherwise you're tuning on anecdotes.' However, it's listed last, after architectural options like routers and forced tool_choice, rather than as a first step; the closing asks for the tool description and prompt.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Leads with description and prompt changes, then API-level tool_choice. The router/validation loop is offered as an option for always-required cases, and no external framework is recommended. It also asks which framework the user uses.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.01087
+}

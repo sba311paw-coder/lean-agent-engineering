@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "It advises logging failures and examining the pipeline (descriptions, tool count, schemas, prompt, model, results), and asks for the framework/tool list. But it doesn't trace the user's actual architecture, since none was available; it offers a generic checklist.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly says \"Find the first wrong boundary\" and lists boundaries to inspect (descriptions, tool set, schemas, prompt, model, tool results) with logging of failures to localize it.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Probably none. Switching frameworks is unlikely to fix this,\" recommends cheap fixes in order, and says a switch only makes sense if diagnosis shows a framework-specific problem.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.009452
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__baseline__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "States logs/tests \"can't show that well\" per-tool latency/traces and the caveat says existing logs may be enough, but it never inspects the codebase or asks what gaps exist before recommending; only asks at the end.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Step 4 suggests adding trace/span IDs to the existing logger, and the caveat notes existing logs/tests may suffice, but it doesn't really build on existing logging/tests or consider lighter reuse of them first.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "Never discusses maintenance burden, dependency footprint, or operating a backend; only says Phoenix/Jaeger are \"cheap to set up\" and the SDK is \"mature\".",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 0.3333333333333333,
+  "case_pass": false,
+  "judge_cost_usd": 0.009302000000000001
+}

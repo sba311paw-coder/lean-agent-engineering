@@ -1,0 +1,66 @@
+{
+  "key": "debugging-01__neutral__skill__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Find the first boundary that broke, rather than guessing at fixes. Since it worked before the change, the diff is your fastest lead.\n\n**1. Look at the change**\n- Run `git diff` or `git log -p` on the commit(s) since it last worked. If it's not in git, compare against a backup.\n- Roll back or stash the change to confirm it caused the failure. If it still fails, the cause is likely something else, such as an SDK version, API response, or environment variable.\n\n**2. Log each boundary for one failing run**\nCheck these in order, and stop at the first wrong one:\n1. **Tool definitions sent to the model:** Is the schema still valid JSON Schema? Check tool names, `required` fields, and parameter types. Is the tools array actually included in the request?\n2. **Model response:** Does it contain a tool call at all? If not, the definitions or prompt changed. If it does, are the name and arguments what you expect?\n3. **Argument parsing and validation:** Are arguments parsed from a JSON string? Did a rename cause a mismatch between the tool name and your dispatcher or registry?\n4. **Tool execution:** Does the function run, and what does it return or raise? Check for swallowed exceptions.\n5. **Result returned to the model:** Does the tool result message carry the right `tool_call_id`/`tool_use_id`, role, and format? Is it paired with the assistant's tool-call message in the right order? Many APIs reject or ignore mismatches here.\n6. **Final response handling:** Does your loop continue until there are no more tool calls, or does it stop early?\n\n**3. Common culprits after a code change**\n- Renamed a tool or function but not its registration or dispatch key\n- Changed a schema in a way that is now invalid or too strict\n- Message history is built incorrectly (missing the assistant tool-call message, wrong IDs, or tool results not in a single following message)\n- Tool results are not serialized to a string or the expected content format\n- Exceptions are caught and hidden, so failures look like \"no tool call\"\n- A dependency or SDK upgrade changed the request or response shape\n\n**4. Test one hypothesis**\nMake the smallest change that tests it, ideally with a minimal reproduction: one prompt, one tool, and logged raw request and response.\n\n**5. Verify**\nRerun the original failing case and confirm the tool actually executed (check its side effect or log, not just that the agent said it did). Then force a tool error and confirm it's reported properly.\n\nIf you share the error message or traceback, the diff (or the tool definition and dispatch code), and which provider or SDK you use, I can point to the specific cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 988,
+      "cacheReadInputTokens": 2951,
+      "cacheCreationInputTokens": 340,
+      "webSearchRequests": 0,
+      "costUSD": 0.0115391,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 132,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 340,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 340,
+    "cache_read_input_tokens": 2951,
+    "output_tokens": 988,
+    "output_tokens_details": {
+      "thinking_tokens": 132
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 340,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 988,
+        "cache_read_input_tokens": 2951,
+        "cache_creation_input_tokens": 340,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 340
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0115391,
+  "duration_ms": 14442
+}

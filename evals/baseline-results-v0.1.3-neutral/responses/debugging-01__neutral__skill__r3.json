@@ -1,0 +1,66 @@
+{
+  "key": "debugging-01__neutral__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "Since I can't see your code, here's the fastest path: find the first boundary that's wrong, starting with whatever you changed.\n\n**1. Read the actual failure**\nIs it an error, or silent misbehavior? Which kind decides where to look:\n- The model never emits a tool call.\n- The call is emitted but malformed or rejected.\n- The call is emitted but the tool isn't run, or errors.\n- The tool runs but its result never reaches the model, or reaches it in the wrong shape.\n\n**2. Check the change first**\nReview the diff of the recent change (`git diff` or `git log -p` if you use version control, or compare against a backup). The usual suspects, by how often they break tool calling:\n- **Tool schema or definition**: renamed tool or parameter, invalid JSON Schema, missing `description`, `required` fields out of sync with the code.\n- **Request construction**: tools no longer passed in the API call, `tool_choice` changed, or a model or version change that alters tool support.\n- **Parsing the model's call**: the code expects a different field name, structure, or arguments as a string vs. an object.\n- **Dispatch**: the tool-name-to-function mapping no longer matches the schema names.\n- **Result handling**: the tool result isn't sent back with the matching call ID, the message role or ordering is wrong, or the result isn't serialized to a string or the expected content format.\n- **Loop control**: the stop condition changed, so the loop exits before the tool result is fed back.\n\n**3. Log at each boundary**\nLog the raw request (tools included), the raw model response, the parsed call, the tool's return value, and the message sent back. The first place the data looks wrong is your bug. Don't assume the model is at fault until you've confirmed the application-side steps are correct.\n\n**4. Compare against a known-good state**\nRevert or stash the change, or run the old version, and confirm the problem disappears. If reverting fixes it, re-apply the change in pieces until it breaks. This is often faster than reasoning about it.\n\n**5. Test one hypothesis at a time**\nUse the smallest repro: one prompt, one tool, one call. Fix the root cause rather than adding workarounds, and if two fixes fail, step back and re-trace the flow rather than guessing.\n\n**6. Verify**\nRerun the repro and check that the tool actually executed (the side effect happened or the output is correct), not just that the loop finished without errors. Then force a failure, such as a bad argument, and confirm it's reported properly.\n\nIf you paste the error message, the diff or the relevant code (tool definition, call parsing, result handling), and which SDK or model you're using, I can point at the likely cause directly. Redact any keys or secrets first.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1027,
+      "cacheReadInputTokens": 3291,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0106031,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 147,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3291,
+    "output_tokens": 1027,
+    "output_tokens_details": {
+      "thinking_tokens": 147
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1027,
+        "cache_read_input_tokens": 3291,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0106031,
+  "duration_ms": 9614
+}

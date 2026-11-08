@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-02__original__skill__r3",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "Tool calling (also called function calling) is a way for an AI model to request that an external action be performed, instead of only producing text. It lets a language model interact with the world beyond its training data.\n\n## The basic idea\n\nA language model on its own can only generate text. It can't check today's weather, query a database, or send an email. With tool calling, you describe a set of available tools to the model, and the model can decide to \"call\" one by outputting a structured request, usually JSON, naming the tool and its arguments.\n\n## How it works\n\n1. **Define tools.** The developer gives the model a list of tools, each with a name, a description, and a schema for its parameters. For example, `get_weather(city: string)`.\n2. **The user asks something.** For example: \"What's the weather in Paris?\"\n3. **The model decides.** It recognizes that it needs outside information and outputs a structured tool call, such as `{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}`.\n4. **The application executes it.** The model doesn't run anything itself. The surrounding application receives the request, runs the real function or API, and gets a result.\n5. **The result goes back to the model.** The application passes the output (for example, \"18\u00b0C, cloudy\") back into the conversation.\n6. **The model responds.** It uses the result to write a final answer: \"It's 18\u00b0C and cloudy in Paris.\"\n\nThis loop can repeat several times, with the model calling multiple tools in sequence or in parallel before it answers. That loop is the foundation of most AI agents.\n\n## Why it matters\n\n- **Fresh or private data:** access to live information, databases, or internal systems.\n- **Taking actions:** creating tickets, running code, sending messages, editing files.\n- **Reliable computation:** offloading math, search, or precise lookups to deterministic code.\n- **Structured output:** the model produces well-formed arguments rather than free-form text that has to be parsed.\n\n## A key point\n\nThe model only *proposes* a call. The application is what actually executes it, so the application is also where validation and permission checks belong.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 651,
+      "cacheReadInputTokens": 3272,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0068411999999999995,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3272,
+    "output_tokens": 651,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 651,
+        "cache_read_input_tokens": 3272,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0068411999999999995,
+  "duration_ms": 5801
+}

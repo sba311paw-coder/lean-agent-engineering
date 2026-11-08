@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "This usually means the loop stops before the model sees the tool result, or the result never gets back into the conversation correctly. Check these in order:\n\n**1. Are you making a second model call after the tool runs?**\nThe model's first response only says it wants to call a tool (`stop_reason == \"tool_use\"`). You have to run the tool, append the result, and call the model again. If you return after the first call, the user sees no answer.\n\n```python\nmessages = [{\"role\": \"user\", \"content\": \"Weather in Paris?\"}]\n\nwhile True:\n    resp = client.messages.create(model=MODEL, tools=tools, messages=messages, max_tokens=1024)\n\n    if resp.stop_reason != \"tool_use\":\n        break  # this is the final answer\n\n    messages.append({\"role\": \"assistant\", \"content\": resp.content})\n\n    tool_results = []\n    for block in resp.content:\n        if block.type == \"tool_use\":\n            result = get_weather(**block.input)\n            tool_results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": block.id,          # must match\n                \"content\": json.dumps(result),    # string or content blocks\n            })\n    messages.append({\"role\": \"user\", \"content\": tool_results})\n\nfinal_text = \"\".join(b.text for b in resp.content if b.type == \"text\")\n```\n\n**2. Are you reading the right response?**\nMake sure you print the text from the last response, not the first. The first often contains only something like \"Let me check that for you.\"\n\n**3. Is the tool result formatted correctly?**\n- `tool_use_id` must match the tool call's id.\n- The result should be a string (use `json.dumps`) or valid content blocks, not a raw dict or object.\n- Await async tools. A returned Promise or coroutine often becomes empty or `\"[object Promise]\"`.\n- The `tool_result` must go in a `user` message, and the assistant `tool_use` message must be in the history before it.\n\n**4. Is a step or turn limit cutting the loop short?**\nFrameworks often stop after one step by default:\n- **Vercel AI SDK:** set `maxSteps` (or `stopWhen`) above 1.\n- **LangChain/LangGraph:** check `return_direct`, `max_iterations`, and the output parser.\n- **OpenAI Agents SDK:** check `tool_use_behavior`, which can stop at the first tool call.\n- **Claude Agent SDK:** check `max_turns`.\n\n**5. Is the result lost in streaming?**\nIf you stream, make sure you keep consuming after the tool-use turn and collect text from the final turn, not just the first stream.\n\n**6. Is the model ignoring it?**\nLess commonly, the result is present but the system prompt or tool description tells the model not to repeat tool output, or the result is empty or an error string. Log the exact `tool_result` content you send back.\n\n**Quick debugging step:** log the full `messages` array right before the last model call. If the `tool_result` is there and well-formed, the problem is in how you extract the output. If it's missing, the problem is in your loop.\n\nIf you tell me which framework or SDK you're using and share the loop code, I can point to the specific bug.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1426,
+      "cacheReadInputTokens": 681,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0143321,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 413,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 681,
+    "output_tokens": 1426,
+    "output_tokens_details": {
+      "thinking_tokens": 413
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1426,
+        "cache_read_input_tokens": 681,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0143321,
+  "duration_ms": 14280
+}

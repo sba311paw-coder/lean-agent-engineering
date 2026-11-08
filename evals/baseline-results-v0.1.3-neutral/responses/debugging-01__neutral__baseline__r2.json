@@ -1,0 +1,66 @@
+{
+  "key": "debugging-01__neutral__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent's tool-calling integration stopped working after a recent code change. How do I fix it fast?",
+  "response": "I can't see your code, so here is a fast triage order for tool-calling that broke after a change.\n\n**1. Isolate the change (fastest)**\n- Revert or stash the recent change and confirm tool calls work again. If you use git, `git diff` against the last working commit or `git bisect` will find the culprit quickly.\n- Skim the diff for anything touching tool definitions, the request builder, the response parser, or the model/SDK version.\n\n**2. Check the usual suspects**\n- **Tool schema:** Malformed JSON Schema is the most common cause. Check that `input_schema` has `\"type\": \"object\"`, that `properties` and `required` are valid, and that tool names match `^[a-zA-Z0-9_-]{1,64}$`. Make sure names are unique.\n- **Tools not being sent:** Check that the `tools` param is still in the request, or that a refactor didn't drop it or change its shape. Log the final outgoing payload.\n- **Response parsing:** Tool calls come back as `tool_use` content blocks (with `id`, `name`, `input`) and `stop_reason == \"tool_use\"`. If your code only reads `content[0].text`, or checks the wrong field, it will silently skip them.\n- **Tool result round trip:** Your next message must be a `user` message containing `tool_result` blocks whose `tool_use_id` matches the call. Mismatched IDs, a missing result for any parallel call, or text placed before the `tool_result` blocks all cause 400 errors.\n- **Conversation history:** Make sure you're appending the full assistant message (including the `tool_use` blocks), not just its text.\n- **`tool_choice` / model settings:** A new `tool_choice`, a changed model ID, or enabled extended thinking can alter behavior. With thinking, thinking blocks must be passed back unmodified during tool use.\n- **Dispatch layer:** Check that the name-to-function registry still matches, and that argument parsing and async/await handling didn't change. An exception swallowed in a handler often looks like \"tool calling stopped working.\"\n- **Dependencies:** Look for an SDK or framework upgrade (a lockfile diff will show it) that changed the API.\n\n**3. Get the actual error**\n- Log the raw request and response and any exception from the tool-execution step. A 400 will name the offending field, and that usually points straight to the cause.\n\nIf you paste the error message, the tool definition, and the diff of what changed (or the code that handles the `tool_use` and `tool_result` flow), I can pinpoint the problem. It would also help to know which SDK or framework you're using.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 891,
+      "cacheReadInputTokens": 665,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0089805,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 41,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 665,
+    "output_tokens": 891,
+    "output_tokens_details": {
+      "thinking_tokens": 41
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 891,
+        "cache_read_input_tokens": 665,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0089805,
+  "duration_ms": 10423
+}

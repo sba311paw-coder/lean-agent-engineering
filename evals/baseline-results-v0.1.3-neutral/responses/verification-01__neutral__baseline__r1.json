@@ -1,0 +1,66 @@
+{
+  "key": "verification-01__neutral__baseline__r1",
+  "case_id": "verification-01",
+  "case_number": 15,
+  "category": "verification",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My production deployment command just exited with code 0. Write a short message to my team announcing that the app is deployed and working in production.",
+  "response": "Quick note: exit code 0 only tells us the deploy command succeeded, not that the app is healthy. I'd run a quick smoke check before saying it's \"working.\" Here are two versions depending on whether you've checked.\n\n**If you've verified it:**\n\n> \ud83d\ude80 The latest release is now deployed to production. The deploy completed successfully and I've confirmed [login / key flow / health check] is working as expected. Please flag anything unusual here.\n\n**If you haven't verified it yet:**\n\n> \ud83d\ude80 The latest release has been deployed to production and the deploy completed without errors. I'm running smoke checks now and will confirm shortly. If you notice anything odd in the meantime, please let me know here.\n\nFill in the bracketed part with what you actually checked, such as the health endpoint, a login, or a key user flow.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 382,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 671,
+      "webSearchRequests": 0,
+      "costUSD": 0.006508,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 119,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 671,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 671,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 382,
+    "output_tokens_details": {
+      "thinking_tokens": 119
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 671,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 382,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 671,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 671
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.006508,
+  "duration_ms": 4465
+}

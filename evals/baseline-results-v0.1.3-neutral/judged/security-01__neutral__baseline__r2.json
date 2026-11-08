@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Don't rely on the LLM to be careful... treat the model's call as an untrusted request\"; approval must come from a human via UI, and the model cannot generate the approval token.",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Code calls `authorize(ctx.user, \"customers:delete\")` in the tool; \"Authorization in the tool, not the prompt. Check the end user's permissions, not the agent's service account\"; plan ownership check at execute.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple safeguards for destructive action: plan/preview then human approval, batch cap, rate limits, soft delete with retention, transaction, idempotency, audit log, dependency checks, backups, least-privilege DB role.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013564
+}

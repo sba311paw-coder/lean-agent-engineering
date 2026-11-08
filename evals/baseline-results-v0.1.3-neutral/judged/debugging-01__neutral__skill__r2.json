@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response doesn't actually read or reproduce anything, since it says it can't see the code. It advises rerunning the original task and writing a minimal repro script (step 4), and asks for the error/log, but reproduction is only advised, not done or placed first.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1 \"Isolate the change\": run `git diff`/`git log -p` on the last change or revert it temporarily, and look first at tool schemas, names, SDK version, and response parsing.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 2 lays out the flow app \u2192 LLM request \u2192 tool call \u2192 validation \u2192 execution \u2192 result \u2192 LLM, says to log the raw payload at each boundary and find the first wrong one, and gives a symptom-to-boundary table.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Step 3 lists likely causes and step 4 is titled \"Test one hypothesis\", but the hypothesis is a generic minimal-script bisection rather than a specific testable hypothesis, and the fix guidance isn't tied to one. The symptom table does come close to hypothesis-forming.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.011208
+}

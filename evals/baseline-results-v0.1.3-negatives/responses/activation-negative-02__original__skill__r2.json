@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-02__original__skill__r2",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "Tool calling (also called function calling) is a way for an AI model, usually a large language model, to request that an external action be performed instead of only producing text.\n\n**The basic idea**\n\nA language model on its own can only read text and write text. It can't check the weather, query a database, or send an email. Tool calling bridges that gap: the model is told which tools exist, and when it decides one is needed, it outputs a structured request to use it. The surrounding application then carries out that request.\n\n**How it works**\n\n1. **Tools are described to the model.** Each tool has a name, a description, and a schema for its inputs (for example, `get_weather(city: string)`).\n2. **The user asks something.** For example: \"What's the weather in Paris?\"\n3. **The model decides a tool is useful.** Instead of guessing, it emits a structured call, typically JSON, such as `{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}`.\n4. **The application runs the tool.** The model doesn't execute anything itself. The application code calls the real API or function.\n5. **The result goes back to the model.** The application passes the output (e.g., \"14\u00b0C, light rain\") into the conversation.\n6. **The model writes the final answer.** It uses the result to respond: \"It's currently 14\u00b0C and raining lightly in Paris.\"\n\nThis loop can repeat several times, with the model calling multiple tools in sequence or in parallel before giving a final answer.\n\n**Why it matters**\n\n- **Fresh or private data:** the model can access information beyond its training data.\n- **Real actions:** it can create files, run code, book appointments, or update records.\n- **Accuracy:** calculations and lookups are done by reliable software rather than guessed from memory.\n- **Foundation for agents:** AI agents are essentially models that use tool calls in a loop to work toward a goal.\n\n**Key point:** the model only *proposes* a tool call; the application is what actually executes it. That separation is what lets developers control which tools are available and what they're allowed to do.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 639,
+      "cacheReadInputTokens": 3272,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.006721199999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3272,
+    "output_tokens": 639,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 639,
+        "cache_read_input_tokens": 3272,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.006721199999999999,
+  "duration_ms": 5601
+}

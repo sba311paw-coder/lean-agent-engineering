@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "Poor grounding in a RAG agent usually comes from one of three places: retrieval returns the wrong content, the context is poorly assembled, or the model isn't constrained to use what it was given. Work through them in that order, since fixing generation won't help if retrieval is bad.\n\n## 1. Diagnose first\n- Build a small eval set (50-200 real questions with the correct source passages marked).\n- Measure **retrieval** separately (recall@k, MRR: is the right chunk in the top k?) from **generation** (faithfulness: are claims supported by the retrieved text?).\n- Read failures by hand. Most teams find that the majority are retrieval problems.\n\n## 2. Improve retrieval\n**Chunking**\n- Chunk by document structure (headings, sections, paragraphs), not fixed character counts.\n- Use moderate sizes (roughly 200-500 tokens) with some overlap, and tune against your eval set.\n- Prepend context to each chunk: document title, section path, date. Better still, generate a short LLM summary of where the chunk sits in the document (\"contextual retrieval\") and embed that with it.\n\n**Search method**\n- Use **hybrid search**: dense vectors plus BM25/keyword. This helps with names, IDs, acronyms and exact terms that embeddings miss.\n- Retrieve broadly (top 20-50), then **rerank** with a cross-encoder or reranking model and keep the top 3-8.\n- Use metadata filters (source, date, document type, tenant) to narrow the search space.\n\n**Query handling**\n- Rewrite queries using conversation history so follow-ups become standalone.\n- Decompose multi-part questions into sub-queries.\n- Consider HyDE (embedding a hypothetical answer) for vague or short queries.\n- Let the agent retrieve iteratively: search, inspect, then search again with a refined query if results look weak.\n\n**Embeddings**\n- Try a stronger or domain-appropriate embedding model, and make sure you use the right query/document prefixes if the model requires them.\n- Re-embed everything if you change models. Mixing models silently breaks similarity.\n\n## 3. Improve context assembly\n- Deduplicate near-identical chunks.\n- Order the context sensibly; put the most relevant material first or last, not buried in the middle.\n- Don't overstuff. More chunks often means more distraction. Use a relevance score threshold and allow \"no results\".\n- Include source IDs/titles with each chunk so the model can cite them.\n- For tables, PDFs, and scanned documents, check parsing quality. Garbled extraction is a common hidden cause of bad answers.\n\n## 4. Constrain generation\n- Instruct the model to answer **only** from the provided context and to say \"I don't know / not found in the documents\" otherwise.\n- Require **citations** for each claim (chunk ID plus a short quote). Quote-then-answer prompting helps: have it extract relevant quotes first, then answer from them.\n- Keep temperature low.\n- Add a **verification step**: a second pass (or separate model call) that checks each claim against the cited passages and removes or flags unsupported ones.\n- Programmatically validate that cited IDs exist and that quoted text actually appears in the source.\n\n## 5. Agent-specific issues\n- Make sure the agent actually calls retrieval rather than answering from its parametric memory. Require a retrieval call before answering factual questions.\n- Check that tool results aren't being truncated or summarized lossy between steps.\n- Log the query the agent sends, the chunks returned, and the final answer, so you can trace each failure.\n\n## Suggested order of attack\n1. Build the eval set and log traces.\n2. Add hybrid search plus a reranker (often the biggest single gain).\n3. Fix chunking and add contextual metadata.\n4. Add \"answer only from context\" with citations and an abstain option.\n5. Add claim-level verification if you still see hallucinations.\n\nIf you tell me your stack (vector DB, embedding model, chunk size, document types) and show an example of a bad answer with what was retrieved, I can point to the most likely cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1345,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 676,
+      "webSearchRequests": 0,
+      "costUSD": 0.016158,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 676,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 676,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1345,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 676,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1345,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 676,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 676
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.016158,
+  "duration_ms": 11456
+}

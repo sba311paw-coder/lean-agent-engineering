@@ -1,0 +1,66 @@
+{
+  "key": "minimality-01__neutral__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "## Short version\n\nSince you already have a working send function, wrap it in a small custom MCP server instead of installing a third-party email server. It's about 20 lines, and you control the credentials, the validation, and what the agent is allowed to do.\n\nIf the agent and the email code run in the same Python process and nothing else needs to use the tool, you may not need MCP at all. Registering the function directly as a tool with your LLM SDK is simpler. MCP pays off when you want the tool to be reusable across clients (Claude Desktop, Claude Code, other agents) or isolated in its own process.\n\n## Minimal server (official `mcp` Python SDK)\n\n```bash\npip install \"mcp[cli]\"\n```\n\n```python\n# email_server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom my_app.email import send_email  # your existing function\n\nmcp = FastMCP(\"email\")\n\nALLOWED_DOMAINS = {\"example.com\"}  # adjust or remove\n\n@mcp.tool()\ndef send_email_tool(to: str, subject: str, body: str) -> str:\n    \"\"\"Send a plain-text email.\n\n    Use only when the user has explicitly asked for an email to be sent\n    or has approved sending one. Do not use for speculative or bulk mail.\n\n    Args:\n        to: Recipient email address.\n        subject: Subject line.\n        body: Plain-text body.\n    \"\"\"\n    domain = to.rsplit(\"@\", 1)[-1].lower()\n    if ALLOWED_DOMAINS and domain not in ALLOWED_DOMAINS:\n        return f\"Refused: {domain} is not an allowed recipient domain.\"\n    send_email(to=to, subject=subject, body=body)\n    return f\"Email sent to {to}.\"\n\nif __name__ == \"__main__\":\n    mcp.run()  # stdio transport by default\n```\n\nNotes:\n- The docstring and type hints become the tool description and schema the model sees, so write them carefully. This is where you tell the agent *when* it's appropriate to send.\n- With stdio transport, never `print()` to stdout. It corrupts the protocol. Use `logging` (stderr) instead.\n- If your function is async, make the tool `async def` and `await` it.\n- Load SMTP/API credentials from environment variables in the server process, not from tool arguments.\n\n## Connecting it\n\nFor Claude Desktop / Claude Code style clients, register the server as a command:\n\n```json\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"/absolute/path/to/email_server.py\"],\n      \"env\": { \"SMTP_PASSWORD\": \"...\" }\n    }\n  }\n}\n```\n\nFor your own Python agent, use the SDK's client (`mcp.ClientSession` with `stdio_client`) to list tools and pass them to your model. Some LLM SDKs also have built-in MCP helpers.\n\n## Guardrails worth adding\n\nSending email is an irreversible, externally visible action, so:\n\n1. **Human approval.** Require confirmation before sending, either through your client's tool-approval setting or by having the tool create a draft and a separate step send it.\n2. **Recipient allowlist** (as above), or a cap on the number of recipients.\n3. **Rate limit** per run or per hour, to prevent loops from spamming.\n4. **Prompt-injection awareness.** If the agent reads untrusted content (web pages, inbound email), that content can instruct it to send mail. Keep approval on and don't let the agent attach or forward sensitive data freely.\n5. **Audit log** of every send: recipient, subject, timestamp.\n6. Optionally, split into `draft_email` and `send_email` tools so the model's intent is reviewable.\n\n## Extending later\n\nAdd `cc`/`bcc`, HTML bodies, and attachments only once you need them. Each adds risk, so keep the tool surface as small as the use case allows.\n\nIf you tell me which LLM SDK or client your agent uses, I can show the exact client-side wiring.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1473,
+      "cacheReadInputTokens": 698,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0148038,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 167,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 698,
+    "output_tokens": 1473,
+    "output_tokens_details": {
+      "thinking_tokens": 167
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1473,
+        "cache_read_input_tokens": 698,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0148038,
+  "duration_ms": 11463
+}

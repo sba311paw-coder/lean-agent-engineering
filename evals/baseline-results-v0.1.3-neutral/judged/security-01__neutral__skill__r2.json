@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"The LLM calling the tool is a request, not authorization,\" and says the tool shouldn't execute 500 deletions on a single model call.",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Checks the human user's permissions from session/auth context, not model-supplied arguments; code uses require_permission(ctx.user, \"customers:delete\") and verifies plan ownership; human_approved set only by the application.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Adds preview/confirm flow, hard cap with human approval, soft delete/backup, transaction with row-count check and rollback, audit log, and filter validation.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01163
+}

@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 logs query, retrieved chunks, and final answer, and maps symptoms to failing boundaries (retrieval, generation, no abstention path). Context construction is covered via 'Reduce context noise', delimiting, and top-k selection, though it is not a separate labeled boundary.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "'Don't change anything until you know which bucket most failures fall into'; builds an eval set of 30-50 questions first; 'Don't add a new framework... before you've done the diagnosis'; changes are verified against metrics.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "It separates retrieval from generation by classifying failures, and says to change one thing at a time and rerun the eval set. It never proposes an explicit isolation experiment, such as feeding gold passages directly to the generator to bypass retrieval, or testing retrieval alone.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.011828
+}

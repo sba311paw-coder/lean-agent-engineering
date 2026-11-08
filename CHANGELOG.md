@@ -18,7 +18,7 @@ All notable changes to this project are documented here, in the style of
 - Links to a private repository in `docs/ARCHITECTURE-OPTIONS.md`, replaced with plain text.
 
 ### Notes
-- Version 0.1.3 was not re-evaluated. Evaluation results remain those recorded for 0.1.1, with the 0.1.2 rechecks listed in the README.
+- Version 0.1.3 was rechecked on the neutral and educational prompts on 2026-11-08, with no measurable change from 0.1.2 (see the README's baseline comparison).
 
 ## [Documentation addendum] - 2026-10-15
 

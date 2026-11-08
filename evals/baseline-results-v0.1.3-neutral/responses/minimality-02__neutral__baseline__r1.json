@@ -1,0 +1,66 @@
+{
+  "key": "minimality-02__neutral__baseline__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "# Migrating a small direct-API agent to LangChain\n\nFor an agent with two functions, the migration is small. Here's the approach I'd take.\n\n## 1. Decide what you need\nIf your agent is just \"call the model, run two functions, return results,\" LangChain mainly buys you:\n- A standard tool and agent loop, so you don't hand-write the tool-call/response cycle\n- Easy model swapping between providers\n- Built-in tracing (LangSmith), streaming, retries, and structured output\n- A path to LangGraph if the agent grows (memory, branching, human-in-the-loop)\n\nIf none of that matters yet, staying on the raw API is fine. But if you expect to grow, migrating now while it's small is cheap.\n\n## 2. Install\n```bash\npip install -U langchain langchain-anthropic\n```\nCheck the current docs, since LangChain's API has changed a lot between versions. The sketch below targets the 1.x style.\n\n## 3. Turn your two functions into tools\nAdd type hints and a docstring. LangChain uses these to build the tool schema you were probably writing by hand as JSON.\n\n```python\nfrom langchain.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get the current weather for a city.\"\"\"\n    return your_existing_weather_logic(city)\n\n@tool\ndef get_time(timezone: str) -> str:\n    \"\"\"Get the current time in a timezone.\"\"\"\n    return your_existing_time_logic(timezone)\n```\nKeep your existing logic as-is. Just wrap it or decorate it.\n\n## 4. Replace your manual loop with an agent\n```python\nfrom langchain.agents import create_agent\n\nagent = create_agent(\n    model=\"anthropic:claude-sonnet-5-5\",\n    tools=[get_weather, get_time],\n    system_prompt=\"You are a helpful assistant.\",\n)\n\nresult = agent.invoke(\n    {\"messages\": [{\"role\": \"user\", \"content\": \"Weather in Paris and time in CET?\"}]}\n)\nprint(result[\"messages\"][-1].content)\n```\nThis replaces the code where you send the request, check for tool calls, execute the functions, append results, and call the model again.\n\n## 5. Verify parity\n- Run the same inputs through the old and new versions and compare outputs.\n- Check that both tools get called (including in the same turn, if your old code did parallel calls).\n- Confirm error handling still behaves as before. Raise exceptions or return error strings from tools deliberately.\n- Make sure the system prompt and model parameters (temperature, max tokens) match the original.\n\n## 6. Add the extras gradually\nOnce it works, consider:\n- Setting `LANGSMITH_TRACING=true` for tracing\n- Structured output, if you return results in a fixed shape\n- A checkpointer for conversation memory\n- Middleware or LangGraph if you need custom control flow\n\n## Tips\n- Migrate incrementally: keep the old script until the new one matches its behavior.\n- Don't rewrite your business logic. Only the model-calling and loop code should change.\n- If you share your current code, I can give you a concrete before/after conversion.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1224,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 697,
+      "webSearchRequests": 0,
+      "costUSD": 0.015032000000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 215,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 697,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 697,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1224,
+    "output_tokens_details": {
+      "thinking_tokens": 215
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 697,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1224,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 697,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 697
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.015032000000000002,
+  "duration_ms": 9969
+}

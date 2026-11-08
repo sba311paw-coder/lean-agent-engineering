@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__baseline__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Does not trace the user's actual architecture; it gives generic causes and a 'Measure it' step, and only asks for framework/model/tool details at the end.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Names candidate fault points (model, tool definitions, prompt) and suggests logging failures to see if errors cluster around specific tools, but does not pinpoint the first incorrect boundary for this case.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Switching frameworks probably won't fix this' and recommends fixes to descriptions, prompts, and guardrails first. It limits switching to cases where the framework mangles tool definitions.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009428
+}

@@ -1,0 +1,66 @@
+{
+  "key": "debugging-02__neutral__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models is often not the fix for wrong RAG answers. Check where the failure is first, because it usually isn't the embeddings.\n\n**Quick diagnosis (about 30 minutes)**\nTake 20-30 bad answers and check, for each one:\n1. **Was the right chunk in the retrieved top-k?**\n   - If **no**, it's a retrieval problem (embeddings, chunking, or query formulation).\n   - If **yes but the answer was still wrong**, it's a generation or prompt problem, and a new embedding model won't help.\n2. **Is the right info in your corpus at all?** Often it's missing, stale, or split badly across chunks.\n\n**Common culprits that aren't the model**\n- Chunks too small or too large, or splitting mid-concept (try 300-800 tokens with some overlap, or structure-aware splitting)\n- No reranker (a cross-encoder reranker on the top 20-50 often gives a bigger gain than a new embedder)\n- Pure vector search on content with exact terms like IDs, names, or code. Add hybrid search (BM25 + vector).\n- Query/document mismatch. Some models need specific query vs. document prefixes or instructions, and missing them hurts quality.\n- Metadata or filters not applied\n- Too few or too many chunks passed to the LLM, or a prompt that doesn't say \"answer only from context, otherwise say you don't know\"\n\n**If retrieval is the problem and you do want to change models**\nThe best choice depends on your domain, language, and budget, so I'd shortlist a few and test on your own data:\n- **Hosted APIs:** OpenAI `text-embedding-3-large`, Cohere Embed v3/v4, Voyage AI (e.g. the voyage-3 family, with domain variants for code, law, and finance), Google Gemini embeddings\n- **Open-source/self-hosted:** BGE (e.g. bge-m3 for multilingual), E5 / multilingual-e5, Nomic Embed, Qwen3-Embedding, Jina embeddings\n\nMy knowledge of the newest releases may be out of date, so check the current MTEB leaderboard, but treat it as a starting point. Leaderboard rank often doesn't match performance on your data.\n\n**How to choose properly**\nBuild a small eval set of 50-100 real questions, each labeled with the chunk(s) that should be retrieved. Compare candidates on recall@k and MRR. It takes an afternoon and beats guessing.\n\nIf you tell me your domain, document types, language(s), current embedding model, chunking setup, and a couple of example failures, I can give a more specific recommendation.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 932,
+      "cacheReadInputTokens": 661,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0093901,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 67,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 661,
+    "output_tokens": 932,
+    "output_tokens_details": {
+      "thinking_tokens": 67
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 932,
+        "cache_read_input_tokens": 661,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0093901,
+  "duration_ms": 8733
+}

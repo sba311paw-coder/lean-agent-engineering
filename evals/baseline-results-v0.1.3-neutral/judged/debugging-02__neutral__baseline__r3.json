@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Switching embedding models is often not the fix\" and recommends diagnosis first; only lists candidate models conditionally after other steps.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Section 1 separates retrieval (right chunk not retrieved), generation (retrieved but wrong answer, prompt/context ordering/noisy context), and ingestion; also covers context ordering/noise, which addresses context construction.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Advises checking a handful of bad answers for top-k contents, building a 30-100 question eval set measuring recall@k and MRR, and asks for an example bad answer and setup details before a specific recommendation.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010416
+}

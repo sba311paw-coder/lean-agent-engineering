@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "The response reasons about why the model skips the tool and ends with a debug section tying skip patterns (common-knowledge vs random) to specific fixes, but it mostly lists fixes rather than tracing the decision boundary.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It has a 'How to debug it' section (log skipped cases) and asks for a tool description and skipped-call example, but only after seven fixes including architectural ones like gating and routing.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "It recommends no frameworks; the fixes are descriptions, prompts, the tool_choice API setting, and simple rule-based or cheap-model routing.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.01016
+}

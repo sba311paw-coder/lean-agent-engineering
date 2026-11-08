@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Switching embedding models is probably premature\" and explains it forces a full re-index; does not recommend a specific model.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Walks through retrieval (top-k, chunking, query mismatch, hybrid, reranker), context construction (chunk length/noise, buried in middle, conflicting chunks), and generation (grounding prompt).",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Prescribes collecting 10-20 failing questions and checking each stage, building a labeled eval set with recall@k/MRR, and asks for setup details and examples of wrong answers with retrieved chunks.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009836
+}

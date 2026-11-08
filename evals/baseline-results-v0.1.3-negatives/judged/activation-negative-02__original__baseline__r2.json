@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-02__original__baseline__r2",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Clear, structured educational explanation covering definition, how it works, why it matters, caveats, and an example.",
+      "criterion": "Give a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The response just explains the concept; no debugging steps, tool runs, or troubleshooting workflow initiated.",
+      "criterion": "Do not automatically initiate a debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008312
+}

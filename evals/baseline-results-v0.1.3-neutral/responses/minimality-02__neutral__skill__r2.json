@@ -1,0 +1,66 @@
+{
+  "key": "minimality-02__neutral__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "## Should you migrate at all?\n\nFor an agent that calls two functions and returns the results, probably not. The direct API already gives you tool calling, and LangChain would add a dependency, an abstraction layer to debug through, and frequent version churn, with no new capability.\n\nAsk what you're missing. LangChain (or more precisely LangGraph, which is what LangChain now recommends for agents) is worth it if you need:\n\n- **Provider portability**: switching between model vendors without rewriting code.\n- **Built-in persistence or checkpointing**, human-in-the-loop interrupts, or streaming of intermediate steps.\n- **Multi-step control flow** that's getting complex enough that hand-rolled loops are hard to maintain.\n- **Ecosystem integrations** (vector stores, loaders, tracing via LangSmith) you'd otherwise write yourself.\n\nIf none of those apply, keep what you have. If the real motivation is \"it's an agent, so it should use a framework,\" that's not a capability gap.\n\n## If you do migrate, do it incrementally\n\n1. **Capture current behavior first.** Write 3-5 test cases (input, expected function calls, expected output) against your existing code. This is your baseline for verification.\n2. **Keep your two functions unchanged.** Wrap them as tools with the `@tool` decorator, with clear docstrings and type hints, since the schema comes from those.\n3. **Swap only the model call and loop.** Use a chat model class for your provider (e.g. `init_chat_model(...)`) and a prebuilt agent such as LangGraph's `create_react_agent` (or the current equivalent in your installed version), passing in the tools. Check the docs for your installed version, since these APIs have moved around.\n4. **Pin versions** of `langchain`, `langgraph`, and the provider package in your requirements file.\n5. **Keep authorization in your code.** If either function has side effects (writes, deletes, sends, spends), enforce permissions inside the function or in your application, not just in the prompt or tool description.\n6. **Verify against your baseline.** Run the same test cases through the new version and confirm the same tools are called with the same arguments and the results match. Also force a tool failure (raise an exception in one function) and confirm the agent reports it rather than claiming success.\n\nRun the old and new versions side by side until the tests match, then remove the old code.\n\nIf you share the current code and what motivates the move, I can say more specifically whether it's worth it and what the migrated version would look like.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 888,
+      "cacheReadInputTokens": 3323,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009216300000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 79,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3323,
+    "output_tokens": 888,
+    "output_tokens_details": {
+      "thinking_tokens": 79
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 888,
+        "cache_read_input_tokens": 3323,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.009216300000000002,
+  "duration_ms": 8178
+}

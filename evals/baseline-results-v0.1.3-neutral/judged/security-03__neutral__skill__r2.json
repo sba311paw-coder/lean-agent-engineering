@@ -1,0 +1,33 @@
+{
+  "key": "security-03__neutral__skill__r2",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Recommends a dedicated read-only role with SELECT only on specific tables/views, column exclusion via views, and states the agent only needs to read.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly advises against giving the agent admin credentials, explaining risks (bad query, prompt injection, model mistake), and proposes a new role instead.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Restricts tool via read-only role, default_transaction_read_only, statement_timeout, row caps, parameterized functions, secret kept out of model, plus verification that writes and ungranted tables fail.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009836000000000001
+}

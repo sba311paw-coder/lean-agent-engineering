@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens by identifying the boundary \"between your application receiving the result and the model seeing it\" as the first suspect, and details causes such as result not appended to history, wrong role, and missing tool call message.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1: \"Dump the full `messages` payload... sent to the LLM after the tool runs. Then look for the temperature in it,\" with branching on missing vs present.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "\"Check that before touching prompts\" and \"Fix the first boundary where the data disappears\"; it states the tool works and only suggests changing tool output format as a later, lower-priority cause.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009899999999999999
+}

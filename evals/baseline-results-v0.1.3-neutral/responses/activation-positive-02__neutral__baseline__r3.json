@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "Inconsistent tool use usually comes from the model judging that it doesn't need the tool. These fixes are roughly in order of impact.\n\n**1. Improve the tool description**\n- Say *when* to use the tool, not just what it does. For example: \"Use this for any question about current inventory. Never answer inventory questions from memory.\"\n- Name the situations where the model will be tempted to skip it (facts that seem well known, simple lookups, follow-up questions).\n- Make parameter names and descriptions unambiguous, with examples of valid inputs.\n\n**2. Make the system prompt explicit**\n- State a rule: \"For questions about X, you must call `tool_name` before answering. Do not rely on prior knowledge.\"\n- Explain *why* (the data changes, your knowledge may be stale, accuracy matters). Models follow rules better when they know the reason.\n- Put the rule near the top or bottom of the prompt, not buried in the middle.\n- Add 2-3 short examples of a query followed by the correct tool call.\n\n**3. Force tool use through the API when it's deterministic**\n- Most APIs have a `tool_choice` setting. `any` or a specific tool name forces a call, while `auto` lets the model decide, which is where skipping happens.\n- A common pattern is to force the tool on the first turn, then switch back to `auto` so the model can respond.\n- If the tool should *always* run for a given input type, consider running it in your code before the model call and injecting the result into the context. That removes the decision entirely.\n\n**4. Reduce competing options**\n- Too many tools, or overlapping ones, make the model hesitate or fall back on its own knowledge. Merge or remove redundant tools and make their descriptions clearly distinct.\n- Return concise, well-structured tool results. If past results were messy or unhelpful, the model learns within the conversation to avoid the tool.\n\n**5. Add a verification layer**\n- Check in code whether the tool was called before accepting the final answer. If not, re-prompt: \"You must use `tool_name` to answer this. Try again.\"\n- For high-stakes cases, have the answer cite the tool output, and reject answers that don't.\n\n**6. Debug it systematically**\n- Collect 10-20 queries where it skipped the tool and compare them to the ones where it didn't. Look for patterns: phrasing, topic, conversation length, or questions the model feels confident about.\n- Run the same set after each change to measure improvement, rather than eyeballing it.\n- Lower the temperature if you want more consistent behavior.\n\nIf you tell me which framework or API you're using, what the tool does, and an example where it skipped the call, I can suggest a more specific description or prompt rewrite.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 905,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 674,
+      "webSearchRequests": 0,
+      "costUSD": 0.01175,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 34,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 674,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 674,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 905,
+    "output_tokens_details": {
+      "thinking_tokens": 34
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 674,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 905,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 674,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 674
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.01175,
+  "duration_ms": 8654
+}

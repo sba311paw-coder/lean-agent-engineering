@@ -1,0 +1,66 @@
+{
+  "key": "architecture-03__neutral__baseline__r2",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "# Recommended setup: keep it simple\n\nFor one user, two functions, and Q&A, you don't need an agent framework. A single tool-calling loop around an LLM API is enough.\n\n## Architecture\n\n```\nUser input \u2192 LLM (with tool schemas) \u2192 tool call? \u2500yes\u2192 run Python function \u2192 feed result back \u2192 LLM\n                                          \u2502no\n                                          \u2514\u2192 final answer\n```\n\n1. **Tool definitions**: describe each function with a name, a clear description, and a JSON schema for its parameters.\n2. **Loop**: send the conversation plus tool schemas to the model. If it returns a tool call, run the function, append the result as a tool-result message, and call the model again. Stop when it returns plain text.\n3. **Guardrails**: cap the iterations (e.g. 5-10), catch exceptions and return them as tool results so the model can recover, and validate arguments before executing.\n4. **Memory**: keep the message list in memory. Persist it to a JSON file or SQLite only if you want history across sessions.\n\n## Tools\n\n| Need | Choice |\n|---|---|\n| LLM API | Anthropic SDK (`anthropic`) or OpenAI SDK. Both have native tool use. |\n| Schemas | Pydantic, to generate JSON schemas from type hints and validate arguments |\n| Config/secrets | `python-dotenv` or environment variables |\n| Logging | Standard `logging`, and print every tool call and result while developing |\n| CLI/UI | Plain `input()` loop at first, then `rich` or Streamlit/Gradio if you want a nicer interface |\n\n## Minimal sketch (Anthropic SDK)\n\n```python\nimport anthropic\nclient = anthropic.Anthropic()\n\ntools = [{\n    \"name\": \"my_function_a\",\n    \"description\": \"What it does and when to use it.\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\"x\": {\"type\": \"string\"}},\n        \"required\": [\"x\"],\n    },\n}]  # add the second function similarly\n\nregistry = {\"my_function_a\": my_function_a, \"my_function_b\": my_function_b}\n\ndef run(user_msg, messages=None, max_steps=8):\n    messages = messages or []\n    messages.append({\"role\": \"user\", \"content\": user_msg})\n    for _ in range(max_steps):\n        resp = client.messages.create(\n            model=\"<model-id>\", max_tokens=1024,\n            tools=tools, messages=messages,\n        )\n        messages.append({\"role\": \"assistant\", \"content\": resp.content})\n        if resp.stop_reason != \"tool_use\":\n            return \"\".join(b.text for b in resp.content if b.type == \"text\")\n        results = []\n        for b in resp.content:\n            if b.type == \"tool_use\":\n                try:\n                    out = str(registry[b.name](**b.input))\n                except Exception as e:\n                    out = f\"Error: {e}\"\n                results.append({\"type\": \"tool_result\", \"tool_use_id\": b.id, \"content\": out})\n        messages.append({\"role\": \"user\", \"content\": results})\n    return \"Stopped: too many steps.\"\n```\n\n## Tips\n\n- **Write good tool descriptions.** They matter more than anything else for reliable tool selection.\n- **Return compact, readable results** (strings or small JSON), not huge objects.\n- **Confirm before side effects.** If a function writes, deletes, or sends something, ask for confirmation first.\n- **Add a system prompt** that says when to use each tool and when to answer directly.\n\n## When to reach for more\n\n- **Many tools, multi-step workflows, or tracing needs**: consider a framework like LangGraph or the Claude Agent SDK.\n- **Answers grounded in your documents**: add retrieval (embeddings plus a vector store such as Chroma) as a third tool.\n- **Exposing the functions to multiple clients**: wrap them in an MCP server.\n\nIf you tell me which provider you prefer and what the two functions do, I can tailor the schemas and prompt.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1328,
+      "cacheReadInputTokens": 678,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0133518,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 33,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 678,
+    "output_tokens": 1328,
+    "output_tokens_details": {
+      "thinking_tokens": 33
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1328,
+        "cache_read_input_tokens": 678,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0133518,
+  "duration_ms": 10112
+}

@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Lays out the loop architecture: model requests tool, app runs it, result sent back, model writes the answer; includes a code loop and expected message flow user \u2192 assistant \u2192 tool result \u2192 model call.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States the model requests the tool while 'you run it, you send the result back'; the code separates model call (client.messages.create) from app execution (run_tool, appending tool_result).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Enumerates failure points: no second model call, message ordering/ID format, non-serializable/empty tool result, reading wrong content block, framework/streaming/max_tokens settings, conflicting system prompt.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Step 6 suggests printing the message list and logging, and ends by asking for SDK and code, but it mostly lists likely fixes up front rather than leading with investigation; no tools used to inspect the user's code.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011675999999999999
+}

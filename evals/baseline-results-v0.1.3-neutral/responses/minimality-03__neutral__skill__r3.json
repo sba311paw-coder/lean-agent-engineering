@@ -1,0 +1,66 @@
+{
+  "key": "minimality-03__neutral__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "**Don't add one yet.** You already capture the two signals you named, tool-call failures and latency, so there's no capability gap. A large framework would add a dependency, possibly a service to run, new network egress, and the risk of sending prompts and tool data to a third party, all without new capability.\n\n**Questions that would justify adding one:**\n- Can you answer \"what happened in this one bad run?\" from your logs? If not, you're missing a per-run correlation ID, not a framework.\n- Do you need to see a multi-step run (LLM call, tool call, LLM call) as one timeline?\n- Do you need aggregation across many runs, such as p95 latency per tool, failure rate over time, or cost and token trends?\n- Do you need alerting in production, or is this still development?\n\n**Smallest step for each gap, in order:**\n1. **Per-run correlation:** add a run ID and tool name to your log lines, and emit them as structured (JSON) logs. This is a small local change, and you may not need to go further.\n2. **Timeline and aggregation:** add the OpenTelemetry API/SDK, which is a vendor-neutral standard. Wrap each LLM call and tool call in a span, and export to a local collector or a backend you choose later. It avoids lock-in and you can adopt it incrementally.\n3. **LLM-specific views** (prompt and response inspection, token cost, evals): only then consider a dedicated LLM tracing tool, ideally one that builds on OpenTelemetry. Check what data it sends off-machine and redact secrets and private content first.\n\nIf you do add something, verify it. Force a tool failure and a slow call, then confirm both show up in the traces with the correct timing and error status.\n\nIf you tell me what you can't currently answer from your logs, I can narrow this down to the specific addition, if any.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 713,
+      "cacheReadInputTokens": 3296,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0074636,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 129,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3296,
+    "output_tokens": 713,
+    "output_tokens_details": {
+      "thinking_tokens": 129
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 713,
+        "cache_read_input_tokens": 3296,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0074636,
+  "duration_ms": 6449
+}

@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Switching embedding models is often not the fix\" and says to check where the failure is first; it only lists candidate models conditionally, after diagnosis.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Covers retrieval (was the right chunk in top-k, chunking, reranker, hybrid), context construction (too few/many chunks passed, metadata/filters), and generation (prompt, 'answer only from context'). It distinguishes retrieval vs. generation failures.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Prescribes taking 20-30 bad answers and checking each, then building a 50-100 question labeled eval set measuring recall@k and MRR before deciding; asks for example failures.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00972
+}

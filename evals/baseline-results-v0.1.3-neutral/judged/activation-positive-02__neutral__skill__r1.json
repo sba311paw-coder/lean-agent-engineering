@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"decision-boundary problem\" and says to find where the decision goes wrong; step 1 compares failing vs passing runs (prompt, tools, history, raw response, tool_choice), and later sections examine descriptions, overlap, and context as boundary causes.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Find where the decision goes wrong before changing anything\"; section 1 \"Reproduce and capture evidence\"; closes by asking for the tool definition, system prompt, and a failing and passing trace.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Fixes are ordered \"cheapest fix first\" (descriptions, prompt, tool_choice), and the application check is plain code. No framework or orchestration library is recommended.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01017
+}

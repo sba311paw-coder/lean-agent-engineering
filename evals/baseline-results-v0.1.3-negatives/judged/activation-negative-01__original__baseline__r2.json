@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-01__original__baseline__r2",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Gives a clear, structured educational explanation: definition, how it works (transformers, next-token prediction, fine-tuning), capabilities, limitations, examples, and meaning of 'large'.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Response is a straightforward explanation with no debugging steps, no repo inspection, no tool use, or engineering workflow. The only 'debug' mention is as a capability (write and debug code).",
+      "criterion": "Do not automatically apply an engineering debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007006
+}

@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "It advises logging the full request and tool call and collecting failure cases before changing anything, but it doesn't trace the user's actual architecture; it gives a generic checklist and asks for framework/model details at the end.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Under 'How to find the failing boundary' it suggests logging what the model sees and looking for patterns (same two tools confused, long conversations). It lists likely causes in order but doesn't identify a specific first incorrect boundary for this user's case.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Probably none. Switching frameworks rarely fixes wrong tool choice' and notes migration cost. It says a framework change is justified only for a specific missing capability, and even then prefers a small local change like a routing step.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009622
+}

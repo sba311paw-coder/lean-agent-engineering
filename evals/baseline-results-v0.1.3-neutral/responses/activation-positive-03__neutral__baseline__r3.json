@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r3",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "Poor grounding in a RAG agent usually comes from one of three places: retrieval returning the wrong content, the model ignoring or overreaching beyond what was retrieved, or the documents being chunked and indexed badly. Work through them in that order.\n\n## 1. Fix retrieval quality first\n\nMost \"hallucination\" is really a retrieval failure. Check what the agent actually retrieved before blaming the model.\n\n- **Log and inspect retrieved chunks** for a set of failing queries. If the right passage isn't in the top-k, no prompt fix will help.\n- **Use hybrid search**: combine dense embeddings with BM25/keyword search. Embeddings miss exact terms like IDs, names, and acronyms.\n- **Add a reranker**: retrieve a wide set (e.g., top 30-50), then rerank with a cross-encoder and pass only the best 5-8 to the model.\n- **Rewrite queries**: have the model turn conversational or multi-part questions into standalone search queries, or decompose them into sub-queries.\n- **Tune top-k and similarity thresholds**: too few misses evidence, too many dilutes it. Add a minimum score cutoff so weak matches aren't treated as evidence.\n- **Use metadata filters** (document type, date, source, section) to narrow the search space.\n\n## 2. Improve chunking and indexing\n\n- **Chunk by structure** (headings, sections, paragraphs) rather than fixed character counts, with modest overlap.\n- **Keep chunks self-contained**: prepend the document title and section heading, or use contextual retrieval (a short LLM-generated summary of where the chunk sits in the document).\n- **Right-size chunks**: roughly 200-500 tokens is a common starting point. Test it, since the best size depends on your documents.\n- **Handle tables, PDFs, and layout carefully**: bad parsing produces garbled text that embeds poorly. Check your extraction output.\n- **Consider parent-child retrieval**: match on small chunks, but give the model the larger surrounding section.\n- **Check your embedding model** suits your domain and language, and re-embed if you change it.\n\n## 3. Constrain generation\n\n- **Instruct the model to answer only from the provided context** and to say \"I don't know\" or \"the documents don't say\" when the evidence is missing. Give it explicit permission to abstain.\n- **Require citations**: each claim should reference a chunk ID or quoted span. Quote-then-answer (extract supporting quotes first, then answer from them) works well.\n- **Label sources clearly** in the prompt, with IDs, titles, and dates, and put them in a consistent structure (for example, XML-style tags).\n- **Put the question and instructions after long context**, and keep the context free of near-duplicate or contradictory chunks.\n- **Lower temperature** for factual tasks.\n\n## 4. Verify after generation\n\n- **Groundedness check**: a second pass (or separate model) checks that each claim is supported by the retrieved text, and removes or flags unsupported ones.\n- **Validate citations programmatically**: confirm quoted text actually appears in the cited chunk.\n- **Let the agent retry**: if the check fails or confidence is low, reformulate the query and search again rather than answering.\n\n## 5. Evaluate systematically\n\nBuild a small test set (50-200 real questions with known source passages) and measure separately:\n\n- **Retrieval**: recall@k, MRR (was the right chunk retrieved?)\n- **Generation**: faithfulness (is the answer supported by context?) and answer correctness\n\nThis tells you which layer is failing so you don't guess. Tools like Ragas, TruLens, or a simple LLM-as-judge script can automate it.\n\n## Agent-specific tips\n\n- Give the agent a search tool that returns source metadata and lets it search multiple times with different queries.\n- Prefer letting the agent iterate (search, read, refine) over one-shot retrieval for complex questions.\n- Keep tool outputs compact so the context isn't flooded with irrelevant text.\n\n## Suggested order of attack\n\n1. Log retrieved chunks for failing cases and classify each failure: missing evidence, wrong evidence, or ignored evidence.\n2. Add hybrid search plus reranking (usually the biggest win).\n3. Improve chunking with headings and context.\n4. Tighten the prompt with citations and abstention.\n5. Add a groundedness check and an eval set to prevent regressions.\n\nIf you share details such as your embedding model, chunk size, top-k, document types, and a few examples of bad answers, I can give more targeted suggestions.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1512,
+      "cacheReadInputTokens": 676,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.015191600000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 676,
+    "output_tokens": 1512,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1512,
+        "cache_read_input_tokens": 676,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.015191600000000001,
+  "duration_ms": 13014
+}

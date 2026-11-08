@@ -1,0 +1,66 @@
+{
+  "key": "architecture-02__neutral__skill__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "The tool result is probably being lost between your tool call and the final LLM call. Logging the result only proves the tool worked. It doesn't prove the model ever saw it.\n\n## 1. Find the first wrong boundary\n\nLog the **exact request payload** sent to the model on the final call (the full `messages` array), not just the tool output. Then check:\n\n- **Is the tool result in it at all?** The most common bug is that the result is logged but never appended to the message history. Another is that the final call uses a stale copy of the history, such as a variable captured before the tool ran.\n- **Does it have the right role and ID?** The assistant message with the tool call must be followed by a tool-result message that references the same ID (`tool_call_id` for OpenAI-style APIs, `tool_use_id` for Anthropic). A mismatched or missing ID can cause the result to be dropped or ignored.\n- **Is the content usable?** Check for `None`, an empty string, an unserialized object (`<object at 0x...>`), or a nested structure the model can't interpret. Return a plain string or JSON like `{\"city\": \"Paris\", \"temp_c\": 18.5, \"conditions\": \"cloudy\"}`.\n- **Is the assistant's tool-call message preserved?** If you append only the tool result and drop the assistant turn that requested it, the history is malformed.\n- **Is the loop exiting early?** Make sure the app makes a second model call after tool execution, rather than returning the first response or a fallback string.\n\n## 2. Check the less common causes\n\n- A system prompt that says something like \"answer concisely and generically\" or \"don't cite data\" can override the tool output.\n- The result may be truncated or sit far from the question, with a large payload burying the temperature.\n- With streaming, you may be returning the first streamed message instead of the post-tool one.\n- The final call may be made without the original user question, so the model has no reason to use the data.\n\n## 3. Fix and verify\n\nApply the fix at the point where the payload was wrong, usually by appending the assistant tool-call message and the matching tool-result message to the same history used for the next call.\n\nTo verify, stub the tool to return a distinctive value the model couldn't guess (e.g., `37.3\u00b0C` in \"Reykjavik\") and assert that the final answer contains `37.3`. Then make the tool fail and confirm the agent reports the failure instead of giving a generic reply.\n\nIf it still fails after you've confirmed the payload contains the result, the problem is the prompt or the model. Until then it's almost certainly application plumbing. If you paste the loop code that builds the messages and makes the second call, I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1293,
+      "cacheReadInputTokens": 3308,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0132648,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 449,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3308,
+    "output_tokens": 1293,
+    "output_tokens_details": {
+      "thinking_tokens": 449
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1293,
+        "cache_read_input_tokens": 3308,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0132648,
+  "duration_ms": 11791
+}

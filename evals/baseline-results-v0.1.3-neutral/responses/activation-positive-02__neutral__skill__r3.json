@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-02__neutral__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "# Agent sometimes skips a tool\n\nThe model deciding to answer directly is usually a symptom, not the root cause. Work through the boundaries in order and fix the first one that's wrong.\n\n## 1. Reproduce and log\n\nRun the same failing prompt 10-20 times and log the full request sent to the LLM and the raw response. Check for the following:\n- Was the tool actually in the `tools` list on the skipped runs? Conditional tool loading, truncated context, or a bad config can silently drop it.\n- Did the model emit a tool call that your application failed to parse or dropped?\n- What distinguishes skipped runs from good ones (phrasing, conversation length, topic)?\n\n## 2. Fix the tool definition\n\nIf the tool was available and the model chose not to use it, the cause is usually ambiguity:\n- **Description:** state what the tool does and when to use it, including when *not* to answer from memory. For example: \"Use this for any question about current order status. Do not answer such questions without calling it.\"\n- **Name and parameters:** make them specific and self-explanatory. Vague tools get skipped.\n- **System prompt:** add a short, explicit rule for the cases where the tool is required. One clear sentence beats a long list.\n- **Context bloat:** with many tools or a long prompt, the model more often falls back to its own knowledge. Remove tools the task doesn't need.\n\n## 3. Enforce it in the application if it must always happen\n\nPrompting only makes skipping less likely, not impossible. If the tool call is required for correctness, don't rely on the LLM's decision:\n- **`tool_choice`:** most APIs let you force a specific tool, or require *some* tool call, on a given turn.\n- **Deterministic routing:** if the application can tell from the input that the tool is needed (for example, an order ID in the message), call the tool directly and give the result to the model.\n- **Validation:** check that a tool call occurred before accepting a final answer, and retry or fail if not.\n\nForcing a tool every turn can cause loops or pointless calls, so apply it only where the call is truly required.\n\n## 4. Verify\n\nBuild a small set of prompts that should trigger the tool (plus some that shouldn't) and run each multiple times. Measure the tool-call rate before and after your change. A single successful run proves little with a non-deterministic system.\n\n## Likely order of payoff\n\n1. Confirm the tool is actually present in every request.\n2. Rewrite the description and add one explicit system-prompt rule.\n3. If it still skips and correctness depends on it, enforce it with `tool_choice` or application-side routing.\n\nIf you share the tool definition, the system prompt, and an example of a skipped prompt, I can point to the specific cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1050,
+      "cacheReadInputTokens": 3300,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010834,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 171,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3300,
+    "output_tokens": 1050,
+    "output_tokens_details": {
+      "thinking_tokens": 171
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1050,
+        "cache_read_input_tokens": 3300,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010834,
+  "duration_ms": 9656
+}

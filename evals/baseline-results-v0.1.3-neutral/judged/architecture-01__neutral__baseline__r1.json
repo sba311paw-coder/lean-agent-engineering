@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__baseline__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Does not trace the user's actual architecture (can't see it); it lists generic layers (model, tool definitions, prompt) and ends by asking for framework, model, tool count, and an example. Suggests logging failures, but no actual trace up front.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Names likely fault boundaries (tool descriptions, prompt, model) and says to log failures to find patterns like similar descriptions, but doesn't identify a specific first incorrect boundary; it gives a generic ordered list instead.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Switching frameworks probably won't fix this\" and prescribes incremental fixes (descriptions, prompt, model, constraints) before any replacement; framework switch is conditional on needing specific capabilities.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009716
+}

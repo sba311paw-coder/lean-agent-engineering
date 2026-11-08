@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-03__neutral__skill__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving grounding in a RAG agent\n\nFind which boundary is failing before changing anything. Poor grounding usually comes from either **retrieval** (the right content never reaches the model) or **generation** (the model ignores or goes beyond what it was given). The fixes differ.\n\n## 1. Diagnose first\n\nTake 20-50 real queries where answers were poorly grounded. For each, check:\n\n1. **Was the answer in the corpus?** If not, the right behavior is to say \"I don't know,\" and that's a prompting/policy issue.\n2. **Was the relevant chunk in the retrieved top-k?** If not, it's a retrieval problem.\n3. **Was it retrieved but ignored or misused?** Then it's a generation problem.\n4. **Was it retrieved but cut off or split badly?** That's a chunking problem.\n\nTally the results. The biggest bucket tells you where to spend effort. Without this you're guessing.\n\n## 2. Fixes by failure type (smallest first)\n\n**Retrieval misses**\n- Inspect the actual retrieved chunks for failing queries. Most bugs show up immediately.\n- Fix chunking: split on document structure (headings, paragraphs) rather than fixed character counts, and keep modest overlap. Prepend document title/section to each chunk so it stands alone.\n- Check that the same embedding model is used for indexing and querying, and that your distance metric matches the model's.\n- Add **hybrid search** (BM25 + vectors) if queries involve exact terms, IDs, or names, where pure embeddings are weak.\n- Tune top-k, and add a **reranker** over a larger candidate set (e.g., fetch 30, keep 5). It's often the single biggest quality gain.\n- Use metadata filters (source, date, document type) where the query implies them.\n- For vague or conversational queries, rewrite the query before retrieval.\n\n**Generation ignoring or going beyond context**\n- Instruct the model to answer only from the provided passages and to say when they're insufficient.\n- Require **citations** (chunk IDs or quotes) for each claim. Have the application check that cited IDs exist in the retrieved set, and optionally that quoted text actually appears in the chunk.\n- Put passages in clearly delimited, labeled blocks, and keep context short. Too many marginal chunks dilute attention.\n- Add a **no-answer path**: if top reranker scores fall below a threshold, return \"not found\" rather than letting the model improvise.\n\n**Document ingestion issues**\n- Check parsing quality. Bad PDF extraction (tables, columns, headers/footers) silently poisons the index.\n- Deduplicate and remove stale versions of documents.\n\n## 3. Treat retrieved text as untrusted\n\nRetrieved documents are data, not instructions. A document containing \"ignore previous instructions\u2026\" shouldn't be able to steer the agent. Keep the system prompt authoritative, delimit retrieved content, and enforce tool permissions in the application, not by trusting the model's output.\n\n## 4. Verify with evidence\n\n- Build a small eval set (the queries from step 1 plus expected source passages).\n- Measure **retrieval** (is the right chunk in top-k?) separately from **answer quality** (is every claim supported by the retrieved text?). An LLM-as-judge for \"supported by context\" works well as a cheap check, spot-checked by hand.\n- Change one thing at a time and rerun the same set, so you know which change helped.\n\n## What I'd skip initially\n\nFine-tuning embeddings, multi-agent pipelines, knowledge graphs, and bigger frameworks. Add them only if the diagnosis shows a gap that chunking, hybrid search, reranking, and citation checks can't close.\n\nIf you share your stack (embedding model, chunking approach, top-k, vector DB) and a couple of examples of a bad answer alongside the chunks retrieved, I can help pinpoint which boundary is failing.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1382,
+      "cacheReadInputTokens": 3302,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.014154199999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 88,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3302,
+    "output_tokens": 1382,
+    "output_tokens_details": {
+      "thinking_tokens": 88
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1382,
+        "cache_read_input_tokens": 3302,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.014154199999999999,
+  "duration_ms": 12707
+}

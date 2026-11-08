@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Don't switch embedding models yet\" and explains that swapping forces a full re-index.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The table separates retrieval (right passage not in top-k), context/chunking (truncated or split chunks), and generation (retrieved but answer wrong, prompt, context ordering), plus a data-staleness row.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Tells the user to take 10-20 bad answers and inspect retrieved chunks, build a 30-50 question labeled eval set measuring recall@k and MRR, and asks for a failing example before recommending anything.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009154
+}

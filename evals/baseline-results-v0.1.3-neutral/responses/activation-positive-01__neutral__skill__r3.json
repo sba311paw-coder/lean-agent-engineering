@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-01__neutral__skill__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "Trace the boundaries and find the first one where the data is lost. \"The tool returns data\" only proves the tool boundary works. The failure is almost always in the application code between the tool and the second model call, not in the model.\n\n## Where to look\n\nLog the exact request sent to the LLM *after* the tool runs. That one payload tells you which case you're in.\n\n1. **Tool result never added to the message history (most common).** The app runs the tool but doesn't append the result before calling the model again.\n2. **Result added in the wrong format.** Most APIs require the assistant's tool-call message to be followed by a tool-result message with a matching ID, for example:\n   - OpenAI-style: `role: \"tool\"` with the matching `tool_call_id`\n   - Anthropic-style: a `tool_result` block with the matching `tool_use_id`, inside a user message\n3. **No second model call.** The loop returns after the tool call, or returns the text from the first model turn (often empty or \"Let me check the weather\").\n4. **Wrong message returned.** The app reads the final text from `messages[0]` or the first response instead of the last one.\n5. **Bad serialization.** The result is a dict, object, or `None` that gets stringified as empty or `[object Object]`, or it's truncated.\n6. **Streaming.** Only the first stream (the tool-call turn) is consumed, and the follow-up stream is dropped.\n\n## Minimal correct loop (pseudocode)\n\n```python\nmessages = [user_msg]\nwhile True:\n    resp = llm(messages, tools=tools)\n    messages.append(resp.message)            # include the tool-call message\n\n    if not resp.tool_calls:\n        return resp.text                     # final answer = last turn\n\n    for call in resp.tool_calls:\n        result = run_tool(call)              # validate args and permissions here\n        messages.append({\n            \"role\": \"tool\",\n            \"tool_call_id\": call.id,         # must match\n            \"content\": json.dumps(result),   # string, non-empty\n        })\n```\n\n## How to confirm the root cause\n\n- Print `messages` right before the second `llm(...)` call. Is the tool result in it, in the right position, with a matching ID?\n- If it is, and the model still ignores it, check the system prompt for instructions that conflict with using tool output, and check whether the result is huge, empty, or ambiguous (such as `{\"status\": \"ok\"}` with no data).\n- If it isn't, the bug is in your loop, and it's fixed by the code above.\n\n## Verify the fix\n\nRun a query with a known answer (for example, stub the tool to return `72\u00b0F, sunny` for \"Paris\") and check that the final response contains those exact values. Then force a failure (tool raises an error or returns empty) and confirm the agent reports that instead of inventing weather.\n\nIf you share the loop code and the messages payload from the second call, I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1139,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 609,
+      "webSearchRequests": 0,
+      "costUSD": 0.014099800000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 218,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 609,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 609,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 1139,
+    "output_tokens_details": {
+      "thinking_tokens": 218
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 609,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1139,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 609,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 609
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.014099800000000003,
+  "duration_ms": 10983
+}

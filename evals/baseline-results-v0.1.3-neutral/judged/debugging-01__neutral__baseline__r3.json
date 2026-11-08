@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Advises logging raw request/response and a minimal repro call, but the response did not itself read code or reproduce the failure; it said it can't see the code and asked for the error.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Section 1 recommends `git diff`, `git log -p`, and `git bisect`, but only as advice; it didn't run them (and the environment isn't a git repo).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Walks the tool-call flow: tools array, tool_use block, dispatcher name matching, tool_result in user message with matching tool_use_id, stop_reason loop handling, history appending.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Maps symptoms to likely causes (hypotheses) and suggests isolating via a minimal call, but it's a generic list, not a single testable hypothesis formed before a fix.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.625,
+  "case_pass": false,
+  "judge_cost_usd": 0.010586
+}

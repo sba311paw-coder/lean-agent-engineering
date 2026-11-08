@@ -1,0 +1,66 @@
+{
+  "key": "architecture-01__neutral__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks probably won't fix this. Wrong tool selection is almost always caused by the model's inputs and setup, not the framework, and most frameworks (LangGraph, OpenAI Agents SDK, Claude Agent SDK, CrewAI, etc.) pass the same tool definitions to the same underlying model. Try these first, roughly in order of payoff:\n\n**1. Improve tool descriptions**\n- Say what the tool does, when to use it, and when *not* to use it.\n- Distinguish similar tools explicitly (\"use `search_orders` for lookups by customer; use `get_order` when you already have an order ID\").\n- Give parameters clear names and descriptions, with enums where possible.\n\n**2. Reduce the choice set**\n- Fewer tools means fewer mistakes. Remove or merge overlapping tools.\n- If you have many tools (roughly 20+), expose only the relevant subset per task or step, via routing, sub-agents, or tool search/dynamic loading.\n\n**3. Use a stronger model or better settings**\n- Tool selection quality varies a lot by model. Try a newer or larger one.\n- Lower temperature for tool-calling steps.\n- Enable extended thinking/reasoning for ambiguous routing decisions.\n\n**4. Tighten the system prompt**\n- Add short guidance on tool-choice policy and a few examples of correct selection for the confusing cases.\n- Tell the agent to ask for clarification when the request is ambiguous.\n\n**5. Constrain when needed**\n- Use forced tool choice (`tool_choice`) for steps where only one tool is valid.\n- Use a state machine/graph (e.g., LangGraph) so certain tools are only available at certain stages.\n- Validate tool calls and return clear error messages so the agent can self-correct.\n\n**6. Measure it**\n- Collect the failing cases into a small eval set (input \u2192 expected tool). Then you can tell whether each change actually helps, and compare frameworks fairly if you still want to.\n\n**When a framework switch does help:** if you need hard structural control (graph-based workflows that restrict tools by step), built-in tool routing/handoffs between specialized agents, or better tracing to see why the model chose what it did. In those cases, LangGraph, OpenAI Agents SDK (handoffs), or the Claude Agent SDK (sub-agents) are reasonable choices, but the gain comes from the architecture, not the brand.\n\nIf you share your tool list, a couple of the descriptions, and an example of a wrong choice, I can suggest specific fixes.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 840,
+      "cacheReadInputTokens": 665,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008470500000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 665,
+    "output_tokens": 840,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 840,
+        "cache_read_input_tokens": 665,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.008470500000000002,
+  "duration_ms": 7804
+}

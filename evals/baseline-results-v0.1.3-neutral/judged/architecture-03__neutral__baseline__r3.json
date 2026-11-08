@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__baseline__r3",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Recommends a single Python app with one LLM via the Anthropic SDK (OpenAI as an alternative), and wires up exactly two existing functions (get_weather, search_notes) in the sketch. Slight hedging between SDKs.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The LLM only emits tool_use blocks; the app code executes them via the FUNCS dispatch dict, handles exceptions, and runs the loop and max_turns guard. Responsibilities are separated in the code, though not explicitly called out as a design principle.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Sketch appends the assistant content, executes the tool calls, builds tool_result entries with tool_use_id, appends them as a user message, and loops back to the model until stop_reason != tool_use.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Says no framework; persistence only if you want it to survive restarts; Pydantic optional; a 'When to reach for more' section ties LangGraph, MCP, and Agent SDK to concrete needs; concludes 'Add complexity only when you hit a concrete need.'",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.013502
+}

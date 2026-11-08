@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States the send-email capability already exists; the real missing piece is exposing it to the agent as a tool (with policy/approval), which the response identifies in step 1 and the policy steps.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Wrap your existing function as a tool in the agent itself\" and the setup builds around calling the existing function from the tool handler.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly says \"skip the MCP server\", calls it overhead for a single app, and limits MCP to multi-client sharing cases.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009132000000000001
+}

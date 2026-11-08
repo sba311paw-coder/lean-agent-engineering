@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r1",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "Inconsistent tool use usually comes from the model judging that it can answer without the tool. Here are the fixes, roughly in order of payoff.\n\n## 1. Improve the tool description\nThe description is the main signal the model uses to decide.\n- Say **when** to use the tool, not just what it does: \"Use this for any question about current inventory, prices, or order status. Do not answer these from memory.\"\n- State what the model *can't* know without it (live data, private data, anything after its training cutoff).\n- Add examples of queries that should trigger it.\n- Keep names and parameter descriptions unambiguous. Overlapping tools make the model hedge.\n\n## 2. Say it explicitly in the system prompt\n- \"For questions about X, you MUST call `tool_name` before answering. Never answer from prior knowledge.\"\n- Give a short decision rule: \"If the answer depends on data that could change or that is specific to this user's system, call a tool.\"\n- Add one or two few-shot examples showing a question followed by a tool call followed by an answer.\n\n## 3. Force it at the API level\nIf the tool call is always required, don't leave it to the model:\n- Set `tool_choice` to `{\"type\": \"any\"}` to require *some* tool call, or `{\"type\": \"tool\", \"name\": \"...\"}` to require a specific one.\n- For multi-step flows, force the tool on the first turn, then switch back to `auto` for the follow-up.\n\n## 4. Enforce it in your code\n- **Router or pre-step:** classify the query first, then call the tool yourself and inject the result into context.\n- **Validation loop:** if the response contains no tool call and one was expected, retry with a nudge (\"You must use `tool_name` to answer this\").\n- Make the tool the only source of truth by instructing the model to cite or quote tool output, and reject answers that don't.\n\n## 5. Reduce the temptation to skip\n- Fewer tools. A large toolset makes selection less reliable.\n- Don't put the answer, or enough information to guess it, in the system prompt or conversation history.\n- Check that tool results from earlier turns aren't convincing the model it already has the answer. If they go stale, say so (\"re-query if the data may have changed\").\n- Lower the temperature if you're sampling at a high one.\n\n## 6. Debug it systematically\n- Log the failing cases and look for patterns: phrasing, conversation length, or specific topics.\n- Build a small eval set of 20 to 50 queries with the expected tool behavior, and measure the tool-call rate before and after each prompt change. Otherwise you're tuning on anecdotes.\n\n**Quick recommendation:** if the tool should *always* be called for a class of queries, use `tool_choice` or a router, since prompts only make it more likely. If the decision is genuinely judgment-based, rewrite the description with explicit \"use when / don't answer from memory\" language and add examples.\n\nIf you tell me which framework or API you're using and share the tool description and system prompt, I can suggest specific rewrites.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1000,
+      "cacheReadInputTokens": 674,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010071400000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 34,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 674,
+    "output_tokens": 1000,
+    "output_tokens_details": {
+      "thinking_tokens": 34
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1000,
+        "cache_read_input_tokens": 674,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010071400000000001,
+  "duration_ms": 12314
+}

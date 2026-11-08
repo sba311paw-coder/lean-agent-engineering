@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r1",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens by identifying the cause as the tool output not making it into the follow-up call's messages, and section 1 walks through the correct tool_use/tool_result handoff and common handoff mistakes.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Debug step: \"Right before the second API call, print the full `messages` list\" and verify the tool_use and tool_result with the temperature; also says to log the exact `content` in the tool_result.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Never suggests modifying the tool and directs tracing the message boundary first, but doesn't explicitly say to avoid changing the tool; the payload-simplification tip is a minor tool-side suggestion, listed after tracing.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.010655999999999999
+}

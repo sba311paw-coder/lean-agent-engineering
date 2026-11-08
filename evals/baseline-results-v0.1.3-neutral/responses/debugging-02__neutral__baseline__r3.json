@@ -1,0 +1,66 @@
+{
+  "key": "debugging-02__neutral__baseline__r3",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models is often not the fix. Wrong answers in a RAG agent usually come from somewhere else, so it's worth a quick diagnosis first. I can't see your setup, so here is how I'd narrow it down.\n\n## 1. Find where it fails\n\nFor a handful of bad answers, check whether the right chunk was in the retrieved top-k:\n\n- **The right chunk was not retrieved:** this is a retrieval problem. An embedding change might help, but chunking, hybrid search, or reranking usually helps more.\n- **The right chunk was retrieved but the answer is still wrong:** this is a generation problem. Look at the prompt, context ordering, too much noisy context, or the LLM itself. A new embedding model won't help here.\n- **The right chunk doesn't exist in your index:** this is an ingestion problem, such as parsing errors, missing documents, or stale data.\n\n## 2. Common fixes that beat swapping embeddings\n\n- **Chunking:** chunks that are too big, too small, or split mid-thought. Try 300-800 tokens with some overlap, or structure-aware splitting by headings or sections.\n- **Hybrid search:** combine BM25 with vector search. This fixes a lot of failures on exact terms, IDs, names, and acronyms.\n- **Reranking:** retrieve 30-50 candidates, then rerank to 5-8 with a cross-encoder or a hosted reranker (Cohere Rerank, Voyage rerank, or BGE reranker). This is often the biggest single gain.\n- **Query rewriting:** for agents especially, the raw user message or a vague tool-call query often retrieves poorly. Have the model rewrite it into a standalone search query.\n- **Metadata filtering:** filter by source, date, or product before the similarity search.\n- **Prompt:** tell the model to answer only from the context and say \"I don't know\" otherwise.\n\n## 3. If the embedding model really is the problem\n\nSigns: domain-specific jargon, non-English or multilingual content, code, or long documents that your current model handles poorly. Candidates to evaluate:\n\n- **Hosted:** OpenAI `text-embedding-3-large`, Voyage (`voyage-3` family, with domain variants for code, law, and finance), Cohere `embed-v3`/`v4` (strong multilingual), Google Gemini embedding models.\n- **Open-source:** BGE (`bge-m3` for multilingual and long inputs), Qwen3-Embedding, Nomic Embed, E5/GTE families.\n\nMy knowledge may be out of date, and this space moves fast, so check the current MTEB leaderboard. Treat its rankings as a rough guide, because they often don't predict performance on your own data.\n\n## 4. Test on your own data\n\nBuild a small eval set of 30-100 real questions with the known correct source chunks. Measure recall@k and MRR for your current model and 2-3 candidates. This takes an afternoon and tells you much more than any benchmark. If you change models, you have to re-embed the whole corpus.\n\nIf you tell me your current embedding model, chunking setup, vector store, content type (docs, code, PDFs, multilingual?), and an example of a bad answer, I can give a more specific recommendation.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1152,
+      "cacheReadInputTokens": 661,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0115901,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 88,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 661,
+    "output_tokens": 1152,
+    "output_tokens_details": {
+      "thinking_tokens": 88
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1152,
+        "cache_read_input_tokens": 661,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0115901,
+  "duration_ms": 15974
+}

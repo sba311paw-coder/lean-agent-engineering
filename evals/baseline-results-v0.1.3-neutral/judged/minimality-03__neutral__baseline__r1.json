@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__baseline__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"only if you need more than what you have\" and explains logs/tests already cover failures and latency in dev; a framework earns place for production, many runs, multi-step traces. Ends by advising holding off for a prototype.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Keep your tests as they are\", \"Add a trace ID to your existing log lines\", and \"Structured JSON logs plus your tests are likely enough\" show building on existing logging/tests; also suggests using existing Datadog/New Relic rather than adding another tool.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "No discussion of maintenance burden, dependency footprint, or operational cost of self-hosting backends. Only a vague mention of \"heavy framework\" and \"self-host\" options without costs.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.009894
+}

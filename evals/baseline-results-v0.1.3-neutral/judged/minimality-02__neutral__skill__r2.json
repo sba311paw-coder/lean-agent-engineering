@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Should you migrate at all?\" and assesses that an agent calling two functions gets no new capability from LangChain, noting the direct API already supports tool calling.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Says \"probably not\" to migrating and \"If none of those apply, keep what you have.\" The migration steps are incremental and minimal: keep the functions unchanged, swap only the model call and loop.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists concrete triggers: provider portability, persistence/checkpointing/human-in-the-loop/streaming, complex multi-step control flow, and ecosystem integrations. It also says the motivation \"it's an agent\" is not a capability gap.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009804
+}

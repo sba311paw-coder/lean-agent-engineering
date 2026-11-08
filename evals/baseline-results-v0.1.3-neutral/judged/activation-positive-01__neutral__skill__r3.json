@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Frames the flow as boundaries: tool -> app code -> second model call, and provides a minimal loop showing LLM call, tool execution, message append, and re-call, tracing the architecture.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "States 'The failure is almost always in the application code between the tool and the second model call, not in the model.' The loop separates llm() decisions (tool_calls) from run_tool(call) executed by the app.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists six failure points: result not appended, wrong format/ID, no second call, wrong message returned, serialization, streaming; also model ignoring result due to system prompt or ambiguous data.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Trace the boundaries and find the first one where the data is lost' and 'Log the exact request sent to the LLM', with a 'How to confirm the root cause' section before concluding the fix; asks for code/payload. Slightly front-loads a code fix, but investigation is primary.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011116000000000001
+}

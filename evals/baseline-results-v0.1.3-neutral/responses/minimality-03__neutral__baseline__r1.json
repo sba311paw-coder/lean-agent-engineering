@@ -1,0 +1,66 @@
+{
+  "key": "minimality-03__neutral__baseline__r1",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "**Short answer: OpenTelemetry (OTel), and only if you need more than what you have.**\n\nYour logs and tests already cover tool-call failures and latency in development. A framework earns its place when you need to see those things in production, across many runs, or across a multi-step trace. If you do:\n\n**1. OpenTelemetry (my default pick)**\n- Vendor-neutral standard, so you aren't locked into a backend.\n- Gives you traces (one span per agent step and per tool call), metrics, and log correlation.\n- Auto-instrumentation exists for `requests`/`httpx`, and the GenAI semantic conventions and libraries like OpenLLMetry/OpenInference cover LLM calls.\n- Send data to Jaeger or Grafana Tempo (self-hosted), or Datadog, Honeycomb, or Grafana Cloud (hosted).\n\n**2. An LLM-agent-specific tool, if you want prompt/response inspection, token costs, and eval workflows**\n- **Langfuse**: open source, self-hostable, good tracing and evals, and works with OTel.\n- **Arize Phoenix**: open source, OTel-native, strong for local debugging and evals.\n- **LangSmith**: the best fit if you already use LangChain/LangGraph.\n\n**How to choose**\n- Want a standard that scales with the rest of your stack: **OTel + Grafana or Honeycomb**.\n- Want agent-centric views such as prompt traces, cost, and eval datasets: **Langfuse or Phoenix** (both accept OTel, so you can start there and keep your options open).\n- Already pay for Datadog or New Relic: use their OTel support rather than adding another tool.\n\n**A practical way to start**\n1. Wrap each tool call in a span, with attributes for tool name, status, error type, and retry count.\n2. Record latency as a histogram metric by tool name.\n3. Add a trace ID to your existing log lines so logs and traces link up.\n4. Keep your tests as they are. They stay useful as regression checks, while observability covers real traffic.\n\nIf the agent is still a single-process script or a prototype, I'd hold off on a heavy framework. Structured JSON logs plus your tests are likely enough until you have production traffic or multi-step failures that logs can't explain.\n\nIf you tell me which agent framework you use (LangChain, custom loop, OpenAI/Anthropic SDK directly) and whether you can self-host, I can give a more specific setup.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 924,
+      "cacheReadInputTokens": 670,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.009311,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 112,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 670,
+    "output_tokens": 924,
+    "output_tokens_details": {
+      "thinking_tokens": 112
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 924,
+        "cache_read_input_tokens": 670,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.009311,
+  "duration_ms": 12833
+}

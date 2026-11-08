@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States \"Don't let the LLM's tool call be the thing that deletes 500 production records. Enforce safety in the tool and backend, not in the prompt.\" and \"The LLM can't confirm its own proposal.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorize as the end user, not the agent\"; code calls authz.can_delete(user, r), checks requested_by, and the agent's service account should not have broad delete rights.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Two-phase propose/confirm, human approval for bulk, hard caps, soft delete, transaction with row-count check, audit log, idempotency token, rate limiting against splitting.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.01291
+}

@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Says the fault is likely \"between the tool result and the model's final call\" and walks through how the tool result is appended to messages (roles, IDs, assistant tool-call turn) for the handoff.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1: \"Dump the full `messages` array right before the second model call\" and check it contains user message, assistant tool call, and tool result linked by ID.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with \"The tool working and being logged only proves the tool boundary is fine\" and directs inspecting the payload first; tool changes (simplify result, fake value) only come later as conditional or verification steps.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010144
+}

@@ -1,0 +1,66 @@
+{
+  "key": "minimality-03__neutral__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "**Probably none yet.** You already have logging and tests that surface tool-call failures and latency, which covers the two things you named. A large framework (Datadog, OpenTelemetry full stack, LangSmith, Langfuse self-hosted, etc.) would add a dependency, a service or account, new credentials, possible data egress of prompts and tool outputs, and ongoing maintenance, without closing a gap you've identified.\n\n**Check whether you have an actual gap first.** Ask what you can't currently answer:\n\n- Can't trace a single request across LLM call \u2192 tool call \u2192 result? Add a correlation/trace ID to your existing logs.\n- Can't see aggregate latency or failure rates over time (p95, error rate per tool)? Emit structured (JSON) logs and query them, or add a small timing decorator around tool calls.\n- Can't see token usage or cost? Log the usage fields the LLM API already returns.\n- Multiple services or agents, with failures you can't localize from logs? That's the point where tracing is justified.\n\n**If you do hit a real gap, escalate in small steps:**\n\n1. Structured JSON logs with a trace ID, tool name, duration, status, and error type.\n2. The OpenTelemetry Python API/SDK, exporting to a local or existing backend. It's a vendor-neutral standard, so you avoid lock-in, and you can add it incrementally around tool calls.\n3. A hosted or LLM-specific platform (Langfuse, LangSmith, Datadog) only if you need dashboards, prompt/trace browsing, or team-wide alerting that you can't get otherwise.\n\nIf you go to step 3, decide up front what data (prompts, tool outputs, user data) is allowed to leave your environment, and redact it.\n\n**Verification for any addition:** trigger a known tool failure and a deliberately slow call, then confirm they appear with correct status and duration in the new system, matching what your current logs show.\n\nIf you tell me what question you currently can't answer (for example, \"which tool is slow in production\" or \"why did this run fail across three agents\"), I can point to the smallest fix.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 682,
+      "cacheReadInputTokens": 3296,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0071535999999999995,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3296,
+    "output_tokens": 682,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 682,
+        "cache_read_input_tokens": 3296,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0071535999999999995,
+  "duration_ms": 6705
+}

@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"The LLM calling the tool is not authorization\" and says approval must come from the application, not the model saying \"the user confirmed.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorize in the tool\" checks the human user's permissions; the sketch uses user.can_delete(r) and a preview token bound to the user, with an out-of-band approvals check.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Preview/confirm, human approval above a threshold, soft delete, max per call and rate limits, transaction and idempotency, audit log, and tests.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011522
+}

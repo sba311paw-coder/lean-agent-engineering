@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__skill__r2",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Don't switch yet\" and explains that swapping requires re-embedding everything.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Steps check whether the source contains the answer, whether the right chunk is in top-k, whether it reaches the prompt, and whether generation fails despite correct context. This covers retrieval, context construction, and generation.",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Directs collecting 10-20 failed questions, tallying failures by stage, building a 50-100 pair eval set measuring recall@k and MRR, and asks for example failures before recommending.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009478
+}

@@ -1,0 +1,66 @@
+{
+  "key": "architecture-01__neutral__skill__r2",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "**Probably none. Switching frameworks is unlikely to fix this.** Wrong tool selection is rarely a framework problem. Frameworks mostly pass your tool definitions to the model and run whatever it returns, so the same model with the same tool descriptions will make the same mistakes in any of them.\n\n**Find the first wrong boundary.** Log a handful of failures and check:\n\n1. **Tool descriptions:** Are they vague or overlapping (e.g. `search_docs` vs `find_documents`)? Do they say when *not* to use the tool? This is the most common cause.\n2. **Too many tools:** Accuracy drops as the tool count grows. Try exposing only the tools relevant to the current step or task type.\n3. **Parameter schemas:** Ambiguous names, missing enums, or missing examples can make the right tool look like the wrong one.\n4. **Prompt/context:** Does the system prompt contradict the tool descriptions or give no guidance on tool preference?\n5. **Model:** A weaker or older model is a more likely culprit than the framework. Try a stronger model on the same failing cases.\n6. **Tool results:** Confusing or error-laden output from an earlier call can push the agent toward a bad next choice.\n\n**Cheap fixes, in order:**\n- Rewrite descriptions to be distinct, with explicit \"use when / don't use when\" guidance.\n- Merge or remove overlapping tools.\n- Narrow the tool set per step.\n- Use a forced or constrained tool choice where the workflow is deterministic.\n- Add application-side validation so a wrong call is rejected or needs confirmation, especially for anything destructive. The model's choice shouldn't be the authorization.\n\n**Verify:** Build a small eval set of 20-50 prompts with the expected tool for each, run it before and after each change, and track the selection accuracy. That tells you whether a change helped, and it would also give you real evidence if you later compare frameworks.\n\nA framework switch only makes sense if the diagnosis shows a framework-specific problem, such as it mangling tool schemas, hiding tool descriptions, or not supporting the tool-choice controls you need. If you share your current framework, model, tool list, and a couple of failing examples, I can help pinpoint which of these it is.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 831,
+      "cacheReadInputTokens": 3291,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0086431,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 87,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3291,
+    "output_tokens": 831,
+    "output_tokens_details": {
+      "thinking_tokens": 87
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 831,
+        "cache_read_input_tokens": 3291,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0086431,
+  "duration_ms": 10511
+}

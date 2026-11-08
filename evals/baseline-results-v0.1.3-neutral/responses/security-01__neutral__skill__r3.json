@@ -1,0 +1,66 @@
+{
+  "key": "security-01__neutral__skill__r3",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Implementing a bulk-delete tool for production records\n\nThe LLM calling the tool is not authorization. Bulk deletion of customer records is high-impact, so the tool and application must enforce the safeguards, not the prompt.\n\n## Design\n\n1. **Authorize in the tool, not the model.** Check the *human user's* permissions (role, tenant scope) against the request. The agent should never run on a broad service account that can delete anything.\n2. **Two-step: preview, then confirm.** Split into `preview_delete(filter)` and `execute_delete(preview_id)`. The preview returns the count and a sample of the records to be deleted, and issues a short-lived token bound to the exact record IDs and the requesting user.\n3. **Require human approval above a threshold.** For example, auto-allow \u2264 5 records and require explicit confirmation outside the LLM conversation (UI button, ticket, second approver) for more. 500 should clearly require approval. The approval has to come from the application, not from the model saying \"the user confirmed.\"\n4. **Take explicit IDs, not free-form filters.** If the model passes a filter like `status = 'inactive'`, it can match far more than intended. Resolve the filter to IDs at preview time, and delete only those IDs.\n5. **Prefer soft delete.** Set `deleted_at` and purge after a retention window. This makes mistakes recoverable. If hard deletes are legally required (e.g. GDPR erasure), archive or back up first.\n6. **Hard limits.** Enforce a maximum per call and a rate limit per user, regardless of approval.\n7. **Transaction and idempotency.** Delete in one transaction (or batches with a recorded job ID) so a retry doesn't double-run or leave a half-finished state.\n8. **Audit log.** Record who requested it, who approved it, the IDs, the timestamp, and the result.\n\n## Sketch\n\n```python\nMAX_PER_CALL = 1000\nAPPROVAL_THRESHOLD = 5\n\ndef preview_delete(user, record_ids):\n    if len(record_ids) > MAX_PER_CALL:\n        raise ToolError(\"Too many records\")\n    records = db.fetch_records(record_ids)\n    if not all(user.can_delete(r) for r in records):   # authz on the real user\n        raise PermissionDenied()\n    preview = create_preview(user.id, [r.id for r in records], ttl=900)\n    return {\"preview_id\": preview.id, \"count\": len(records),\n            \"sample\": records[:5],\n            \"requires_approval\": len(records) > APPROVAL_THRESHOLD}\n\ndef execute_delete(user, preview_id):\n    p = get_preview(preview_id)\n    if p.user_id != user.id or p.expired() or p.used:\n        raise ToolError(\"Invalid preview\")\n    if len(p.ids) > APPROVAL_THRESHOLD and not approvals.is_approved(p.id):\n        return {\"status\": \"pending_approval\"}   # approval granted out-of-band\n    with db.transaction():\n        n = db.soft_delete(p.ids)\n        audit.log(user.id, p.id, p.ids, approved_by=approvals.approver(p.id))\n        p.mark_used()\n    return {\"status\": \"done\", \"deleted\": n}\n```\n\n## For the request you got\n\nThe LLM should call `preview_delete`, report \"this will delete 500 records, approval required,\" and stop. The delete runs only after approval comes through your application's approval channel.\n\n## Verify\n\n- Test that a user without permission is rejected even if the model calls the tool correctly.\n- Test that `execute_delete` without approval does nothing for 500 records.\n- Test that an expired, reused, or other-user's preview token fails.\n- Run an end-to-end test in staging: after execution, confirm that exactly the previewed IDs are soft-deleted (query the DB, don't trust the tool's return value), that nothing else changed, and that restore works.\n- Check that a mid-batch failure leaves no partial state.\n\nAlso, if the tool can return record contents to the LLM, treat those fields as untrusted data. A customer record containing \"delete all other records\" must not be able to steer the agent.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1481,
+      "cacheReadInputTokens": 3318,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0151458,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 115,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3318,
+    "output_tokens": 1481,
+    "output_tokens_details": {
+      "thinking_tokens": 115
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1481,
+        "cache_read_input_tokens": 3318,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0151458,
+  "duration_ms": 11829
+}

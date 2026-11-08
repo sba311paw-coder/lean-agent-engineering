@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-01__neutral__skill__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "Trace the data across each boundary and find the first place the weather result disappears. The tool running fine only proves the first hop works.\n\n**1. Is the result reaching the application?**\nLog the raw tool return. If it's empty, `None`, or an unawaited coroutine/promise, the fix is in the tool wrapper.\n\n**2. Is the application sending the result back to the model? (most common cause)**\nAfter a tool call, the application must make a second model call that includes:\n- the assistant message containing the tool call, and\n- a tool-result message with the matching `tool_call_id` / `tool_use_id` and the data.\n\nCommon bugs:\n- The loop ends after the tool call and returns the pre-tool text.\n- The result is appended to a local variable or log but not to the `messages` list.\n- The `tool_call_id` doesn't match, or the role/type is wrong, so the result is dropped or errors silently.\n- The result is a non-string object (dict, bytes) that is serialized badly, such as `[object Object]` or an empty string.\n- The final response is taken from the first model response, not the one after the tool result.\n\n**3. Did the model receive it but ignore it?**\nLog the exact payload of the second model call. If the weather data is in it and the answer still omits it, then it's a prompt or format issue:\n- The result is huge or deeply nested, with the useful fields buried.\n- The system prompt constrains the output format in a way that excludes it.\n- The tool returns cryptic codes or an error-shaped payload (e.g. `{\"status\": \"ok\"}` with no data).\n\n**4. Is the final answer being dropped on the way out?**\nCheck that the app returns the last assistant message's text, not just the first content block. With streaming, make sure the post-tool turn is consumed too.\n\n**Quickest diagnosis:** print the full `messages` array right before the final model call.\n- Tool result missing \u2192 application bug (step 2).\n- Present but unused \u2192 payload shape or prompt (step 3).\n- Final text correct but not shown \u2192 output handling (step 4).\n\n**Verify the fix:** ask for the weather in a city with a known value, confirm the value appears in the final answer, then force a tool failure and confirm the agent reports the error instead of making something up.\n\nIf you share the loop code that handles the tool call and the message list at the second model call, I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 821,
+      "cacheReadInputTokens": 3307,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0085447,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 75,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3307,
+    "output_tokens": 821,
+    "output_tokens_details": {
+      "thinking_tokens": 75
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 821,
+        "cache_read_input_tokens": 3307,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0085447,
+  "duration_ms": 8767
+}

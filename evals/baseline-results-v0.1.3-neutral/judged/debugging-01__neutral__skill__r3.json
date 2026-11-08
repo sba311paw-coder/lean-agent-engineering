@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__skill__r3",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Step 1 \"Read the actual failure\" and step 5 \"smallest repro\" advise reading the failure and reproducing it, but the response didn't itself read or reproduce anything (no tool use, says it can't see the code), so it only gives guidance.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 2 \"Check the change first\" says to review the diff with `git diff`/`git log -p` and lists usual suspects; step 4 compares against a known-good state.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Step 3 \"Log at each boundary\" traces request, raw model response, parsed call, tool return, and message sent back; it also enumerates the flow stages (schema, request, parsing, dispatch, result handling, loop control).",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Step 5 \"Test one hypothesis at a time\" with a smallest repro, fix the root cause not workarounds, and re-trace if fixes fail; step 4 revert-and-bisect also frames testable hypotheses before fixing.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.011118
+}

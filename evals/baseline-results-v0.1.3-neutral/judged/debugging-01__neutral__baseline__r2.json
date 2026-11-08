@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r2",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Section 3 says to log raw request/response and get the actual error, and asks the user to paste the error, but it never directly says to reproduce the failure first, and it puts this last.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1 says to revert or stash the change, use `git diff` or `git bisect`, and skim the diff. It also suggests checking lockfile diffs for SDK upgrades.",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "It walks through the whole flow: tool definitions, the request payload, response parsing of tool_use blocks, the tool_result round trip, conversation history, and the dispatch layer.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "It gives a ranked list of likely causes (\"usual suspects\") and says to isolate by reverting, but it does not frame an explicit testable hypothesis to form before fixing. It leans toward a checklist and asking for more information.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.010548
+}

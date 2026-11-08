@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States \"A two-function agent on the model API directly is already about as simple as an agent gets\" and \"With two functions, you probably have no gap yet,\" assessing the actual scale and need.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Says \"Doing nothing is a valid decision,\" suggests a thin own wrapper may suffice for provider switching, and if migrating, \"keep it small\" and \"Replace only the glue.\"",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Table maps concrete needs (provider switching, tracing/retries/streaming, persistence/human approval, many or changing tools) to when a framework pays off, and says \"Migrate when you can name a concrete capability you're missing.\"",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010654
+}

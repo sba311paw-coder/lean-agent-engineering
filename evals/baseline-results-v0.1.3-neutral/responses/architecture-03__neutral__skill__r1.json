@@ -1,0 +1,66 @@
+{
+  "key": "architecture-03__neutral__skill__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I'm building a small Python AI agent for my own use. It answers questions and calls two existing Python functions. What architecture and tools should I use?",
+  "response": "# Recommended: a single tool-calling loop\n\nFor one agent with two existing Python functions, you don't need a framework, MCP server, or multi-agent setup. The provider SDK's native tool calling plus a ~30-line loop covers it.\n\n## Architecture\n\n```\nYou -> your Python app (loop) -> LLM -> tool call request\n                  ^                          |\n                  |                          v\n              tool result  <-  your app validates + runs func_a / func_b\n```\n\n- **LLM**: interprets the question and decides whether to call a function.\n- **Your app**: validates arguments, runs the function, handles errors, and caps the number of steps.\n- **Your functions**: do the actual work, unchanged.\n\n## Tools\n\n- The `anthropic` SDK (or `openai`, if you prefer), with API key in an environment variable.\n- Your two existing functions, imported directly.\n- Nothing else to start with.\n\n## Sketch\n\n```python\nimport anthropic\nfrom my_funcs import func_a, func_b   # your existing functions\n\nclient = anthropic.Anthropic()        # reads ANTHROPIC_API_KEY\nMODEL = \"your-chosen-model\"\n\nTOOLS = [\n    {\"name\": \"func_a\", \"description\": \"What func_a does and when to use it\",\n     \"input_schema\": {\"type\": \"object\",\n                      \"properties\": {\"x\": {\"type\": \"string\"}},\n                      \"required\": [\"x\"]}},\n    {\"name\": \"func_b\", \"description\": \"What func_b does and when to use it\",\n     \"input_schema\": {\"type\": \"object\",\n                      \"properties\": {\"n\": {\"type\": \"integer\"}},\n                      \"required\": [\"n\"]}},\n]\nREGISTRY = {\"func_a\": func_a, \"func_b\": func_b}   # allowlist\n\ndef run(question, max_steps=8):\n    messages = [{\"role\": \"user\", \"content\": question}]\n    for _ in range(max_steps):\n        resp = client.messages.create(\n            model=MODEL, max_tokens=1024, tools=TOOLS, messages=messages)\n        messages.append({\"role\": \"assistant\", \"content\": resp.content})\n        if resp.stop_reason != \"tool_use\":\n            return \"\".join(b.text for b in resp.content if b.type == \"text\")\n\n        results = []\n        for b in resp.content:\n            if b.type == \"tool_use\":\n                try:\n                    out, is_err = str(REGISTRY[b.name](**b.input)), False\n                except Exception as e:\n                    out, is_err = f\"error: {e}\", True\n                results.append({\"type\": \"tool_result\", \"tool_use_id\": b.id,\n                                \"content\": out, \"is_error\": is_err})\n        messages.append({\"role\": \"user\", \"content\": results})\n    raise RuntimeError(\"Step limit reached\")\n```\n\n## Design points worth keeping\n\n- **Clear tool descriptions and schemas** matter most. They are how the model knows when and how to call each function.\n- **Allowlist registry**: only the two named functions can ever run.\n- **Step cap and error passthrough**: prevents runaway loops and lets the model see failures instead of guessing.\n- **Side effects**: if either function deletes, sends, pays, or writes something important, add a confirmation prompt in your app code before executing. Don't rely on the model's decision as permission.\n\n## What to skip (for now)\n\nLangChain/LlamaIndex, MCP servers, vector databases, and multi-agent orchestration. Add one only when you hit a concrete gap, such as needing document search, persistent memory, or tools shared across several apps.\n\n## Verify it works\n\n1. Ask a question that should trigger `func_a`, and check the output matches calling it directly.\n2. Do the same for `func_b`.\n3. Ask something needing no tools and confirm it answers directly.\n4. Force a function to raise an exception and confirm the agent reports the failure rather than claiming success.\n\nIf you tell me what the two functions do (and whether they have side effects), I can tighten the tool schemas and safeguards.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 2104,
+      "cacheReadInputTokens": 3304,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0213744,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 813,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3304,
+    "output_tokens": 2104,
+    "output_tokens_details": {
+      "thinking_tokens": 813
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2104,
+        "cache_read_input_tokens": 3304,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0213744,
+  "duration_ms": 14430
+}

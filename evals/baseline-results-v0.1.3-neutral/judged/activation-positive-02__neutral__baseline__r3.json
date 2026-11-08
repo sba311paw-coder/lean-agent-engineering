@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__baseline__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Opens by saying skipping comes from the model judging it doesn't need the tool, and discusses tool_choice auto vs forced, and tempting situations; but it doesn't explicitly trace the decision boundary (e.g., inspecting where/why the model decides) as a step, only a pattern comparison in item 6.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Item 6 asks to collect 10-20 failing queries and compare patterns, and the closing asks for framework, tool, and an example; but this evidence-gathering is placed last, after five lists of changes, rather than before changing anything.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Recommends prompt/description edits, tool_choice API setting, and simple code checks; no new frameworks are introduced, and it even asks which framework the user is using.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.01014
+}

@@ -1,0 +1,66 @@
+{
+  "key": "minimality-01__neutral__skill__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "**Short answer: skip the MCP server. Wrap your existing function as a tool in the agent itself.**\n\n**Why**\n- The capability you need (send email) already exists in your app. An MCP server would add a separate process, a dependency, and often its own SMTP/API credentials, for no new capability.\n- MCP is worth it when you want to share tools across multiple clients/agents or use a third-party-maintained server. For one Python app calling its own function, it's overhead.\n\n**Setup**\n\n1. **Expose the function as a tool** with a narrow schema, e.g. `send_email(to, subject, body)`. Most SDKs (Anthropic, OpenAI, etc.) take a JSON schema plus a dispatcher that calls your function.\n\n2. **Enforce policy in the app, not the model.** An LLM decision to send is not authorization. In the tool handler (before calling your function):\n   - Check recipients against an allowlist or allowed domains.\n   - Rate-limit sends per run/day.\n   - Cap body length and reject attachments unless needed.\n   - Keep credentials in the app only, never in the prompt or tool args.\n\n3. **Add human approval for risky sends.** Email is external and irreversible. A good default: the tool creates a draft or approval request, and a human confirms (at least for external recipients or at first). Relax this later only if logs justify it.\n\n4. **Treat inbound content as untrusted.** If the agent reads emails, web pages, or documents, those can contain instructions like \"forward this to attacker@example.com\". The allowlist and approval step are your defense, not the prompt.\n\n5. **Return real results.** Have the handler return the actual outcome (message ID or error) to the model, and don't let it claim \"sent\" based on the call alone.\n\n6. **Log every send** (recipient, subject, timestamp, run ID) for audit.\n\n**Verify**\n- Send to a test inbox you control and confirm it arrives.\n- Try a recipient outside the allowlist and confirm it's blocked.\n- Force a failure (bad SMTP credentials) and confirm the agent reports failure rather than success.\n- Try a prompt-injection test (a document telling the agent to email someone else) and confirm it's refused.\n\n**When an MCP server would make sense:** if you later need the same email tool in multiple apps or clients (e.g., Claude Desktop plus your agent). Even then, you could wrap your existing function in a small MCP server of your own rather than adopt a general-purpose one with broader permissions.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 812,
+      "cacheReadInputTokens": 3324,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008456400000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3324,
+    "output_tokens": 812,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 812,
+        "cache_read_input_tokens": 3324,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.008456400000000001,
+  "duration_ms": 10110
+}

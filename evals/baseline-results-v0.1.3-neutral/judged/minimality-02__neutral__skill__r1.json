@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Start with whether you need to migrate\" and notes a two-function direct-API agent is already simple; assesses actual complexity and need before recommending anything.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends staying on the direct API for two functions; if migrating, \"keep it small\", swap only the model call, and use a plain loop as the lightest orchestration instead of a prebuilt agent.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists specific gaps that justify migrating: provider switching, tracing/retries/memory, growth to many tools or branching workflows, team standardization; and says to migrate only if one applies.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.00999
+}

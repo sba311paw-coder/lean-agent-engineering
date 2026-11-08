@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__skill__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "States the existing function already sends email, so MCP adds no capability; identifies what's actually missing as exposing it to the agent as a tool plus policy/approval guardrails (allowlist, human approval, error reporting).",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"expose that function directly to the agent as a tool\"; the sketch calls `send_email(to, subject, body)  # your existing function` inside the tool handler.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with \"you probably don't need an MCP server\", lists the costs (separate process, dependency, credentials), and limits MCP to cases like sharing across multiple clients or needing process isolation.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010931999999999999
+}

@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-03__neutral__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "# Improving grounding in a RAG agent\n\nFind which stage is failing before changing anything. Poor grounding usually comes from retrieval, not the model.\n\n## 1. Diagnose first\n\nTake 20-50 real bad answers and, for each, check in order:\n\n1. **Was the right content in the corpus?** If not, it's an ingestion problem.\n2. **Was it retrieved in the top-k?** If not, it's a retrieval problem.\n3. **Was it in the prompt, in readable form?** If not, it's a context assembly problem.\n4. **Did the model use it faithfully?** If not, it's a generation problem.\n\nTally the failures by stage and fix the biggest bucket first. Without this, you're guessing.\n\n## 2. Fixes by stage (simplest first)\n\n**Ingestion and chunking**\n- Chunk along document structure (headings, sections, paragraphs) rather than fixed character counts. Add modest overlap.\n- Attach metadata (title, section, source, date) to each chunk and include it in the text that gets embedded.\n- Clean parsing artifacts (PDF headers/footers, broken tables, OCR noise). Bad parsing is a common hidden cause.\n\n**Retrieval**\n- Inspect actual retrieved chunks for failing queries. Often the fix is obvious.\n- Add **hybrid search** (BM25 + vectors). It helps with exact terms, IDs, and names that embeddings miss.\n- Add a **reranker** over a wider candidate set (e.g., retrieve 30, rerank to 5).\n- Rewrite or decompose the query when users ask vague or multi-part questions.\n- Use a similarity threshold so the agent gets *nothing* rather than irrelevant chunks.\n- Confirm the same embedding model is used for indexing and querying.\n\n**Context assembly**\n- Fewer, better chunks beat more chunks. Irrelevant context invites the model to blend in its own knowledge.\n- Label each chunk with an ID and source so it can be cited.\n- Deduplicate near-identical chunks.\n\n**Generation**\n- Instruct the model to answer only from the provided sources, to cite chunk IDs, and to say \"not found in the documents\" when the context doesn't support an answer.\n- Require quotes or citations for key claims.\n- Treat retrieved text as data, not instructions. Documents can contain prompt injection, so the agent application, not the document, should control which tools get called.\n\n**Verification in the application**\n- Check that cited IDs actually exist in the retrieved set.\n- Optionally run a cheap entailment or \"is each claim supported by the cited text?\" check, and flag or retry unsupported answers.\n\n## 3. Measure it\n\n- Build a small eval set of real questions with the expected source passages.\n- Track **retrieval recall@k** (was the right chunk retrieved?) separately from **faithfulness** (is the answer supported by the retrieved text?).\n- Change one thing at a time and re-run the set. Only keep changes that move a metric.\n\n## 4. What to avoid\n\n- Don't add a framework, extra agent, or new vector DB until the diagnosis shows the current one is the limit.\n- Don't rewrite prompts to fix what is really a retrieval miss.\n\nIf you share your chunking setup, embedding model, top-k, and a couple of example failures with the retrieved chunks, I can help pinpoint which stage is failing.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1193,
+      "cacheReadInputTokens": 3302,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0122642,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 81,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3302,
+    "output_tokens": 1193,
+    "output_tokens_details": {
+      "thinking_tokens": 81
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1193,
+        "cache_read_input_tokens": 3302,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0122642,
+  "duration_ms": 12427
+}

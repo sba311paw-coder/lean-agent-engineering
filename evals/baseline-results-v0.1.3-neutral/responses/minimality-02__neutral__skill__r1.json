@@ -1,0 +1,66 @@
+{
+  "key": "minimality-02__neutral__skill__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "## Start with whether you need to migrate\n\nA small agent that calls two functions through the model API directly is already simple. LangChain adds a dependency, an abstraction layer, and more to debug, so migrate only if you have a specific gap, such as:\n\n- Switching between model providers without rewriting code\n- Needing built-in tracing/observability, retries, or memory/checkpointing\n- Growing from 2 tools to many, or to multi-step or branching workflows\n- Your team already standardizing on LangChain/LangGraph\n\nIf none of these apply, **not migrating is a valid decision**. The model provider's SDK already supports tool calling natively.\n\n## If you do migrate, keep it small\n\n1. **Lock in current behavior first.** Write 2-3 tests or saved input/output examples from the existing agent: one per function, plus one case where the model calls neither or both. They are your proof the migration didn't change behavior.\n\n2. **Keep your functions unchanged.** Wrap them as tools with the `@tool` decorator (from `langchain_core.tools`). Give each a clear docstring and type hints, since LangChain uses them to build the tool schema the model sees.\n\n3. **Swap only the model call.** Use the provider's LangChain package (e.g., `langchain-anthropic` or `langchain-openai`), create the chat model, and attach tools with `.bind_tools([...])`.\n\n4. **Choose the lightest orchestration.**\n   - For a fixed \"call two functions and return results\" flow, a plain loop is enough: invoke the model, execute any returned tool calls in your code, append `ToolMessage` results, and invoke again.\n   - Use a prebuilt agent (LangGraph's `create_react_agent` or the current LangChain agent constructor) only if you want the framework to manage the loop. Check the current docs, since this API has changed repeatedly.\n\n5. **Keep validation and authorization in your code.** The model's tool call is a request, not permission. If either function has side effects (writes, deletes, sends, spends), enforce argument validation and approval inside the tool or application, not in the prompt.\n\n6. **Verify against the baseline.** Rerun your saved cases on both versions and compare the tool calls made, arguments passed, and final output. Also force a tool failure (raise an exception in one function) and confirm the agent reports it instead of claiming success.\n\n7. **Migrate in one step and keep the old version.** Keep the old code in version control (your directory isn't a git repo yet, so run `git init` and commit first) so you can roll back easily.\n\n## Recommendation\n\nFor two functions, I'd stay on the direct API until you hit one of the gaps above. If your goal is learning LangChain, migrating is fine, but treat it as a learning exercise and keep the baseline tests so you can tell whether the framework actually improved anything.\n\nIf you share the current code, I can suggest a specific minimal diff.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1058,
+      "cacheReadInputTokens": 3323,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0109163,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 120,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3323,
+    "output_tokens": 1058,
+    "output_tokens_details": {
+      "thinking_tokens": 120
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1058,
+        "cache_read_input_tokens": 3323,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0109163,
+  "duration_ms": 9335
+}

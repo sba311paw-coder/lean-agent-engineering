@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-03__original__skill__r2",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "Retrieval-augmented generation (RAG) is a technique where a language model is given relevant information retrieved from an external source at the time it answers, instead of relying only on what it learned during training.\n\n**How it works**\n\n1. **Indexing (done ahead of time):** Documents such as manuals, wikis, or support tickets are split into chunks. Each chunk is converted into an embedding (a numeric vector that captures its meaning) and stored in a vector database or search index.\n2. **Retrieval:** When a user asks a question, the question is also embedded, and the system finds the chunks most similar to it. Keyword search or a hybrid of both is sometimes used too.\n3. **Augmentation:** The retrieved chunks are inserted into the prompt alongside the user's question.\n4. **Generation:** The model writes an answer grounded in that supplied context, often with citations to the source passages.\n\n**Why it's used**\n\n- **Fresh or private knowledge:** The model can answer from company documents or recent data it was never trained on.\n- **Fewer hallucinations:** Answers are anchored to actual source text, and can be traced back to it.\n- **Cheaper than retraining:** Updating knowledge means updating the index, not fine-tuning the model.\n- **Access control:** Different users can be given access to different document sets.\n\n**Compared with alternatives**\n\n- **Fine-tuning** changes the model's behavior or style, but is a poor way to add facts that change often.\n- **Long-context prompting** (pasting everything into the prompt) works for small document sets, but RAG scales to collections far larger than any context window.\n\n**Limitation to keep in mind:** the answer is only as good as the retrieval. If the right passage isn't retrieved, the model has nothing correct to ground on.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 569,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 578,
+      "webSearchRequests": 0,
+      "costUSD": 0.0082758,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 578,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 578,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 569,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 578,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 569,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 578,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 578
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0082758,
+  "duration_ms": 5296
+}

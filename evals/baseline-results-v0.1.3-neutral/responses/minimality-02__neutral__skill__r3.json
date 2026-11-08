@@ -1,0 +1,66 @@
+{
+  "key": "minimality-02__neutral__skill__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "## First, decide whether to migrate\n\nA two-function agent on the model API directly is already about as simple as an agent gets. LangChain adds a dependency, an abstraction layer, and version churn. Before moving, ask what you're missing:\n\n| If you need... | Then |\n|---|---|\n| Nothing specific, you just want \"a real agent framework\" | Stay as you are. Doing nothing is a valid decision. |\n| To switch between model providers easily | LangChain helps, though a thin wrapper of your own may be enough. |\n| Built-in tracing, retries, or streaming | Worth considering (LangSmith or LangGraph). |\n| Persistence, human approval steps, or multi-step workflows | LangGraph is a good fit. |\n| Many tools, or tools that change often | A framework starts to pay off. |\n\nWith two functions, you probably have no gap yet. Migrate when you can name a concrete capability you're missing.\n\n## If you do migrate, keep it small\n\n1. **Lock down current behavior first.** Save 3-5 representative inputs and the outputs your agent produces now. This is your baseline.\n2. **Leave the functions alone.** They're plain Python, so they don't need to change. Wrap them as tools (`@tool`, with type hints and docstrings, since the model reads those).\n3. **Replace only the glue.** Swap the manual loop (call model, parse tool call, run function, send result back) for LangChain's agent constructor. Check the current docs, because the API has changed across versions. Recently it's `create_agent` in `langchain.agents` with `init_chat_model`, but confirm against the version you install.\n4. **Pin the version** so an upgrade doesn't silently change behavior.\n5. **Keep authorization in your code.** If either function has side effects (writes, deletes, sends, spends), enforce permissions and validation inside the function or in your app, not in the prompt. The model choosing a tool is not authorization.\n\nA minimal sketch:\n\n```python\nfrom langchain.tools import tool\nfrom langchain.agents import create_agent\n\n@tool\ndef func_a(x: str) -> str:\n    \"\"\"What func_a does, in one clear sentence.\"\"\"\n    return original_func_a(x)\n\n@tool\ndef func_b(y: int) -> str:\n    \"\"\"What func_b does, in one clear sentence.\"\"\"\n    return original_func_b(y)\n\nagent = create_agent(\"your-model-id\", tools=[func_a, func_b])\nresult = agent.invoke({\"messages\": [(\"user\", \"your request\")]})\n```\n\n## Verify before you switch over\n\n- Run your saved baseline inputs through both versions and compare. Check that the same tools get called with the same arguments, not just that the final text looks similar.\n- Force a failure (a function raising an exception, a bad argument) and confirm the new agent reports it rather than claiming success.\n- Compare latency and token usage. Framework wrappers sometimes add extra calls.\n\nKeep the old version until the new one matches the baseline, so you can roll back easily.\n\nIf you tell me what's driving the move (provider flexibility, tracing, more tools coming), I can say whether LangChain, LangGraph, or staying put is the better fit.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1267,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 625,
+      "webSearchRequests": 0,
+      "costUSD": 0.0154438,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 243,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 625,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 625,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 1267,
+    "output_tokens_details": {
+      "thinking_tokens": 243
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 625,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1267,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 625,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 625
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0154438,
+  "duration_ms": 14407
+}

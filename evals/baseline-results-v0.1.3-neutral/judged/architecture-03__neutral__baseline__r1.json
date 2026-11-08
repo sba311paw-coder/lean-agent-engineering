@@ -1,0 +1,39 @@
+{
+  "key": "architecture-03__neutral__baseline__r1",
+  "case_id": "architecture-03",
+  "case_number": 18,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Commits to a plain loop with no framework and shows Anthropic SDK with two functions in the registry. But it hedges on the LLM ('Anthropic, OpenAI, etc.') and invents placeholder functions rather than committing to a single concrete choice.",
+      "criterion": "Choose one Python Agent App, one LLM, and the two existing Python functions."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "The model only emits tool_use blocks; the application code looks up REGISTRY, executes the functions, handles exceptions, and caps max_steps. Orchestration stays in the app loop.",
+      "criterion": "Separate LLM decisions from application execution and orchestration."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The sketch appends the assistant content, checks stop_reason, executes tool_use blocks, builds tool_result with tool_use_id, appends as user message, and loops until a final text answer.",
+      "criterion": "Show the complete tool-result loop."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Rejects LangChain/LangGraph/multi-agent up front, with persistence and UI marked optional/later. The 'When to reach for more' section ties MCP, LangGraph, LiteLLM, and a vector store to specific requirements.",
+      "criterion": "Add infrastructure only when a concrete requirement justifies it."
+    }
+  ],
+  "score": 0.875,
+  "case_pass": false,
+  "judge_cost_usd": 0.013002
+}

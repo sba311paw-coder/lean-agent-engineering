@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-01__neutral__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "The usual cause is the application, not the model, so find the first boundary where the result goes missing.\n\n## Trace the boundaries\n\n```\nLLM \u2192 tool call \u2192 app runs tool \u2192 app appends result \u2192 app calls LLM again \u2192 final text \u2192 app returns it\n```\n\nLog the exact `messages` array sent on the **second** LLM call. That shows which of these is happening:\n\n| What you see in the log | Root cause | Fix |\n|---|---|---|\n| No second LLM call happens | The app returns the first response (often just \"Let me check the weather\u2026\") | Loop until the model stops requesting tools (`stop_reason != \"tool_use\"` or no `tool_calls`) |\n| Second call has no tool result message | The result was never appended to history | Append the assistant tool-call message and then the tool result |\n| Tool result is present but mismatched | Wrong role, or `tool_use_id` / `tool_call_id` doesn't match the call | Echo back the exact ID from the model's tool call |\n| Result content is `\"\"`, `None`, `[object]`, or a coroutine | Serialization or missing `await` | Return a string or JSON (`json.dumps(result)`) and await async tools |\n| Result is correct in the second call, but the output lacks it | You're reading the wrong part of the response (e.g., only `content[0]`, or the pre-tool text block) | Concatenate all text blocks from the **final** response |\n| Everything is correct but the model ignores it | The system prompt conflicts, or the result is huge or truncated | Fix the prompt, and trim or format the tool output |\n\n## Minimal correct loop (Anthropic-style)\n\n```python\nmessages = [{\"role\": \"user\", \"content\": user_input}]\n\nwhile True:\n    resp = client.messages.create(model=MODEL, tools=tools, messages=messages, max_tokens=1024)\n\n    if resp.stop_reason != \"tool_use\":\n        break\n\n    messages.append({\"role\": \"assistant\", \"content\": resp.content})  # includes the tool_use block\n\n    results = []\n    for block in resp.content:\n        if block.type == \"tool_use\":\n            out = run_tool(block.name, block.input)   # validate and check permissions here\n            results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": block.id,              # must match\n                \"content\": json.dumps(out),           # must be a string or content blocks\n            })\n    messages.append({\"role\": \"user\", \"content\": results})\n\nfinal_text = \"\".join(b.text for b in resp.content if b.type == \"text\")\n```\n\nThe most common bugs are leaving out the `while` loop, or skipping the `messages.append` of the assistant turn and the tool result.\n\n## Verify\n\n1. Log the second request and confirm it contains the tool result with a matching ID.\n2. Ask for the weather in a city where you know the answer, and confirm the final text includes the returned values.\n3. Force the tool to fail, for example by raising an error, and confirm the agent reports the failure instead of inventing data.\n\nIf you share the loop code and the logged messages from the second call, I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1356,
+      "cacheReadInputTokens": 3307,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0138947,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 373,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3307,
+    "output_tokens": 1356,
+    "output_tokens_details": {
+      "thinking_tokens": 373
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1356,
+        "cache_read_input_tokens": 3307,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0138947,
+  "duration_ms": 11574
+}

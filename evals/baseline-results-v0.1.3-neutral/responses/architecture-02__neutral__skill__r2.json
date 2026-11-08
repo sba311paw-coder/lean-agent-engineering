@@ -1,0 +1,66 @@
+{
+  "key": "architecture-02__neutral__skill__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "The tool working and being logged only proves the tool boundary is fine. The likely fault is between the tool result and the model's final call, so check what the model actually received.\n\n## Step 1: Log the exact request sent to the LLM for the final turn\n\nDump the full `messages` array right before the second model call, not the tool's output. It should contain, in order:\n\n1. The user message.\n2. The assistant message containing the tool call.\n3. The tool result message, linked to that call by ID.\n\nWherever the temperature is missing, you've found the first wrong boundary.\n\n## Step 2: Common causes\n\n| Symptom in the payload | Fix |\n|---|---|\n| No tool result message at all | Append the result to the same list you pass to the next call. A common bug is building a new list or discarding the updated one. |\n| Result present but wrong role or format | Use your API's format: OpenAI-style needs `role: \"tool\"` with a matching `tool_call_id`. Anthropic-style needs a `tool_result` block with the matching `tool_use_id` inside a user message. |\n| Assistant tool-call message missing | Append the assistant's tool-call turn before the result. Some APIs reject or ignore orphaned results. |\n| Result content is empty or garbled | Serialize it explicitly (`json.dumps(result)` or a plain string). Watch for `None`, an unawaited coroutine, or an object repr. |\n| Payload is correct | The final answer comes from a different path (see below). |\n\nAnthropic-style example:\n\n```python\nmessages.append({\"role\": \"assistant\", \"content\": response.content})\nmessages.append({\n    \"role\": \"user\",\n    \"content\": [{\n        \"type\": \"tool_result\",\n        \"tool_use_id\": tool_use_block.id,\n        \"content\": json.dumps(result),\n    }],\n})\nfinal = client.messages.create(model=..., tools=tools, messages=messages)\n```\n\n## Step 3: If the payload is correct\n\n- **Wrong response returned:** your code may return the first response's text, a fallback, or a cached or streamed answer instead of the post-tool one.\n- **Loop exits early:** the loop may stop before the model gets its post-tool turn.\n- **Prompt conflict:** the system prompt may push toward generic answers, for example \"answer briefly\" or \"don't state specifics\". Test with a minimal system prompt.\n- **Buried result:** a very large or noisy tool result can be overlooked. Return only the fields needed, such as `{\"city\": \"...\", \"temp_c\": 18, \"conditions\": \"cloudy\"}`.\n\n## Step 4: Verify\n\n- Make the tool return a distinctive fake value (for example `temp_c: 37.4`) and confirm the final answer contains it.\n- Then make the tool fail and confirm the agent reports the failure rather than giving a generic reply.\n\nIf you paste the code that runs the tool call and the next model call (or the sanitized final-turn `messages` payload), I can point to the exact line. Please redact any API keys first.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1694,
+      "cacheReadInputTokens": 3308,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0172748,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 732,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3308,
+    "output_tokens": 1694,
+    "output_tokens_details": {
+      "thinking_tokens": 732
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1694,
+        "cache_read_input_tokens": 3308,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0172748,
+  "duration_ms": 16700
+}

@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-03__original__baseline__r1",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "# Retrieval-Augmented Generation (RAG)\n\n**RAG** is a technique that improves a large language model's (LLM) answers by letting it look up relevant information from an external knowledge source *before* generating a response, rather than relying only on what it learned during training.\n\n## How it works\n\n1. **Indexing (offline):** Documents (PDFs, wikis, databases, web pages) are split into chunks, converted into vector embeddings, and stored in a vector database or search index.\n2. **Retrieval:** When a user asks a question, the query is embedded and used to find the most semantically similar chunks (often combined with keyword search like BM25, and sometimes reranked).\n3. **Augmentation:** The retrieved chunks are inserted into the model's prompt as context.\n4. **Generation:** The LLM writes an answer grounded in that context, ideally citing the sources.\n\n## Why use it\n\n- **Fresher knowledge:** Access information newer than the model's training cutoff.\n- **Fewer hallucinations:** Answers are anchored to real documents.\n- **Private/domain data:** Use internal company docs without retraining the model.\n- **Traceability:** You can show citations so users can verify claims.\n- **Cheaper than fine-tuning:** Updating knowledge means updating the index, not the model.\n\n## Common challenges\n\n- **Retrieval quality:** If the wrong chunks are retrieved, the answer suffers (\"garbage in, garbage out\").\n- **Chunking choices:** Chunks that are too small lose context; too large dilute relevance.\n- **Context limits and cost:** Too much retrieved text increases latency and expense.\n- **Evaluation:** You need to measure both retrieval accuracy and answer faithfulness.\n- **Security:** Retrieved documents can contain prompt injection or sensitive data requiring access controls.\n\n## Common variations\n\n- **Hybrid search:** Vector plus keyword retrieval.\n- **Reranking:** A second model reorders results for relevance.\n- **Agentic RAG:** The model decides when and what to search, possibly over multiple steps.\n- **GraphRAG:** Uses knowledge graphs to capture relationships between entities.\n\n## Simple example\n\n> User: \"What's our refund policy for annual plans?\"\n> The system searches the company's policy docs, finds the relevant section, passes it to the LLM, and the LLM answers using that exact text.\n\nIf you'd like, I can go deeper on any part, such as chunking strategies, choosing a vector database, or a minimal code example.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 827,
+      "cacheReadInputTokens": 650,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008339000000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 650,
+    "output_tokens": 827,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 827,
+        "cache_read_input_tokens": 650,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.008339000000000001,
+  "duration_ms": 6974
+}

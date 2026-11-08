@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-03__original__skill__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "Retrieval-augmented generation (RAG) is a technique where a language model is given relevant information retrieved from an external source at the time it answers, rather than relying only on what it learned during training.\n\n**How it works**\n\n1. **Index:** Documents (manuals, wikis, support tickets, etc.) are split into chunks and converted into numerical vectors (embeddings) that capture meaning. These are stored in a vector database or search index.\n2. **Retrieve:** When a user asks a question, the question is embedded the same way, and the system finds the chunks most similar to it. Keyword search or a hybrid of both is also common.\n3. **Augment:** The retrieved chunks are inserted into the model's prompt alongside the question.\n4. **Generate:** The model writes an answer grounded in that supplied context, often with citations back to the source passages.\n\n**Why it's used**\n\n- **Fresh or private knowledge:** The model can answer about data it was never trained on, such as internal documents or recent events.\n- **Fewer hallucinations:** Answers are anchored to actual text, and can be traced to sources.\n- **Cheaper than retraining:** Updating knowledge means updating the index, not fine-tuning the model.\n- **Access control:** Different users can be limited to different documents at retrieval time.\n\n**Contrast with fine-tuning**\n\nFine-tuning changes the model's weights and is best for teaching style, format, or behavior. RAG supplies facts at query time and is better for knowledge that changes or must be attributed.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 490,
+      "cacheReadInputTokens": 3276,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0052315999999999994,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3276,
+    "output_tokens": 490,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 490,
+        "cache_read_input_tokens": 3276,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0052315999999999994,
+  "duration_ms": 4320
+}

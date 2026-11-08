@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__baseline__r3",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Step 1 distinguishes between always calling both functions vs. model-chosen tools, which touches on actual requirements. But it then assumes the second case and proceeds to the full agent migration without evaluating whether a small two-function script warrants it.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Mentions plain runnables for the deterministic case and 'Keep tools thin', but never suggests staying with the direct API or a simple loop; the main path is a full LangChain migration.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "FAIL",
+      "evidence": "Never lists evidence or conditions that would justify adding a framework. Step 6 lists features available after migrating, but does not say what needs (multi-step workflows, many tools, provider swapping, tracing) would warrant adopting LangChain.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 0.3333333333333333,
+  "case_pass": false,
+  "judge_cost_usd": 0.011137999999999999
+}

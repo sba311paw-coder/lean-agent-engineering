@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__skill__r2",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Lays out the flow explicitly: \"LLM \u2192 tool call \u2192 app runs tool \u2192 app appends result \u2192 app calls LLM again \u2192 final text \u2192 app returns it\" and gives a loop example.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with \"The usual cause is the application, not the model\"; the table separates app-side failures (no second call, result not appended, ID mismatch) from model-side ones (\"model ignores it\"), and the code comments distinguish what the model emits (tool_use block) from what the app runs (run_tool).",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "The table enumerates distinct failure boundaries: no second call, result not appended, ID/role mismatch, serialization/await, wrong response part read, model ignoring or prompt conflict.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PASS",
+      "evidence": "Says to \"find the first boundary where the result goes missing\" and to log the messages array on the second LLM call before choosing a fix; the table is keyed by what the log shows, and it ends by asking for the loop code and logs.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011444
+}

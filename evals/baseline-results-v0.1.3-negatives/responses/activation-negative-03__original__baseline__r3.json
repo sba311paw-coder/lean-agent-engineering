@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-03__original__baseline__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "What is retrieval augmented generation (RAG)?",
+  "response": "**Retrieval-Augmented Generation (RAG)** is a technique that improves a large language model's answers by fetching relevant information from an external source and giving it to the model as context before it generates a response.\n\n## How it works\n\n1. **Indexing (offline):** Documents (PDFs, web pages, wikis, databases) are split into chunks, converted into vector embeddings, and stored in a vector database or search index.\n2. **Retrieval:** When a user asks a question, the query is embedded and used to find the most relevant chunks, often via semantic similarity, keyword search (BM25), or a hybrid of both.\n3. **Augmentation:** The retrieved chunks are inserted into the prompt alongside the user's question.\n4. **Generation:** The LLM writes an answer grounded in that supplied context, ideally citing the sources.\n\n## Why use it\n\n- **Fresher knowledge:** Models have a training cutoff; RAG lets them use up-to-date information.\n- **Private/domain data:** Access company docs or specialized content the model never saw in training.\n- **Fewer hallucinations:** Answers are anchored to retrieved text and can be verified via citations.\n- **Cheaper than fine-tuning:** Updating knowledge means updating the index, not retraining the model.\n- **Access control:** You can restrict retrieval based on user permissions.\n\n## Common challenges\n\n- **Retrieval quality:** If the wrong chunks are retrieved, the answer will be poor. Chunking strategy, embedding choice, and reranking matter a lot.\n- **Context limits and noise:** Too much or irrelevant context can confuse the model.\n- **Multi-hop questions:** Questions requiring information from several documents are harder.\n- **Evaluation:** You need to measure both retrieval (recall/precision) and answer faithfulness.\n\n## Common improvements\n\n- Hybrid search (vector + keyword)\n- Reranking with a cross-encoder\n- Query rewriting or decomposition\n- Metadata filtering\n- Agentic RAG, where the model decides when and what to retrieve, possibly over multiple steps\n\n## Simple example\n\nA support chatbot gets the question \"What's your refund policy for annual plans?\" The system searches the company's policy docs, retrieves the relevant paragraphs, and passes them to the LLM with the question. The LLM then answers using the actual policy text rather than guessing.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 780,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 650,
+      "webSearchRequests": 0,
+      "costUSD": 0.010404,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 650,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 650,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 780,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 650,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 780,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 650,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 650
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010404,
+  "duration_ms": 9830
+}

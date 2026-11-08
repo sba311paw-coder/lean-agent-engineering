@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__skill__r3",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Gives a clear definition, a step-by-step explanation (index, retrieve, augment, generate), benefits, and a contrast with fine-tuning.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Treats it as a conceptual question; no debugging, error-hunting, or tool use for investigating code or the environment.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.006828
+}

@@ -1,0 +1,33 @@
+{
+  "key": "debugging-02__neutral__baseline__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Switching embedding models is often not the fix\" and advises diagnosing first; though it lists candidate models, it conditions them on diagnosis.",
+      "criterion": "Do not immediately replace the embedding model."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Covers retrieval (right chunk in top-k, chunking, hybrid, reranker, query rewriting), context construction (context ordering/overload, chunk context), and generation (prompt, model choice).",
+      "criterion": "Trace retrieval, context construction, and generation."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Recommends checking bad answers for retrieved chunks, building a 50-100 question eval set, measuring recall@k/MRR, and asks the user for examples of wrong answers with retrieved content.",
+      "criterion": "Collect evidence first."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009466
+}

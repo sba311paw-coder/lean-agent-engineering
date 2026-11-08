@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__baseline__r1",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Opens with \"For an agent with two functions, the migration is small\" and asks what's needed, but it doesn't really question whether the agent's actual complexity (two functions, return results) warrants a framework; it largely assumes migration.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Says \"staying on the raw API is fine\" if none of the benefits matter, but immediately leans toward migrating (\"migrating now while it's small is cheap\") and then provides a full migration plan rather than recommending the simpler approach.",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Lists LangChain benefits (tracing, model swapping, memory, branching, human-in-the-loop) and says to migrate \"if you expect to grow\", which hints at justifications, but doesn't clearly frame them as evidence/triggers that should be observed before adding a framework.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.011074
+}

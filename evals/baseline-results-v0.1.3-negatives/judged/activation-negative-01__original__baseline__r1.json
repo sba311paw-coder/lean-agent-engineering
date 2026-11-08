@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-01__original__baseline__r1",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Gives a clear, structured educational explanation: definition, how it works, capabilities, limitations, examples, and a summary.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "No debugging workflow, no tool use, no exploring the directory or git repo; just a direct explanation. The mention of debugging code is only as a capability.",
+      "criterion": "Do not automatically apply an engineering debugging workflow."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.006869999999999999
+}

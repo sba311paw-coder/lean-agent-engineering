@@ -1,0 +1,33 @@
+{
+  "key": "security-03__neutral__skill__r3",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Recommends a dedicated read-only role with SELECT only on needed tables/views, column-limiting views, timeouts, and row limits.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens by advising against admin credentials: \"admin access grants far more than that\"; says to avoid admin for real customer data.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Restricts via GRANT SELECT on specific objects, read-only transactions, read replica, predefined queries, and verification that writes and ungranted reads are denied.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.010052
+}

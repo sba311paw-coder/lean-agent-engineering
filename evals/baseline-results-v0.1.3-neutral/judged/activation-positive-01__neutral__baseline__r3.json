@@ -1,0 +1,39 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r3",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Lays out the agent loop: model call, tool_use, execute tool, append tool_result, call model again, extract final text. Shows the architecture in code.",
+      "criterion": "Trace the agent architecture."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Implicitly separates the model's tool_use/stop_reason from the app's tool execution and message appending, and notes the prompt may make the model skip summarizing. It never explicitly frames LLM decisions versus app execution.",
+      "criterion": "Distinguish LLM decisions from Agent App execution."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Lists several failure boundaries: result not returned to model, wrong extraction, malformed tool_result, early loop exit, framework settings, prompt. The final debugging step splits 'loop' from 'extraction'.",
+      "criterion": "Identify possible failure boundaries."
+    },
+    {
+      "n": 4,
+      "verdict": "PARTIAL",
+      "evidence": "Gives a 'Quick debugging step' (print messages before last call) and asks for code, but mostly lists likely fixes up front rather than investigating first.",
+      "criterion": "Investigate before proposing a fix."
+    }
+  ],
+  "score": 0.75,
+  "case_pass": false,
+  "judge_cost_usd": 0.010974000000000001
+}

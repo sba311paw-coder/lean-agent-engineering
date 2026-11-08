@@ -1,0 +1,66 @@
+{
+  "key": "architecture-02__neutral__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "When the tool runs and logs the right value but the final answer is generic, the result usually isn't reaching the model in the form it expects. The common causes, roughly in order of likelihood:\n\n**1. The tool result isn't appended to the conversation**\nAfter the model emits a tool call, you must send a follow-up request that includes:\n- the assistant message containing the `tool_use` block (unmodified), and\n- a `user` message with a `tool_result` block whose `tool_use_id` matches the call's `id`.\n\nIf you log the result but never add it to `messages`, or you call the model again with only the original user prompt, the model never sees the temperature.\n\n```python\nmessages.append({\"role\": \"assistant\", \"content\": response.content})\nmessages.append({\n    \"role\": \"user\",\n    \"content\": [{\n        \"type\": \"tool_result\",\n        \"tool_use_id\": tool_use.id,\n        \"content\": str(result),   # string or content blocks\n    }],\n})\nfinal = client.messages.create(model=..., tools=tools, messages=messages)\n```\n\n**2. Wrong `tool_use_id` or message shape**\nA mismatched ID, a result placed in an `assistant` message, or the result nested incorrectly can cause an error or get ignored. Print the exact `messages` array you send on the second call and check it.\n\n**3. You're returning the first response, not the second**\nA frequent bug: the code reads `response.content[0].text` from the first response, which may contain preamble text like \"Let me check the weather,\" or a generic reply, instead of the final response after the tool result. Loop until `stop_reason != \"tool_use\"`, and read the text from that last response.\n\n**4. The result is unhelpful or malformed**\nIf the tool returns something like `None`, an object repr, an empty string, or a bare number with no context, the model may not use it. Return something explicit:\n```json\n{\"location\": \"Berlin\", \"temperature_c\": 14, \"conditions\": \"cloudy\"}\n```\n\n**5. The system prompt or instructions discourage using it**\nCheck that nothing says to answer briefly or generically. You can add: \"Use the weather tool's result in your answer and state the temperature.\"\n\n**6. Framework-specific issues**\nIf you use LangChain, LlamaIndex, the Agent SDK, etc., confirm the tool output is actually fed back (for example, that the agent executor returns intermediate steps to the model and that a custom output parser isn't discarding it).\n\n**Fastest way to debug:** log the full request payload for the second model call. If the `tool_result` with the temperature is in it and the answer is still generic, the problem is the prompt or result format (causes 4 and 5). If it's missing, it's the message handling (causes 1 to 3).\n\nIf you share the code for your tool loop (the part that handles `tool_use` and makes the follow-up call), I can point to the exact bug.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 966,
+      "cacheReadInputTokens": 682,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0097322,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 60,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 682,
+    "output_tokens": 966,
+    "output_tokens_details": {
+      "thinking_tokens": 60
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 966,
+        "cache_read_input_tokens": 682,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0097322,
+  "duration_ms": 8764
+}

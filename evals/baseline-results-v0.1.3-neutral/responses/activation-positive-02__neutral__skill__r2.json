@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-02__neutral__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "My agent sometimes calls the right tool, but sometimes skips it and answers from its own knowledge. How do I fix this?",
+  "response": "Intermittent tool skipping is usually a prompt or configuration problem at the LLM boundary, but confirm that before changing anything.\n\n## 1. Find the failing boundary\n\nCollect 10-20 runs of the same kind of request and log, for each one, the exact request sent to the model (system prompt, tool definitions, `tool_choice`) and the raw response. Then sort the runs into:\n\n- **Tool never offered**: the tool is missing from the request in some code paths, for example because of conditional registration, a context-length trim, or a schema that fails validation.\n- **Tool offered but not called**: the model chose to answer directly.\n- **Tool called but the call was dropped**: your app parsed the response wrongly, for example by reading only the text block when the response has both text and a tool call, or by hitting `max_tokens` mid-call.\n\nOnly the second case is a real \"model skipped it\" problem. The first and third are plain application bugs and are cheaper to fix.\n\n## 2. Fixes for \"offered but not called\", simplest first\n\n1. **Improve the tool description.** State when to use it, not just what it does. For example: \"Use this for any question about current order status. Do not answer from memory.\" Vague descriptions are the most common cause.\n2. **Say it in the system prompt.** Add something like \"For questions about X, you must call `lookup_x` before answering. Never answer X from memory.\"\n3. **Force it in the application when the rule is deterministic.** If a request type always needs the tool, set `tool_choice` to that tool (or to \"any\") for that step, or call the tool in code and pass the result to the model. This is the only fix that is reliable rather than probabilistic, so prefer it whenever the rule is clear.\n4. **Reduce ambiguity.** Overlapping tools, too many tools, or a question the model can plausibly answer itself all raise the skip rate. Trim or merge tools if you can.\n5. **Add a check after the response.** If the answer needs tool evidence and no tool call occurred, have the application retry once with a nudge or forced `tool_choice`, instead of trusting the answer.\n\nAvoid adding a framework or a second \"router\" agent for this. Steps 1-3 usually solve it.\n\n## 3. Verify\n\nBuild a small fixed set of test prompts (cases that need the tool, and a few that shouldn't use it) and run each several times. Measure the tool-call rate before and after each change. Change one thing at a time. If the rate on tool-required prompts isn't 100% after step 3, the bug is in the application layer, not the model.\n\nIf you share your tool definition, system prompt, and one skipped example, I can point to the likely cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 951,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 602,
+      "webSearchRequests": 0,
+      "costUSD": 0.012191800000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 98,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 602,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 602,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 951,
+    "output_tokens_details": {
+      "thinking_tokens": 98
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 602,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 951,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 602,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 602
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.012191800000000003,
+  "duration_ms": 8935
+}

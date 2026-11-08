@@ -1,0 +1,66 @@
+{
+  "key": "minimality-02__neutral__baseline__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I have a small Python agent that calls two functions and returns the results. It uses the model API directly. Since I'm building an AI agent, I'm planning to move it to LangChain. How should I do the migration?",
+  "response": "# Migrating a small tool-calling agent to LangChain\n\nI can't see your code, so this is the general path. For an agent with two functions, the migration is small.\n\n## 1. Decide whether you need it\nIf the agent is just \"call function A and B, return results,\" LangChain adds a dependency without much benefit yet. It pays off when you want:\n- Model/provider switching\n- Built-in tool-calling loops, retries, and structured output\n- Tracing (LangSmith), streaming, memory/persistence, human-in-the-loop (via LangGraph)\n\nIf you only need a couple of those, migrating is reasonable. Just go in knowing it's a convenience, not a requirement.\n\n## 2. Migration steps\n\n**a. Install**\n```bash\npip install -U langchain langchain-anthropic   # or langchain-openai, etc.\n```\n\n**b. Turn your two functions into tools.** Type hints and docstrings become the schema the model sees, so make them accurate.\n```python\nfrom langchain.tools import tool\n\n@tool\ndef get_weather(city: str) -> str:\n    \"\"\"Get the current weather for a city.\"\"\"\n    return your_existing_weather_logic(city)\n\n@tool\ndef get_time(city: str) -> str:\n    \"\"\"Get the current local time for a city.\"\"\"\n    return your_existing_time_logic(city)\n```\nKeep your existing logic as-is and wrap it, rather than rewriting it.\n\n**c. Create the agent**\n```python\nfrom langchain.agents import create_agent\n\nagent = create_agent(\n    model=\"anthropic:claude-sonnet-4-5\",   # use whichever model you currently call\n    tools=[get_weather, get_time],\n    system_prompt=\"You are a helpful assistant. Use the tools when needed.\",\n)\n```\n\n**d. Invoke it**\n```python\nresult = agent.invoke({\"messages\": [{\"role\": \"user\", \"content\": \"Weather and time in Paris?\"}]})\nprint(result[\"messages\"][-1].content)\n```\n\n`create_agent` runs the loop (model \u2192 tool call \u2192 tool result \u2192 model) that you were probably hand-writing with the raw API.\n\n## 3. Port carefully\n- **Prompts:** move your system prompt over verbatim first, so behavior stays comparable.\n- **Message format:** LangChain uses its own message objects (`HumanMessage`, `AIMessage`, `ToolMessage`). If you persist history, you'll need to convert it.\n- **Error handling:** tool exceptions are handled differently. Decide whether you want errors returned to the model or raised.\n- **Return values:** tools should return strings or serializable data. If your functions return rich objects, serialize them.\n- **Final output:** if you were parsing the model's last message, check `result[\"messages\"][-1]`, or use structured output if you need a schema.\n\n## 4. Verify parity\nBefore deleting the old version, run both on the same 5\u201310 representative inputs and compare tool calls and outputs. Turn on tracing (LangSmith, or just `print` the `result[\"messages\"]`) to see the exact tool calls.\n\n## 5. Add features incrementally\nOnly after parity: streaming, a checkpointer for memory, middleware, or dropping down to LangGraph if you need custom control flow like branching or approval steps.\n\nIf you paste your current code, I can show a concrete before/after conversion.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1315,
+      "cacheReadInputTokens": 697,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.013223700000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 245,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 697,
+    "output_tokens": 1315,
+    "output_tokens_details": {
+      "thinking_tokens": 245
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1315,
+        "cache_read_input_tokens": 697,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.013223700000000001,
+  "duration_ms": 12983
+}

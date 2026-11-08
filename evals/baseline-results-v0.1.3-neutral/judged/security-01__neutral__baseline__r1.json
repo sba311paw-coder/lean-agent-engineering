@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__baseline__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Don't rely on the LLM or the prompt to be careful. Enforce safety in the tool code\"; LLM only gets request_delete, which never deletes, and can't self-approve.",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Authorize as the end user, not the agent\"; code calls authz.can_delete(user, ids) for tenant and permission; execute_deletion verifies the approval token bound to the plan.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Multiple safeguards: dry run, human out-of-band approval, soft delete, max batch size, rate limits, snapshot, audit log, idempotency, alerting, and prompt-injection guard.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.012762
+}

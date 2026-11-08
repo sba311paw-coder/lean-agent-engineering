@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__baseline__r2",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Gives a clear definition, how it works, benefits, challenges, enhancements, and RAG vs fine-tuning comparison \u2014 a standard educational explanation.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Treats the question as a conceptual query; no debugging steps, no assumptions about errors, no tool use or file inspection.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007776
+}

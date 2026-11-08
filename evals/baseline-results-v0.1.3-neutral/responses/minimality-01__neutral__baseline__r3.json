@@ -1,0 +1,66 @@
+{
+  "key": "minimality-01__neutral__baseline__r3",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "## Short answer\n\nWrap your existing function in a small MCP server using the official Python SDK (`pip install \"mcp[cli]\"`), expose it as one tool, and run it over stdio. You don't need a third-party email MCP server, since yours already works.\n\n## Minimal server\n\n```python\n# email_server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom myapp.emailer import send_email  # your existing function\n\nmcp = FastMCP(\"email\")\n\n@mcp.tool()\ndef send_email_message(to: str, subject: str, body: str) -> str:\n    \"\"\"Send a plain-text email.\n\n    Only call this when the user has explicitly asked for an email to be sent\n    or has approved sending one. `to` must be a single email address.\n    \"\"\"\n    send_email(to=to, subject=subject, body=body)\n    return f\"Email sent to {to}\"\n\nif __name__ == \"__main__\":\n    mcp.run()  # stdio transport by default\n```\n\nTest it with `mcp dev email_server.py` (MCP Inspector) before connecting your agent.\n\n## Connecting it to your agent\n\nMost clients and frameworks take a command-based config like this:\n\n```json\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"/abs/path/to/email_server.py\"],\n      \"env\": { \"SMTP_PASSWORD\": \"...\" }\n    }\n  }\n}\n```\n\nUse an absolute path, and the Python interpreter from the venv that has your app's dependencies.\n\n## Things that matter in practice\n\n- **Never `print()` to stdout** in a stdio server (including inside your email function). It corrupts the protocol stream. Use `logging` to stderr.\n- **Tool description is your prompt.** The docstring tells the model *when* to send. Be explicit about the conditions.\n- **Guardrails for a side-effecting tool:**\n  - Require human approval (most agent frameworks have a permission or confirmation hook for tools), or split into `draft_email` and `send_email` tools.\n  - Add a recipient allowlist or domain restriction in the server.\n  - Rate-limit and log every send (recipient, subject, timestamp).\n  - Validate inputs (address format, body length), and return clear errors so the model can correct itself.\n- **Secrets** go in environment variables passed to the server, not in tool arguments or code.\n- **Make it async** if your send function is blocking and the server handles other calls, e.g. `await asyncio.to_thread(send_email, ...)` inside an `async def` tool.\n\n## Do you even need MCP?\n\nIf the agent and the email function live in the same Python app and nothing else will use it, registering the function directly as a native tool in your agent framework is simpler. MCP pays off when you want to reuse the email capability across multiple agents or clients (Claude Desktop, IDEs, other services), or run it as a separate process or service with its own credentials and permissions.\n\nIf you tell me which agent framework you're using (Claude Agent SDK, LangChain, OpenAI Agents SDK, custom loop), I can show the exact client-side wiring.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1524,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 698,
+      "webSearchRequests": 0,
+      "costUSD": 0.018036,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 518,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 698,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 698,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1524,
+    "output_tokens_details": {
+      "thinking_tokens": 518
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 698,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1524,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 698,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 698
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.018036,
+  "duration_ms": 11523
+}

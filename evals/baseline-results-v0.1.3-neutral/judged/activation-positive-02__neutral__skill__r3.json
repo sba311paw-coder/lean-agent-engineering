@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r3",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Walks through boundaries in order: tool present in the request, model's tool call parsed/dropped, then tool definition/description, then application enforcement. \"Work through the boundaries in order and fix the first one that's wrong.\"",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 1 \"Reproduce and log\" runs the failing prompt 10-20 times and logs full requests/responses before any changes; ends by asking for the tool definition, system prompt, and a skipped example.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Recommends cheap fixes first (description, one system-prompt rule, tool_choice, simple validation/routing); no frameworks or orchestration layers suggested. Advises removing unneeded tools.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009972
+}

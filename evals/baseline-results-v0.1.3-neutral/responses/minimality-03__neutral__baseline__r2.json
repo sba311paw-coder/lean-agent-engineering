@@ -1,0 +1,66 @@
+{
+  "key": "minimality-03__neutral__baseline__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My Python agent has logging and tests that show tool-call failures and latency. Which large observability framework should I add to it?",
+  "response": "**OpenTelemetry (OTel)** is the one to pick if you want a large, standard framework. It's vendor-neutral, has a mature Python SDK, and lets you change backends later without re-instrumenting.\n\n**Why it fits your case**\n- Tool-call failures and latency map directly onto **spans**: one span per tool call, with status/exception recorded and duration measured automatically.\n- You can attach attributes such as tool name, arguments (redacted as needed), retry count, and model name, then slice by them.\n- It also carries metrics (latency histograms, error counters) and correlates your existing logs with traces via trace IDs.\n- Most agent-specific tools ingest OTel data, so you aren't locked in.\n\n**Backend choice (where the data goes)**\n- **Langfuse** or **Arize Phoenix**: open source, built for LLM agents (prompt/response traces, token cost, tool-call trees). Phoenix is easy to run locally.\n- **LangSmith**: a good option if you're already on LangChain/LangGraph.\n- **Grafana (Tempo/Prometheus), Jaeger, or Datadog**: better if you want general-purpose infrastructure observability alongside everything else.\n\n**Minimal starting point**\n```bash\npip install opentelemetry-sdk opentelemetry-exporter-otlp\n```\n```python\nfrom opentelemetry import trace\ntracer = trace.get_tracer(\"my-agent\")\n\ndef call_tool(name, args):\n    with tracer.start_as_current_span(\"tool.call\") as span:\n        span.set_attribute(\"tool.name\", name)\n        try:\n            return tools[name](**args)\n        except Exception as e:\n            span.record_exception(e)\n            span.set_status(trace.Status(trace.StatusCode.ERROR))\n            raise\n```\n\n**Caveat:** if your logs and tests already tell you what's failing and how slow it is, a full framework mostly buys you production visibility: traces across multi-step runs, aggregate dashboards, and alerting. If you're only running locally or in small volumes, Phoenix or Langfuse alone, with OTel instrumentation, may be enough before you invest in a heavier stack.\n\nIf you tell me which agent framework or LLM SDK you use, and whether you're running in production, I can narrow the backend recommendation.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 885,
+      "cacheReadInputTokens": 670,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.008921,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 125,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 670,
+    "output_tokens": 885,
+    "output_tokens_details": {
+      "thinking_tokens": 125
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 885,
+        "cache_read_input_tokens": 670,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.008921,
+  "duration_ms": 7402
+}

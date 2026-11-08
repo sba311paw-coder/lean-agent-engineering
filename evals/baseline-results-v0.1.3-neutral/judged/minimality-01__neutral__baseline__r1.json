@@ -1,0 +1,33 @@
+{
+  "key": "minimality-01__neutral__baseline__r1",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "It notes the existing function already sends email and that MCP only adds reusability/isolation, and stresses the agent needs to know when to send (docstring, guardrails). But it never clearly names the missing piece as simply exposing the function to the agent as a tool.",
+      "criterion": "Identify the actual missing capability."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Says to wrap the existing function rather than install a third-party server, and mentions direct tool registration may suffice. But the headline recommendation is still a custom MCP server, with the in-process option as a caveat.",
+      "criterion": "Prefer the existing function if it already satisfies the requirement."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "It states MCP is unnecessary if same process and no other consumers, and that MCP pays off for reuse/isolation. Yet the lead is 'wrap it in a small custom MCP server' and the bulk of the answer builds MCP, so it doesn't fully avoid defaulting to MCP.",
+      "criterion": "Do not recommend MCP merely because it is available."
+    }
+  ],
+  "score": 0.5,
+  "case_pass": false,
+  "judge_cost_usd": 0.012178000000000001
+}

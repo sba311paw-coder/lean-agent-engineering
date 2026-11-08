@@ -1,0 +1,66 @@
+{
+  "key": "debugging-02__neutral__skill__r1",
+  "case_id": "debugging-02",
+  "case_number": 11,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "prompt": "My RAG agent is giving wrong answers. Which embedding model should I switch to?",
+  "response": "Switching embedding models is probably premature. Wrong answers in a RAG system most often come from somewhere other than the embedding model, and swapping it forces a full re-index, so it's an expensive guess. Find the first failing stage first.\n\n**Quick diagnosis (about an hour)**\n\nTake 10-20 questions the agent answers wrongly and, for each, check in order:\n\n1. **Does the answer exist in your corpus?** If not, it's a coverage problem, and no model will fix it.\n2. **Is the right chunk in the top-k retrieved results?**\n   - **No:** this is a retrieval problem. Go to step 3.\n   - **Yes, but the answer is still wrong:** this is a generation or context problem. Check whether the prompt tells the model to stay grounded, whether the chunks are too long or noisy, whether the right chunk is buried in the middle of the context, and whether conflicting chunks are present.\n3. **If retrieval is failing, why?** Look at the cause before blaming embeddings:\n   - **Chunking:** answers split across chunks, chunks without enough context, or tables and code mangled.\n   - **Query mismatch:** short or conversational queries against long documents. Query rewriting or HyDE-style expansion often helps.\n   - **Exact-match needs:** IDs, error codes, names, and acronyms are poorly served by dense vectors alone. Adding BM25/hybrid search is usually a bigger win than a new model.\n   - **No reranker:** the right chunk is at rank 15 but you only pass the top 5. A cross-encoder reranker is a cheap fix.\n   - **Metadata/filtering bugs, stale index, or mismatched embedding models** between indexing and querying.\n\n**If the embedding model is the problem**\n\nYou'll see the right chunk consistently missing from the top 20-50 even with sane chunking and hybrid search. Then:\n\n- Build a small eval set of 50-100 real queries labeled with the correct chunk(s). Measure recall@k and MRR.\n- Compare 2-3 candidates on your data, including your current model as the baseline. Look at a current retrieval leaderboard such as MTEB for candidates, but don't trust it over your own eval, since domain, language, and document length matter a lot.\n- Constraints to weigh: language coverage, max input length, vector dimensions (storage and latency), cost, and whether you can self-host.\n- Re-index into a separate collection and compare there before cutting over.\n\n**Verification:** after any change, rerun the same failing questions and the eval set to confirm the failures actually flip and nothing else regresses.\n\nIf you share your current setup (embedding model, chunk size, top-k, whether you use hybrid search or a reranker) and two or three examples of wrong answers with what was retrieved, I can help pinpoint which stage is failing.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1042,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 589,
+      "webSearchRequests": 0,
+      "costUSD": 0.0130498,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 118,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 589,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 589,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 1042,
+    "output_tokens_details": {
+      "thinking_tokens": 118
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 589,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1042,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 589,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 589
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0130498,
+  "duration_ms": 11653
+}

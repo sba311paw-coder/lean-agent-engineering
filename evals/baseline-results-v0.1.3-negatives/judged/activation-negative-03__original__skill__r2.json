@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__skill__r2",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Clear educational explanation: definition, how it works (indexing, retrieval, augmentation, generation), benefits, comparisons, and a limitation.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Treats it as a conceptual question; no debugging steps, no tool calls, no assumptions about errors or code issues.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.007144
+}

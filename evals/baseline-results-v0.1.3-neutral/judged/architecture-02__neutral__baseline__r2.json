@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__baseline__r2",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Focuses on the tool-result handoff to the model: causes 1-3 cover appending the assistant tool_use and user tool_result messages, matching IDs, and using the second response; also mentions framework feeding back output.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Says \"Print the exact `messages` array you send on the second call\" and \"Fastest way to debug: log the full request payload for the second model call,\" with branching interpretation.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Debug advice puts payload inspection first and tool changes (cause 4, result format) are only suggested after the boundary check; but it never explicitly says to avoid modifying the tool before tracing, and it lists format changes among causes.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.01006
+}

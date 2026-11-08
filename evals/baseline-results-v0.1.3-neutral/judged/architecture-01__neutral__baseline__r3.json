@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__baseline__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "It doesn't trace the user's actual architecture; it gives a generic ordered checklist and ends by asking for the tool list, descriptions, and a failing example. It does explain that frameworks pass the same tool definitions to the model, a partial architectural framing.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "It argues the fault is in model inputs/setup (tool descriptions, choice set, prompt) rather than the framework, and suggests an eval set of failing cases. But it doesn't pinpoint a specific first incorrect boundary; it lists several candidates 'roughly in order of payoff'.",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with 'Switching frameworks probably won't fix this' and recommends incremental fixes (descriptions, fewer tools, model/settings, prompt) before any replacement, and says a switch only helps for specific structural needs.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.6666666666666666,
+  "case_pass": false,
+  "judge_cost_usd": 0.010296
+}

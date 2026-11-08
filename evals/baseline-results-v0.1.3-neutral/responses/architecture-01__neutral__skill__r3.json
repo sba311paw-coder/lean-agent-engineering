@@ -1,0 +1,66 @@
+{
+  "key": "architecture-01__neutral__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Probably none. Switching frameworks rarely fixes wrong tool selection, because the cause is almost always upstream of the framework. Every framework ends up sending the model the same thing: a prompt plus tool definitions. If those are unclear, a new framework will reproduce the same mistakes.\n\n**Likely causes, roughly in order of frequency**\n\n1. **Vague or overlapping tool descriptions.** If two tools could plausibly fit a request, the model will sometimes pick the wrong one. Descriptions should say when to use the tool and when *not* to.\n2. **Too many tools.** Accuracy drops as the tool list grows. Expose only the tools relevant to the current task or step.\n3. **Poor parameter names or schemas.** Ambiguous names, missing enums, and loose types invite bad calls.\n4. **Missing guidance in the system prompt** about how to choose between similar tools.\n5. **Model capability.** A weaker model may need a stronger one, or a more constrained setup.\n6. **Application-layer bugs.** Check that the tool list your app actually sends matches what you think it sends, and that results are passed back correctly.\n\n**What I'd do instead of switching**\n\n1. **Collect failures.** Log the user input, the tool list sent, the tool the model chose, and the tool it should have chosen. Even 10-20 examples will show a pattern.\n2. **Find the first wrong boundary.** Is the right tool missing from the list, poorly described, or confused with another one? Or did the model have clear options and still choose wrong?\n3. **Make the smallest fix.** Rewrite descriptions, merge or remove overlapping tools, narrow the tool set per step, or add a short selection rule to the prompt.\n4. **Add a guard at the app layer.** Validate tool calls against the arguments and permissions you expect. This matters most for tools with side effects, where the model's choice shouldn't be the only safeguard.\n5. **Verify.** Re-run your failure cases as a small regression set and confirm the error rate actually dropped.\n\n**When a framework change might make sense**\n\nOnly if you find a concrete gap, such as needing built-in routing, state management, or tracing that you can't reasonably build yourself. Even then, tell me what you're missing rather than what's going wrong, and the choice will be easier to make.\n\nIf you share your current tool definitions (names, descriptions, schemas) and an example or two of a wrong choice, I can point to the likely cause.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 898,
+      "cacheReadInputTokens": 2698,
+      "cacheCreationInputTokens": 593,
+      "webSearchRequests": 0,
+      "costUSD": 0.011625800000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 97,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 593,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 593,
+    "cache_read_input_tokens": 2698,
+    "output_tokens": 898,
+    "output_tokens_details": {
+      "thinking_tokens": 97
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 593,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 898,
+        "cache_read_input_tokens": 2698,
+        "cache_creation_input_tokens": 593,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 593
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.011625800000000002,
+  "duration_ms": 11262
+}

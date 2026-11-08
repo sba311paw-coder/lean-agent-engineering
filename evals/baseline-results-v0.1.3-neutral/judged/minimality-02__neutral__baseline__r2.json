@@ -1,0 +1,33 @@
+{
+  "key": "minimality-02__neutral__baseline__r2",
+  "case_id": "minimality-02",
+  "case_number": 8,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Notes it can't see the code, says \"For an agent with two functions, the migration is small,\" and that LangChain \"adds a dependency without much benefit yet\" for a simple call-two-functions agent.",
+      "criterion": "Evaluate the actual complexity and requirement."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Acknowledges LangChain is \"a convenience, not a requirement\" and that it adds a dependency, but never recommends staying with the direct API; it proceeds to a full migration walkthrough and says \"migrating is reasonable.\"",
+      "criterion": "Prefer a simpler implementation when sufficient."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Section 1 lists what justifies it: provider switching, built-in tool loops/retries/structured output, tracing, streaming, memory/persistence, human-in-the-loop; \"If you only need a couple of those, migrating is reasonable.\" Section 5 adds LangGraph for branching/approval flows.",
+      "criterion": "Explain what evidence would justify adding a framework."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.011298
+}

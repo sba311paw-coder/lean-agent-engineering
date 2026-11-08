@@ -1,0 +1,33 @@
+{
+  "key": "architecture-01__neutral__skill__r3",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "It explains that every framework sends prompt plus tool definitions and recommends logging inputs, tool lists, and chosen tools, but it doesn't trace the user's actual architecture (none is available); it asks for tool definitions at the end instead.",
+      "criterion": "Trace the architecture first."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Step 2: \"Find the first wrong boundary. Is the right tool missing from the list, poorly described, or confused with another one? Or did the model have clear options and still choose wrong?\"",
+      "criterion": "Identify the first incorrect boundary."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Probably none. Switching frameworks rarely fixes wrong tool selection,\" recommends the smallest fix, and limits framework change to a concrete gap.",
+      "criterion": "Avoid unnecessary architectural replacement."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.009559999999999999
+}

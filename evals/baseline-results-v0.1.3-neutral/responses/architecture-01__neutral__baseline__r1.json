@@ -1,0 +1,66 @@
+{
+  "key": "architecture-01__neutral__baseline__r1",
+  "case_id": "architecture-01",
+  "case_number": 16,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My AI agent sometimes chooses the wrong tool. Which agent framework should I switch to?",
+  "response": "Switching frameworks probably won't fix this. Wrong tool selection is usually caused by the model, the tool definitions, or the prompt, and those carry over to any framework. I'd try the following first, roughly in order of payoff.\n\n**1. Improve tool descriptions and schemas**\n- Say when to use each tool *and when not to*. Example: \"Use for exact order lookups by ID. Do not use for general product questions.\"\n- Make names distinct and specific (`search_orders_by_id` vs. `search_docs`, not `search` vs. `lookup`).\n- Use enums and tight parameter types, and describe each parameter.\n- Remove overlapping tools or merge them. Fewer tools (ideally under ~10-15 per decision point) means fewer mistakes.\n\n**2. Fix the prompt**\n- Add a short decision guide in the system prompt for ambiguous cases.\n- Include a few examples of correct tool choices for the confusing pairs.\n- Let the model reason briefly before it calls a tool, if your setup allows it.\n\n**3. Use a stronger model or better settings**\n- Tool-selection accuracy varies a lot between models. A more capable model often helps more than any framework change.\n- Lower the temperature for tool-calling steps.\n\n**4. Constrain the choices**\n- Expose only the relevant tools for the current step or state, using routing, sub-agents, or a first-pass classifier.\n- Force a specific tool (`tool_choice`) when the step is deterministic.\n- Validate arguments and return clear, actionable errors so the agent can self-correct.\n\n**5. Measure it**\n- Build a small eval set of 30-100 real queries with the expected tool for each, and track accuracy as you change things. Log the failures. They usually show a pattern, like two tools with similar descriptions.\n\n**When a framework switch makes sense**\nSwitch if you need something the current one can't do: better control over state and routing (e.g., LangGraph), simpler multi-agent handoffs (e.g., OpenAI Agents SDK), native Claude tooling (Claude Agent SDK), or better tracing and debugging. Calling the provider's API directly with a simple loop is also a good option, since it removes abstraction layers that can obscure what the model actually sees.\n\nIf you tell me which framework and model you're using, how many tools you have, and an example of a wrong choice, I can give more specific suggestions.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 780,
+      "cacheReadInputTokens": 665,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.007870499999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 665,
+    "output_tokens": 780,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 780,
+        "cache_read_input_tokens": 665,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.007870499999999999,
+  "duration_ms": 7466
+}

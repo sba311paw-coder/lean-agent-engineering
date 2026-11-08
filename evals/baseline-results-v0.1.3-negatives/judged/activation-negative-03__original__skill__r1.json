@@ -1,0 +1,27 @@
+{
+  "key": "activation-negative-03__original__skill__r1",
+  "case_id": "activation-negative-03",
+  "case_number": 6,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Gives a clear definition, explains the four-step pipeline, benefits, and a simple example, which is a normal educational explanation.",
+      "criterion": "Provide a normal educational explanation."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Answers the conceptual question directly without exploring the working directory, running tools, or framing it as debugging a problem.",
+      "criterion": "Do not automatically treat the question as a debugging task."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.0067740000000000005
+}

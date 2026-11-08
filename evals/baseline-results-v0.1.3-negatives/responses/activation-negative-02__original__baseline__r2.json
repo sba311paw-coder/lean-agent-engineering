@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-02__original__baseline__r2",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called *function calling*) is a capability that lets a language model request that external code or services be run, instead of only generating text. The model can't browse the web, query a database, or do reliable math on its own, but it can decide *which tool to use* and *what inputs to give it*. Your application then runs the tool and returns the result.\n\n## How it works\n\n1. **You define tools.** Each tool has a name, a description, and a schema (usually JSON Schema) describing its parameters.\n   ```json\n   {\n     \"name\": \"get_weather\",\n     \"description\": \"Get current weather for a city\",\n     \"input_schema\": {\n       \"type\": \"object\",\n       \"properties\": { \"city\": { \"type\": \"string\" } },\n       \"required\": [\"city\"]\n     }\n   }\n   ```\n2. **You send the user's message plus the tool definitions** to the model.\n3. **The model decides** whether a tool is needed. If so, it responds with a structured request, e.g. `get_weather({\"city\": \"Paris\"})`, rather than a final answer.\n4. **Your code executes the tool** (calls the weather API, runs the query, etc.). The model does not run anything itself.\n5. **You send the result back** to the model.\n6. **The model uses the result** to write its final answer, or calls more tools if needed.\n\nThis loop can repeat multiple times in a single task.\n\n## Why it matters\n\n- **Fresh or private data:** access live information, databases, internal systems.\n- **Taking actions:** send emails, create tickets, edit files, run code.\n- **Accuracy:** offload calculation, search, and precise lookups to deterministic systems.\n- **Structured output:** the model produces well-formed arguments that programs can reliably consume.\n- **Agents:** chaining tool calls in a loop is the foundation of AI agents that plan and carry out multi-step tasks.\n\n## Important points\n\n- The model only *proposes* calls; the developer's code controls execution, so you can validate inputs, require user approval, and enforce permissions.\n- Good tool names and descriptions matter a lot, since the model relies on them to choose correctly.\n- Tool results are inputs to the model, so untrusted content in them (like web pages) can contain prompt injection and should be handled carefully.\n- Standards like the Model Context Protocol (MCP) aim to make tools reusable across different AI applications.\n\n## Simple example\n\n> **User:** What's the weather in Paris?\n> **Model:** *(requests)* `get_weather(city=\"Paris\")`\n> **App:** runs the API \u2192 `{\"temp\": 18, \"condition\": \"cloudy\"}`\n> **Model:** \"It's currently 18\u00b0C and cloudy in Paris.\"\n\nIn short: tool calling turns a language model from a text generator into a system that can reason about *what to do* and interact with the outside world through code you control.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 911,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 646,
+      "webSearchRequests": 0,
+      "costUSD": 0.011698,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 646,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 646,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 911,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 646,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 911,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 646,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 646
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.011698,
+  "duration_ms": 9014
+}

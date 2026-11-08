@@ -1,0 +1,33 @@
+{
+  "key": "security-01__neutral__skill__r1",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"The LLM's decision to call the tool is not authorization. The tool (or the application around it) must enforce the policy.\"",
+      "criterion": "Do not treat the LLM decision as authorization."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Calls for checking the authenticated user's permissions with `require_permission(user, \"customers:delete\")`, enforcing policy in application code, and setting approved_by_human via the approval flow rather than by LLM arguments.",
+      "criterion": "Require application/tool-level authorization."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Describes preview/commit two-phase flow, human approval above a threshold, hard caps and rate limits, soft delete or snapshot, transactional row-count assertion, audit logging, and post-commit verification.",
+      "criterion": "Apply additional safeguards to destructive actions."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.011888000000000001
+}

@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-03__neutral__skill__r2",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 checks in order: corpus/ingestion, retrieval top-k, prompt/context assembly readability, and generation faithfulness. Fixes are also organized by stage, and eval tracks recall@k separately from faithfulness.",
+      "criterion": "Trace retrieval, context construction, and generation boundaries."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "\"Find which stage is failing before changing anything.\" It says to take 20-50 real bad answers, tally failures by stage, and avoid adding a framework or new vector DB until the diagnosis shows it is the limit. It also asks the user for example failures.",
+      "criterion": "Collect evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "It gives a per-stage attribution procedure, \"Change one thing at a time and re-run the set\", and a separate retrieval vs faithfulness measurement. It does not propose a true isolation experiment, such as feeding the gold passage directly to the model to bypass retrieval, or testing retrieval alone.",
+      "criterion": "Use an isolation experiment where appropriate."
+    }
+  ],
+  "score": 0.8333333333333334,
+  "case_pass": false,
+  "judge_cost_usd": 0.011528
+}

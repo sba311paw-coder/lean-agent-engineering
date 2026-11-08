@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-03__neutral__baseline__r1",
+  "case_id": "activation-positive-03",
+  "case_number": 5,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My agent reads documents and retrieves information from a vector database, but the answers are sometimes poorly grounded. How can I improve them?",
+  "response": "Poor grounding in a RAG-style agent usually comes from one of three places: retrieval returns the wrong content, the content is fine but the model ignores or overextends it, or the pipeline gives you no way to tell which. Work through them in that order.\n\n## 1. Fix retrieval first\n\nMost \"hallucination\" problems are retrieval problems. If the right passage isn't in the context, no prompt will fix it.\n\n- **Chunking:** Split on document structure (headings, sections, paragraphs) rather than fixed character counts. Keep chunks coherent, typically 200-800 tokens, with modest overlap. Prepend the document title and section heading to each chunk so it stands alone.\n- **Contextual chunk enrichment:** Add a short generated summary of where the chunk sits in the document before embedding it. This helps a lot with chunks that say \"it\" or \"the above.\"\n- **Hybrid search:** Combine vector search with keyword search (BM25) and merge the results (e.g., reciprocal rank fusion). Pure embeddings miss exact terms like IDs, names, and error codes.\n- **Reranking:** Retrieve a wide set (say 30-50), then rerank with a cross-encoder or reranking model and pass only the top 5-10 to the LLM. This is often the single biggest quality gain.\n- **Query rewriting:** Have the agent rewrite vague or multi-part questions into standalone search queries, or decompose them into several. Let it search multiple times if the first result is weak.\n- **Metadata filters:** Filter by document, date, source, or type when the question implies it.\n- **Embedding model:** Check that it suits your domain and language. Use the same model for indexing and querying.\n\n## 2. Make the model stay grounded\n\n- **Explicit instructions:** Tell it to answer only from the provided sources, and to say \"the documents don't say\" when the answer isn't there. Give it permission to decline.\n- **Require citations:** Ask for a quote or passage ID supporting each claim. Quote-first prompting (extract relevant quotes, then answer from them) reduces drift noticeably.\n- **Structure the context:** Wrap each retrieved chunk with clear delimiters and metadata (source, section, ID), e.g. `<document id=\"3\" source=\"...\">...</document>`.\n- **Mind context size and order:** Too many marginal chunks dilute attention. Put the most relevant material in prominent positions, and the question after the documents.\n- **Lower temperature** for factual answers.\n- **Treat retrieved text as data:** Instruct the model not to follow instructions found inside documents.\n\n## 3. Verify and measure\n\n- **Post-hoc check:** Add a verification step where a second call (or the same agent) checks each claim against the cited passages and removes or flags unsupported ones.\n- **Retrieval-quality gate:** If top scores are below a threshold, have the agent say it couldn't find enough information or retry with a reformulated query rather than answer anyway.\n- **Build an eval set:** Collect 50-100 real questions with known answers and source passages. Measure separately:\n  - *Retrieval:* recall@k, MRR (was the right chunk retrieved?)\n  - *Generation:* faithfulness (is every claim supported by context?) and answer correctness\n- **Log everything:** Store the query, retrieved chunks, scores, and final answer so you can diagnose each bad answer as \"not retrieved,\" \"retrieved but ignored,\" or \"retrieved but misread.\"\n\n## 4. Document-specific issues\n\n- Check your parsing: PDFs with tables, columns, headers/footers, or scanned pages often produce garbled text that poisons both embeddings and answers. Inspect what actually gets indexed.\n- Handle tables and figures deliberately (convert to markdown or generate descriptions).\n- Deduplicate and version documents so stale or conflicting content doesn't compete.\n\n## Suggested order of attack\n\n1. Log failures and classify them (retrieval vs. generation).\n2. Inspect parsing and chunking quality.\n3. Add hybrid search + reranking.\n4. Tighten the prompt with citations and an explicit \"not found\" path.\n5. Add a verification step if you still need higher precision.\n\nIf you share details like your chunk size, embedding model, how many chunks you pass in, and an example of a badly grounded answer (with what was retrieved), I can give more targeted suggestions.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1441,
+      "cacheReadInputTokens": 676,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.014481599999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 676,
+    "output_tokens": 1441,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1441,
+        "cache_read_input_tokens": 676,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.014481599999999999,
+  "duration_ms": 12165
+}

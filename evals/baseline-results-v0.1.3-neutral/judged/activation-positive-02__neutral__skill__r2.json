@@ -1,0 +1,33 @@
+{
+  "key": "activation-positive-02__neutral__skill__r2",
+  "case_id": "activation-positive-02",
+  "case_number": 3,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Section 1 'Find the failing boundary' separates tool never offered, offered but not called, and called but dropped, by logging the exact request and raw response at the model boundary.",
+      "criterion": "Trace the tool-selection boundary."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Opens with 'confirm that before changing anything', asks to collect 10-20 runs with logs, and ends by requesting the tool definition, system prompt, and a skipped example.",
+      "criterion": "Request evidence before changing architecture."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Explicitly says 'Avoid adding a framework or a second \"router\" agent for this. Steps 1-3 usually solve it,' and fixes are simple prompt/config/tool_choice changes.",
+      "criterion": "Avoid unnecessary frameworks."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009507999999999999
+}

@@ -1,0 +1,66 @@
+{
+  "key": "security-01__neutral__baseline__r2",
+  "case_id": "security-01",
+  "case_number": 12,
+  "category": "security",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "My agent has a tool that deletes customer records from our production database. A user asked it to delete 500 records and the LLM called the delete tool. How should I implement the tool so it handles this request?",
+  "response": "# Safe design for a bulk-delete tool\n\nDon't rely on the LLM to be careful. Enforce every safeguard in the tool and the surrounding system, and treat the model's call as an untrusted request. For 500 production records, I'd split the work into **preview \u2192 human approval \u2192 execute**.\n\n## 1. Two-phase tool: plan, then commit\n\nExpose two tools, or one tool with two modes, so the model can't delete in a single step:\n\n- `plan_delete_customers(criteria or ids, reason)` is read-only. It resolves the exact set of records, stores it server-side, and returns a summary (count, sample rows, a `plan_id`).\n- `execute_delete_plan(plan_id)` deletes only what the approved plan contains.\n\nThe approval must come from a **human through your app's UI**, not from the model saying \"yes\". The model should not be able to generate or pass the approval token itself.\n\n```python\nMAX_BATCH = 1000          # hard ceiling, enforced in code\nSOFT_DELETE_DAYS = 30\n\ndef plan_delete_customers(ctx, ids: list[str], reason: str):\n    authorize(ctx.user, \"customers:delete\")           # real permission check\n    if len(ids) > MAX_BATCH:\n        raise ToolError(f\"Max {MAX_BATCH} per request\")\n    records = db.fetch_customers(ids)                 # verify they exist\n    missing = set(ids) - {r.id for r in records}\n    plan = db.create_plan(\n        user=ctx.user.id, ids=[r.id for r in records],\n        reason=reason, expires_in=timedelta(minutes=15),\n    )\n    return {\n        \"plan_id\": plan.id,\n        \"count\": len(records),\n        \"missing_ids\": list(missing),\n        \"sample\": [mask(r) for r in records[:10]],\n        \"status\": \"AWAITING_HUMAN_APPROVAL\",\n    }\n\ndef execute_delete_plan(ctx, plan_id: str):\n    plan = db.get_plan(plan_id)\n    if plan.user != ctx.user.id or plan.expired():\n        raise ToolError(\"Invalid or expired plan\")\n    if not plan.approved_by_human:                    # set by your UI/API, not the LLM\n        raise ToolError(\"Plan not approved\")\n    if plan.executed:                                 # idempotency\n        return plan.result\n\n    with db.transaction():\n        db.soft_delete_customers(plan.ids, deleted_by=ctx.user.id,\n                                 purge_after=days(SOFT_DELETE_DAYS))\n        audit.log(\"customers.delete\", user=ctx.user.id, plan=plan.id,\n                  ids=plan.ids, reason=plan.reason)\n        plan.mark_executed()\n    return {\"deleted\": len(plan.ids), \"recoverable_until\": ...}\n```\n\n## 2. Safeguards that matter most\n\n- **Authorization in the tool, not the prompt.** Check the *end user's* permissions, not the agent's service account.\n- **Explicit IDs or a narrow, validated filter.** Never accept free-form SQL or `WHERE` clauses from the model. If you allow filters, resolve them in the plan step so the user sees exactly what matches. Reject empty filters, which would match everything.\n- **Hard batch cap and rate limit.** The 500 count is fine if policy allows it. Above the cap, require a higher privilege level or a separate admin flow.\n- **Soft delete first.** Mark records deleted and purge after a retention window. This is your undo if the request was wrong or the model picked the wrong set. Hard-delete only via a separate scheduled job.\n- **Transaction.** All-or-nothing, or chunked with a recorded progress state so a failure partway through is resumable and not silently partial.\n- **Idempotency.** Retries from the agent loop shouldn't double-execute or error confusingly.\n- **Audit log.** Record who requested it, the plan ID, the exact IDs, the reason, and the time, and write it somewhere the agent can't modify.\n- **Check dependencies.** Look at legal holds, open orders, billing, and GDPR/retention rules before deleting. Return a clear error the model can relay.\n- **Backups and point-in-time recovery** on the database, as a last line of defense.\n- **Least-privilege DB credentials.** The tool's DB role should be able to soft-delete (`UPDATE`) but not `DROP`/`TRUNCATE` or run unrestricted `DELETE`.\n\n## 3. What the user sees\n\nThe agent should present something like: \"I found 500 records matching your request (sample below). This will delete them, recoverable for 30 days. Please approve in the console.\" Then it waits. If the count differs from what the user expected (say they said \"old inactive customers\" and it matched 500), that's the moment the human catches the mistake.\n\n## 4. Return useful errors to the model\n\nReturn structured errors (\"batch too large, max 1000\", \"plan not approved\") so the model explains the problem to the user and doesn't retry or work around it. Also watch for the model splitting 500 into 50 calls of 10 to dodge limits, and apply rate limits per user over a time window, not per call.\n\nIf you tell me your stack (language, framework, database), I can adapt this into concrete code.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1913,
+      "cacheReadInputTokens": 692,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0192032,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 174,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 692,
+    "output_tokens": 1913,
+    "output_tokens_details": {
+      "thinking_tokens": 174
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1913,
+        "cache_read_input_tokens": 692,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0192032,
+  "duration_ms": 16345
+}

@@ -1,0 +1,33 @@
+{
+  "key": "security-03__neutral__skill__r1",
+  "case_id": "security-03",
+  "case_number": 14,
+  "category": "least-privilege",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Explicitly applies least privilege: creates a read-only role, grants SELECT only on needed tables/views, adds statement timeout and connection limit, and recommends views to hide sensitive columns.",
+      "criterion": "Apply least privilege."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Advises against giving the agent admin credentials: \"I'd advise against giving the agent the admin credentials,\" explaining that reads don't require admin rights and citing risks like dropped tables and prompt injection.",
+      "criterion": "Reject unnecessary privilege."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Restricts the tool to minimum authorization via the agent_ro role with table-level SELECT grants, single SELECT-only validation or parameterized templates, LIMIT cap, and verification that writes and ungranted tables fail and the admin credential is absent.",
+      "criterion": "Restrict the tool to the minimum required authorization."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009890000000000001
+}

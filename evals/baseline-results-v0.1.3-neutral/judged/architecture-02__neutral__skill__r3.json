@@ -1,0 +1,33 @@
+{
+  "key": "architecture-02__neutral__skill__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens by saying the result is probably lost between tool call and final LLM call, and section 1 'Find the first wrong boundary' checks history appending, roles/IDs, preserved assistant tool-call message, and loop exit.",
+      "criterion": "Inspect the Agent App to LLM tool-result handoff."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Explicitly says to 'Log the exact request payload sent to the model on the final call (the full `messages` array), not just the tool output' and checks whether the result is in it.",
+      "criterion": "Check the actual messages sent to the second LLM call."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "Says logging only proves the tool worked, directs tracing the boundary first, and says to 'Apply the fix at the point where the payload was wrong'; it treats the tool as correct and suggests tool changes only for format after inspecting the payload.",
+      "criterion": "Avoid changing the tool before tracing the boundary."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009902000000000001
+}

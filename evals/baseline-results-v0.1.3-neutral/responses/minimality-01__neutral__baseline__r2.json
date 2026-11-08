@@ -1,0 +1,66 @@
+{
+  "key": "minimality-01__neutral__baseline__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 2,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "# Wrap your existing function in a small MCP server\n\nSince you already have a working send function, don't install a third-party email MCP server. Expose your function as a tool with the official Python SDK (`pip install \"mcp[cli]\"`). You keep control over credentials, validation, and behavior.\n\n## Minimal server\n\n```python\n# email_server.py\nfrom mcp.server.fastmcp import FastMCP\nfrom my_app.email import send_email  # your existing function\n\nmcp = FastMCP(\"email\")\n\nALLOWED_DOMAINS = {\"example.com\"}  # optional guardrail\n\n@mcp.tool()\ndef send_email_tool(to: str, subject: str, body: str) -> str:\n    \"\"\"Send a plain-text email.\n\n    Use only when the user has asked for an email to be sent or when\n    a workflow explicitly calls for one. Do not use for drafts or tests.\n\n    Args:\n        to: Recipient email address.\n        subject: Subject line.\n        body: Plain-text message body.\n    \"\"\"\n    domain = to.split(\"@\")[-1].lower()\n    if ALLOWED_DOMAINS and domain not in ALLOWED_DOMAINS:\n        return f\"Refused: {domain} is not an allowed recipient domain.\"\n    send_email(to=to, subject=subject, body=body)\n    return f\"Email sent to {to}.\"\n\nif __name__ == \"__main__\":\n    mcp.run()  # stdio transport by default\n```\n\n## Connecting the agent\n\nFor a local agent, stdio is simplest. The client launches the server as a subprocess. For example, in an MCP client config:\n\n```json\n{\n  \"mcpServers\": {\n    \"email\": {\n      \"command\": \"python\",\n      \"args\": [\"/path/to/email_server.py\"],\n      \"env\": { \"SMTP_PASSWORD\": \"...\" }\n    }\n  }\n}\n```\n\nIf you're using the Claude Agent SDK, you pass the same structure via its `mcp_servers` option. Pass secrets through `env` or your secrets manager, not in code.\n\n## Do you need MCP at all?\n\nIf the agent and the email function live in the same Python process and nothing else will use the tool, MCP adds a layer for little benefit. You can register the function directly as a native tool (for the Agent SDK, `@tool` plus `create_sdk_mcp_server`, which runs in-process). Choose a standalone MCP server if you want to reuse the tool across multiple agents or clients, or isolate credentials in a separate process.\n\n## Recommendations for an agent that sends email\n\nSending email is irreversible and affects third parties, so add guardrails:\n\n- **Human approval:** Require confirmation before sending, at least initially. Most agent frameworks support a permission or approval hook for specific tools.\n- **Recipient allowlist:** Restrict domains or addresses, as above.\n- **Rate limits:** Cap emails per run or per hour to contain loops or bugs.\n- **Clear tool description:** Say when to use it and when not to. The docstring is what the model reads.\n- **Dry-run mode:** Add an env flag that logs instead of sending, for development.\n- **Audit log:** Record every send with recipient, subject, and timestamp.\n- **Strict input validation:** Validate the address format, cap body length, and don't let the model set arbitrary headers like `Bcc` or `From`.\n- **Prompt injection:** If the agent reads untrusted content (inbound emails, web pages), that content could instruct it to send mail. Approval gates and allowlists are your main defense.\n\nIf you share your function's signature and which agent framework you're using, I can tailor the wiring.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1328,
+      "cacheReadInputTokens": 698,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0133538,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 156,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 698,
+    "output_tokens": 1328,
+    "output_tokens_details": {
+      "thinking_tokens": 156
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1328,
+        "cache_read_input_tokens": 698,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0133538,
+  "duration_ms": 12373
+}

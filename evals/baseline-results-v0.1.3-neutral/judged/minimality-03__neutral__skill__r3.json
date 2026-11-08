@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r3",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 3,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"no capability gap\" since failures and latency are already captured, then lists questions (per-run correlation, timeline, aggregation, alerting) to test for real gaps.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends not adding a framework yet; first step is to extend existing logs with run ID, tool name, and structured JSON; escalates incrementally only if needed.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States a large framework adds a dependency, possibly a service to run, network egress, and risk of sending prompts/tool data to third parties; advises checking off-machine data and redacting.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.008372000000000001
+}

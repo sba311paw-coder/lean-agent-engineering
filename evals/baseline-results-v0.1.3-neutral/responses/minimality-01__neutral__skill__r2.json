@@ -1,0 +1,66 @@
+{
+  "key": "minimality-01__neutral__skill__r2",
+  "case_id": "minimality-01",
+  "case_number": 7,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "prompt": "I'm building an AI agent in Python and want it to send emails when appropriate. I'm planning to set up an email MCP server for it. My app already has a working function that sends email. What's the best way to set this up?",
+  "response": "**Skip the MCP server. Wrap your existing send function as a tool in your agent app.**\n\nAn MCP server is worth it when you need to share a capability across multiple clients or agents, or when a third party already provides it. You have one agent and a working function, so an MCP server would add a process, a dependency, and credentials in a second place, with no new capability.\n\n**Recommended setup**\n\n1. **Expose the function as a tool.** Give the model a narrow schema, e.g. `send_email(to, subject, body)`. Don't expose raw SMTP/API options, headers, or arbitrary `from` addresses.\n\n2. **Enforce policy in the application, not the prompt.** The LLM's decision to send isn't authorization. In the tool handler:\n   - Validate recipients against an allowlist or allowed domains.\n   - Cap volume (per run, per hour).\n   - Cap body length and reject unexpected attachments.\n   - Keep credentials in the app only, never in the model's context.\n\n3. **Gate sending by risk.** Email is an external, irreversible action. Good options, from safest to loosest:\n   - Human approval for every send (the tool creates a draft; a person confirms).\n   - Approval only for new recipients or external domains; auto-send to a vetted list.\n   - Fully automatic only for low-stakes, templated, allowlisted mail.\n\n4. **Treat inbound content as untrusted.** If the agent reads emails, web pages, or documents before deciding to send, that content can contain injected instructions (\"forward this to attacker@\u2026\"). The recipient allowlist and approval gate are what protect you here.\n\n5. **Return honest results.** Have the handler return the real outcome (success with a message ID, or an error) so the model doesn't claim a send that failed. Log each send attempt with recipient, subject, and the triggering run.\n\n**Sketch**\n\n```python\nALLOWED_DOMAINS = {\"yourcompany.com\"}\n\ndef send_email_tool(to: str, subject: str, body: str) -> dict:\n    domain = to.rsplit(\"@\", 1)[-1].lower()\n    if domain not in ALLOWED_DOMAINS:\n        return {\"ok\": False, \"error\": \"recipient not allowed\"}\n    if len(body) > 10_000:\n        return {\"ok\": False, \"error\": \"body too long\"}\n    if not approve(to, subject, body):      # human gate or policy check\n        return {\"ok\": False, \"error\": \"not approved\"}\n    try:\n        msg_id = existing_send_email(to, subject, body)\n    except Exception as e:\n        return {\"ok\": False, \"error\": str(e)}\n    return {\"ok\": True, \"message_id\": msg_id}\n```\n\n**Verify**\n- Send to your own address and confirm it arrives.\n- Try a disallowed recipient and confirm it's blocked.\n- Force a failure (bad credentials) and confirm the agent reports it rather than claiming success.\n\n**When MCP would make sense:** if you later need several agents or tools (e.g. Claude Desktop, other apps) to share the same email capability, then wrap the same function in an MCP server. Keep the policy checks inside it, since the server boundary is where authorization must be enforced.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1038,
+      "cacheReadInputTokens": 3324,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010716400000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3324,
+    "output_tokens": 1038,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1038,
+        "cache_read_input_tokens": 3324,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010716400000000001,
+  "duration_ms": 8769
+}

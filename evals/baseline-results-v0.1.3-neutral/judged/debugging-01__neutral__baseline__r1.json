@@ -1,0 +1,39 @@
+{
+  "key": "debugging-01__neutral__baseline__r1",
+  "case_id": "debugging-01",
+  "case_number": 10,
+  "category": "debugging",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PARTIAL",
+      "evidence": "Says 'Log the raw API request and response' and 'Check the actual error', and suggests a minimal repro with one trivial tool, but doesn't actually read code or reproduce the failure; it only gives guidance.",
+      "criterion": "Read and reproduce the failure."
+    },
+    {
+      "n": 2,
+      "verdict": "PARTIAL",
+      "evidence": "Step 1 'Find what changed' advises `git diff` and bisecting by reverting pieces, but it doesn't actually check the changes (the directory isn't even a git repo, and no inspection was attempted).",
+      "criterion": "Check recent changes."
+    },
+    {
+      "n": 3,
+      "verdict": "PARTIAL",
+      "evidence": "Lists the flow points to inspect (tool definition, request builder, tool_use dispatch, tool_result wiring, loop condition), but it is generic and not traced through the user's actual code.",
+      "criterion": "Trace the data/control flow."
+    },
+    {
+      "n": 4,
+      "verdict": "FAIL",
+      "evidence": "Offers a broad checklist of possible culprits rather than forming a specific testable hypothesis; no hypothesis is stated and tied to a verification before fixing.",
+      "criterion": "Form a testable hypothesis before fixing."
+    }
+  ],
+  "score": 0.375,
+  "case_pass": false,
+  "judge_cost_usd": 0.010684
+}

@@ -1,0 +1,66 @@
+{
+  "key": "activation-positive-01__neutral__baseline__r1",
+  "case_id": "activation-positive-01",
+  "case_number": 1,
+  "category": "activation",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "My AI agent calls a weather tool. The tool runs fine and returns data, but the agent's final response doesn't include the result. How do I fix this?",
+  "response": "The usual cause is that the tool result never makes it back to the model, or your code reads the wrong message as the \"final\" answer. Check these in order.\n\n## 1. Make sure there's a second model call after the tool runs\nTool use is a loop. The model requests a tool, you run it, you send the result back, and only then does the model write the answer. If your code stops after the tool executes, the user only sees the text from before the tool call (or nothing).\n\n```python\nmessages = [{\"role\": \"user\", \"content\": \"Weather in Paris?\"}]\n\nwhile True:\n    resp = client.messages.create(model=MODEL, tools=tools, messages=messages, max_tokens=1024)\n    messages.append({\"role\": \"assistant\", \"content\": resp.content})  # keep the full content, including tool_use blocks\n\n    if resp.stop_reason != \"tool_use\":\n        break\n\n    results = []\n    for block in resp.content:\n        if block.type == \"tool_use\":\n            out = run_tool(block.name, block.input)\n            results.append({\n                \"type\": \"tool_result\",\n                \"tool_use_id\": block.id,          # must match\n                \"content\": json.dumps(out),       # string or content blocks\n            })\n    messages.append({\"role\": \"user\", \"content\": results})\n\nfinal_text = \"\".join(b.text for b in resp.content if b.type == \"text\")\n```\n\n## 2. Append the messages in the right order and format\n- The assistant message containing the tool call must be in history **before** the tool result.\n- The `tool_use_id` (or `tool_call_id` in OpenAI-style APIs) must match the call's ID.\n- In OpenAI-style APIs the result goes in a message with `role: \"tool\"`. In Anthropic's API it's a `tool_result` block inside a `user` message.\n- If any of this is malformed, you'll often get an error, but some frameworks swallow it silently.\n\n## 3. Return a serializable, non-empty result\nIf your tool returns `None`, a custom object, or a coroutine you forgot to `await`, the model receives an empty or garbage result and may answer as if nothing came back. Return a string or JSON (`json.dumps(...)`), and log exactly what you send back.\n\n## 4. Read the right part of the response\nThe final response may contain multiple blocks. Taking `content[0]` often gives you the \"Let me check the weather\u2026\" preamble instead of the answer. Concatenate the text blocks from the **last** response, as in the example above.\n\n## 5. Check framework-specific settings\nIf you're using a framework rather than a raw loop:\n- **LangChain/LangGraph:** check `return_direct`, `max_iterations`, and that you're reading the last message in state (`result[\"messages\"][-1].content`).\n- **Streaming:** make sure you keep consuming the stream after the tool call, and that you aren't ending on the first `message_stop`.\n- **Max iterations or token limits:** the loop may be cut off before the final turn. Check `stop_reason` (`max_tokens` is a common culprit).\n\n## 6. Debug by printing the full message list\nPrint `messages` right before the last model call. You should see: user \u2192 assistant (tool call) \u2192 tool result \u2192 (model call). If the tool result is missing or empty there, that's your bug. If it's present and the model still ignores it, look at your system prompt for instructions that conflict, such as \"don't mention tool output.\"\n\nIf you tell me which SDK or framework you're using and paste the loop code, I can point to the exact line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1373,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 681,
+      "webSearchRequests": 0,
+      "costUSD": 0.016458,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 267,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 681,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 681,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1373,
+    "output_tokens_details": {
+      "thinking_tokens": 267
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 681,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1373,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 681,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 681
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.016458,
+  "duration_ms": 14553
+}

@@ -1,0 +1,33 @@
+{
+  "key": "minimality-03__neutral__skill__r2",
+  "case_id": "minimality-03",
+  "case_number": 9,
+  "category": "capability-gap",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "skill",
+  "round": 2,
+  "criteria": [
+    {
+      "n": 1,
+      "verdict": "PASS",
+      "evidence": "Opens with \"Probably none yet\" and \"Check whether you have an actual gap first,\" then lists specific questions (trace across calls, aggregate latency, token cost, multi-service) to determine what can't currently be answered; ends by asking which question is unanswerable.",
+      "criterion": "Check the actual capability gap."
+    },
+    {
+      "n": 2,
+      "verdict": "PASS",
+      "evidence": "Recommends extending existing logs with trace IDs, structured JSON logs, a small timing decorator, and logging usage fields the API already returns before adding any framework; escalation ladder starts with existing logs.",
+      "criterion": "Prefer reuse of existing functionality."
+    },
+    {
+      "n": 3,
+      "verdict": "PASS",
+      "evidence": "States a large framework \"would add a dependency, a service or account, new credentials, possible data egress of prompts and tool outputs, and ongoing maintenance\"; also advises deciding up front what data can leave and redacting it.",
+      "criterion": "Identify maintenance and dependency costs."
+    }
+  ],
+  "score": 1.0,
+  "case_pass": true,
+  "judge_cost_usd": 0.009364
+}

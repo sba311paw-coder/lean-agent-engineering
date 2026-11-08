@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-01__original__baseline__r1",
+  "case_id": "activation-negative-01",
+  "case_number": 2,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "What is an LLM?",
+  "response": "An **LLM (large language model)** is a type of AI system trained on huge amounts of text to understand and generate human language.\n\n**How it works**\n- **Training:** The model learns patterns in language by predicting the next piece of text (a \"token\") across billions or trillions of words from books, websites, code, and more.\n- **Architecture:** Most modern LLMs use the *transformer* architecture, which uses \"attention\" to weigh how relevant each word is to others in the context.\n- **Parameters:** The model's learned knowledge is stored in billions of numerical values called parameters. \"Large\" refers to this scale.\n- **Fine-tuning:** After initial training, models are often refined with human feedback and other techniques so they follow instructions, are more helpful, and avoid harmful outputs.\n\n**What they can do**\n- Answer questions and explain concepts\n- Write and edit text\n- Summarize documents\n- Translate languages\n- Write, debug, and explain code\n- Reason through problems and use tools when connected to them\n\n**Limitations**\n- They can state incorrect information confidently (often called \"hallucination\").\n- Their knowledge is limited to their training data unless given search or other tools.\n- They can reflect biases present in training data.\n- They have a limited context window, meaning how much text they can consider at once.\n\n**Examples:** Claude (Anthropic), GPT (OpenAI), Gemini (Google), and Llama (Meta).\n\nIn short, an LLM is a statistical model of language that, at scale, develops surprisingly broad abilities in reasoning, writing, and problem-solving.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 506,
+      "cacheReadInputTokens": 640,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.005128,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 640,
+    "output_tokens": 506,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 506,
+        "cache_read_input_tokens": 640,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.005128,
+  "duration_ms": 4658
+}

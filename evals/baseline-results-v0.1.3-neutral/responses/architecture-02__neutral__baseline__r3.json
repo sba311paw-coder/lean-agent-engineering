@@ -1,0 +1,66 @@
+{
+  "key": "architecture-02__neutral__baseline__r3",
+  "case_id": "architecture-02",
+  "case_number": 17,
+  "category": "architecture",
+  "expected_activation": true,
+  "variant": "neutral",
+  "condition": "baseline",
+  "round": 3,
+  "prompt": "My weather tool returns the correct temperature and I can see it in the logs, but the final answer ignores it and gives a generic reply. How do I fix this?",
+  "response": "When the tool runs and logs correctly but the answer is generic, the result usually isn't reaching the model in the format it expects. Check these in order of likelihood:\n\n**1. The tool result isn't appended to the conversation**\nAfter the model emits a tool call, you must send a follow-up request that includes:\n- the assistant message containing the `tool_use` block (unchanged), and\n- a user message containing a `tool_result` block.\n\nIf you only log the result, or make the second call without the history, the model never sees it.\n\n```python\nmessages.append({\"role\": \"assistant\", \"content\": response.content})\nmessages.append({\n    \"role\": \"user\",\n    \"content\": [{\n        \"type\": \"tool_result\",\n        \"tool_use_id\": tool_use_block.id,   # must match the tool_use id\n        \"content\": \"72\u00b0F, sunny in Paris\",   # string or content blocks\n    }],\n})\nfinal = client.messages.create(model=..., messages=messages, tools=tools, ...)\n```\n\n**2. Mismatched or missing `tool_use_id`**\nThe ID in `tool_result` must exactly match the `id` of the `tool_use` block. A wrong ID typically causes an error, but some frameworks swallow it and fall back to a generic reply.\n\n**3. The result is empty or badly serialized**\nLogging may show the right value before it's transformed. Check what is actually sent:\n- Returning a Python object, `None`, or a coroutine/promise instead of a string or JSON (e.g. you forgot `await`, or `json.dumps`).\n- Result shows as `[object Object]` or `<coroutine ...>`.\n- Nesting the value under a key the model doesn't find meaningful, such as `{\"data\": {\"t\": 22}}` with no units or location. Return something self-explanatory, such as `{\"location\": \"Paris\", \"temp_c\": 22, \"conditions\": \"sunny\"}`.\n\n**4. You're returning the first response instead of the second**\nA common bug: the code prints or returns `response.content[0].text` from the first call (the model's pre-tool text like \"Let me check the weather\") rather than from the call made after the tool result. Make sure you loop until `stop_reason != \"tool_use\"` and return the last response.\n\n**5. Framework-specific issues**\nIn LangChain, LlamaIndex, the Agent SDK, etc.:\n- The tool's return value may be discarded if the function doesn't `return` it (only prints/logs).\n- Streaming handlers may only capture the first text segment.\n- A system prompt like \"answer from general knowledge\" or a low `max_tokens` can cause the model to skip the result.\n\n**6. Prompt reinforcement (last resort)**\nIf everything above is correct, add to the system prompt: \"Use the tool results to answer, and state the specific values returned.\"\n\n**Fastest way to diagnose:** print the exact `messages` array right before the second API call. If you can see the `tool_result` with the temperature there, the problem is in your prompt or output handling. If not, it's the plumbing (1\u20134).\n\nIf you share the code for your tool loop and the framework you use, I can point at the exact line.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1068,
+      "cacheReadInputTokens": 682,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.010752199999999998,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 71,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 682,
+    "output_tokens": 1068,
+    "output_tokens_details": {
+      "thinking_tokens": 71
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1068,
+        "cache_read_input_tokens": 682,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.010752199999999998,
+  "duration_ms": 9631
+}

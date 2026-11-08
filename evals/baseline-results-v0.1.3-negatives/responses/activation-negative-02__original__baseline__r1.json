@@ -1,0 +1,66 @@
+{
+  "key": "activation-negative-02__original__baseline__r1",
+  "case_id": "activation-negative-02",
+  "case_number": 4,
+  "category": "activation",
+  "expected_activation": false,
+  "variant": "original",
+  "condition": "baseline",
+  "round": 1,
+  "prompt": "Explain what tool calling is in AI.",
+  "response": "# Tool Calling in AI\n\n**Tool calling** (also called *function calling*) is a capability that lets a language model request that external code or services be run on its behalf, instead of only generating text from what it learned in training.\n\n## Why it exists\n\nA language model on its own can't check live data, run calculations reliably, query a database, or take actions in the world. Tool calling bridges that gap by letting the model say \"I need to use this function with these arguments,\" while your application does the actual work.\n\n## How it works\n\n1. **You define tools.** You give the model a list of available tools, each with a name, a description, and a schema for its parameters (usually JSON Schema).\n\n   ```json\n   {\n     \"name\": \"get_weather\",\n     \"description\": \"Get current weather for a city\",\n     \"input_schema\": {\n       \"type\": \"object\",\n       \"properties\": { \"city\": { \"type\": \"string\" } },\n       \"required\": [\"city\"]\n     }\n   }\n   ```\n\n2. **The model decides.** Given a user message such as \"What's the weather in Paris?\", the model recognizes a tool would help and responds with a structured request, e.g. `get_weather({\"city\": \"Paris\"})`, rather than a plain text answer.\n\n3. **Your code executes it.** The model doesn't run anything itself. Your application (or the platform) calls the real API or function.\n\n4. **You return the result.** The output is sent back to the model as a tool result.\n\n5. **The model responds.** It uses the result to write a final answer: \"It's 14\u00b0C and cloudy in Paris.\"\n\nThis loop can repeat multiple times, with the model chaining several tool calls to complete a task.\n\n## Common uses\n\n- **Retrieving information:** web search, database queries, document lookup (as in RAG)\n- **Taking actions:** sending emails, creating calendar events, filing tickets\n- **Computation:** running code, calculators, data analysis\n- **Controlling software:** editing files, running shell commands, browsing (the basis of AI agents)\n- **Structured output:** forcing responses into a specific JSON format\n\n## Key points\n\n- The model **chooses** when and how to call tools, but **doesn't execute** them.\n- Good tool names, descriptions, and parameter schemas greatly improve how reliably the model uses them.\n- Models can sometimes pick the wrong tool or pass bad arguments, so validate inputs and be careful with tools that have side effects (deleting data, spending money). Requiring user confirmation for risky actions is common.\n- Tool calling is the foundation of **agents**: systems where a model loops through reasoning, calling tools, and observing results until a goal is met.\n- Standards like the **Model Context Protocol (MCP)** exist to make tools reusable across different AI applications.\n\n## In one sentence\n\nTool calling lets an AI model turn a natural-language request into a structured call to external functions, so it can fetch real data and take real actions, then use the results to answer.",
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 924,
+      "cacheReadInputTokens": 646,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0093086,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "cacheCreationEphemeral5mInputTokens": 0,
+      "cacheCreationEphemeral1hInputTokens": 0,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 646,
+    "output_tokens": 924,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 924,
+        "cache_read_input_tokens": 646,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "cost_usd": 0.0093086,
+  "duration_ms": 9187
+}
