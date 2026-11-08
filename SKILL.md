@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Works with skills-compatible AI agents. Requires no specific model, API, framework, network access, or paid service.
 metadata:
   author: HumanInTheLoopAI
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # Lean Agent Engineering
@@ -263,3 +263,31 @@ A task is complete when:
 
 Never claim success solely because code was written or a command exited
 without an error.
+
+## Examples
+
+**Example 1 — "Should I add an MCP server for this?"**
+
+Request: "My agent needs to read files in the project folder. Should I
+add a filesystem MCP server?"
+
+Good response:
+1. Missing capability: read project files.
+2. Existing system: the agent already has a file-read tool scoped to
+   the project.
+3. A new MCP server would add a process, a dependency, and broader file
+   permissions for no new capability.
+4. Decision: reuse the existing tool; add nothing.
+5. Verify: have the agent read one known file and check the contents match.
+
+**Example 2 — "The agent said it saved the file, but it isn't there."**
+
+Good response:
+1. Trace the boundaries: the LLM emitted a correct write call; the
+   application logged "success"; the file is missing.
+2. First wrong boundary: the application treats any tool return as
+   success and never checks the result.
+3. Fix: the application checks that the file exists and is non-empty
+   after the write, and reports failure otherwise.
+4. Verify: rerun the same task, then force a failure (read-only folder)
+   and confirm the agent reports it instead of claiming success.

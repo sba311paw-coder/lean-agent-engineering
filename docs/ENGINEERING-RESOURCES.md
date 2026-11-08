@@ -6,6 +6,12 @@ See [architecture diagrams and options](ARCHITECTURE-OPTIONS.md) for the applica
 
 A concrete anticipated future use can justify building a bounded optional capability before a current failure occurs. Describe the use, alternatives, prerequisites, maintenance, activation policy, and verification. Simplicity remains a design preference, not a ban on useful future functionality. Credentials, paid usage, external data, and production authority are separate decisions.
 
+## Standing efficiency policy — 10-29-2026
+
+For current and future projects, first define the outcome and challenge whether each requirement, dependency, or proposed prompt is needed. Prefer existing capabilities and the simplest architecture that meets the real need safely. Combine compatible steps and reuse relevant verified evidence; repeat an audit when a material change or unresolved risk justifies it. Select model and reasoning effort appropriate to the difficulty, and define acceptance and stop criteria before work begins. Preserve essential authorization, security, backup, and risk-based verification gates; efficiency does not excuse missing necessary work. Raise proposed simplifications for a decision when they affect the objective or boundaries.
+
+This is a project policy addendum; it does not change the released skill instructions, version, or historical evaluation results.
+
 ## Ordered engineering backlog
 
 1. Maintain source-linked documentation and learning references.

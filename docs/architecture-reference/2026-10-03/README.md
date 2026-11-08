@@ -39,7 +39,6 @@ The model proposes; application code enforces authority. Tool execution and veri
 - [Reference technology profile](docs/TECHNOLOGY_DECISIONS.md)
 - [Cost policy](docs/COST_POLICY.md)
 - [Safety, evaluations, and operations](docs/SAFETY_AND_OPERATIONS.md)
-- [Push to GitHub](PUSH_TO_GITHUB.md)
 
 The technology profile retains the user's agreed local Mac/Python/n8n and provider strategy as the initial reference profile. It is not a universal requirement for every application. Codex is the user's default coding worker; Claude/Gemini are targeted reviewers. Colab is a lab; MCP is an optional adapter. No Devin or new paid subscription without a proven capability gap.
 

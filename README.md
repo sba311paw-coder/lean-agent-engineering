@@ -1,10 +1,8 @@
 # Lean Agent Engineering
 
-[Architecture diagrams and options](docs/ARCHITECTURE-OPTIONS.md) — editable boundary, implementation choices, and evidence loop.
-
 Build reliable AI agents with the minimum complexity necessary.
 
-Version **0.1.2** · Author **HumanInTheLoopAI** · [Apache-2.0](LICENSE)
+Version **0.1.3** · Author **HumanInTheLoopAI** · [Apache-2.0](LICENSE)
 
 This is a portable instruction skill for engineering AI and agentic software.
 It helps an agent reuse existing capabilities, locate failures, preserve
@@ -12,7 +10,9 @@ authorization boundaries, and verify outcomes before claiming completion.
 
 ## Use the skill
 
-For the current source-linked engineering backlog, evaluation/tracing contracts, and future capability policy, see [Engineering resources and future capabilities](docs/ENGINEERING-RESOURCES.md), updated 10-15-2026. This documentation addendum does not change skill version 0.1.2 or its historical evaluation evidence.
+For the current source-linked engineering backlog, evaluation/tracing contracts, and future capability policy, see [Engineering resources and future capabilities](docs/ENGINEERING-RESOURCES.md), updated 10-29-2026. This documentation addendum does not change the skill's instructions or its historical evaluation evidence.
+
+[Architecture diagrams and options](docs/ARCHITECTURE-OPTIONS.md) — editable boundary, implementation choices, and evidence loop.
 
 Place this folder, named `lean-agent-engineering`, in a skill directory
 supported by your agent client. Follow that client's discovery or reload
@@ -63,10 +63,10 @@ Document editions are separate from skill versions.
 
 | Document | Edition/version | Created here | Last updated | Status |
 |---|---|---|---|---|
-| [Canonical skill](SKILL.md) | 0.1.2 | 2026-09-12 | 2026-09-27 | Current; 0.1.2 adds one activation-boundary sentence |
+| [Canonical skill](SKILL.md) | 0.1.3 | 2026-09-12 | 2026-11-08 | Current; 0.1.3 adds two worked examples; not re-evaluated |
 | [18-case evaluation JSON](evals/evals.json) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Historical baseline |
 | [Minimal-agent example](examples/minimal-agent.md) | Skill 0.1.1 | 2026-09-12 | 2026-09-12 | Current; unchanged |
-| [README](README.md) | Skill 0.1.2 | 2026-09-12 | 2026-09-27 | Current |
+| [README](README.md) | Skill 0.1.3 | 2026-09-12 | 2026-11-08 | Current |
 | [Baseline script](evals/baseline_cli.py) | Skill 0.1.1 and 0.1.2 runs | 2026-09-26 | 2026-09-26 | Current |
 | [Neutral prompts](evals/neutral-prompts.json) | Skill 0.1.1 run | 2026-09-26 | 2026-09-26 | Current |
 | [Baseline results](evals/baseline-results/summary.md) | Skill 0.1.1 | 2026-09-26 | 2026-09-26 | Current |
@@ -76,9 +76,14 @@ Document editions are separate from skill versions.
 | [Gate 3 review](evals/gate-3-portability-consistency.md) | Gate 3 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
 | [Gate 4 evaluation record](evals/gate-4-production-reliability.md) | Gate 4 record; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
 | [Evaluation results PDF](docs/lean-agent-engineering-v0.1.1-project-record-through-gate-4.pdf) | 2026-09-20 edition; skill 0.1.1 | 2026-09-20 | 2026-09-20 | Current |
+| [Engineering resources](docs/ENGINEERING-RESOURCES.md) | Documentation addendum | 2026-10-15 | 2026-10-29 | Current |
+| [Architecture options](docs/ARCHITECTURE-OPTIONS.md) | Documentation addendum | 2026-10-15 | 2026-10-15 | Current |
+| [Architecture reference](docs/architecture-reference/2026-10-03/README.md) | 2026-10-03 edition | 2026-10-03 | 2026-10-03 | Historical |
+| [Changelog](CHANGELOG.md) | Skill 0.1.3 | 2026-11-08 | 2026-11-08 | Current |
 
 The Apache-2.0 `LICENSE` remains unchanged since 2026-09-12. `.gitignore`
-was updated on 2026-09-20 to exclude the older project PDF. Neither is a
+was updated on 2026-09-20 to exclude the older project PDF, and again on
+2026-11-08 to ignore local tool cache and `CLAUDE.local.md`. Neither is a
 separately versioned evaluation document.
 
 The skill's discovery description was refined after the Gate evaluations,
@@ -209,6 +214,10 @@ separate in their respective reviews; scores across gates should not be combined
 ## Package
 
 - [SKILL.md](SKILL.md): agent instructions and metadata.
+- [CHANGELOG.md](CHANGELOG.md): release history.
+- [docs/ENGINEERING-RESOURCES.md](docs/ENGINEERING-RESOURCES.md): engineering backlog and future-capability policy.
+- [docs/ARCHITECTURE-OPTIONS.md](docs/ARCHITECTURE-OPTIONS.md): architecture diagrams and implementation options.
+- [docs/architecture-reference/2026-10-03/](docs/architecture-reference/2026-10-03/README.md): historical architecture reference.
 - [evals/evals.json](evals/evals.json): prompts, criteria, and historical status.
 - [evals/gate-2-robustness-safety.md](evals/gate-2-robustness-safety.md):
   twelve scenario reviews and evidence limitations.

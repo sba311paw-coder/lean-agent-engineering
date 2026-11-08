@@ -6,6 +6,10 @@
 *.swp
 *~
 
+# Local tool cache and private working rules
+.serena/
+CLAUDE.local.md
+
 # Credentials and private local configuration
 .env
 .env.*
