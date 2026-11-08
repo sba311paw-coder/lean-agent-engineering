@@ -2,6 +2,8 @@
 
 Build reliable AI agents with the minimum complexity necessary.
 
+![Workflow diagram of the lean loop: Define the gap, then Check what exists. If it exists, reuse it and go straight to Verify. If there is a real gap, make the smallest safe fix, then Verify. If verification fails, fix the root cause and verify again. When it passes, ship.](docs/images/core-loop.svg)
+
 Version **0.1.3** · Author **HumanInTheLoopAI** · [Apache-2.0](LICENSE)
 
 This is a portable instruction skill for engineering AI and agentic software.
